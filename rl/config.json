@@ -1,0 +1,14 @@
+{
+  "hidden": 64,
+  "lr": 0.0003,
+  "gamma": 0.99,
+  "gae_lambda": 0.95,
+  "clip": 0.2,
+  "value_coef": 0.5,
+  "entropy_coef": 0.01,
+  "max_grad_norm": 0.5,
+  "epochs": 2,
+  "batch_size": 32,
+  "rollout_steps": 128,
+  "prep_budget": 128
+}
