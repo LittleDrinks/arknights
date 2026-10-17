@@ -53,12 +53,16 @@ def main():
                             pass
                     peak = max(peak, rss)
                     current_size = 0
-                    for path in out.rglob('*'):
-                        try:
-                            if path.is_file() and not path.is_symlink():
-                                current_size += path.stat().st_size
-                        except FileNotFoundError:
-                            pass
+                    # Each test removes its own temporary tree while the supervisor samples.
+                    # os.walk tolerates a directory disappearing before scandir enters it.
+                    for parent, _, names in os.walk(out):
+                        for name in names:
+                            path = Path(parent) / name
+                            try:
+                                if path.is_file() and not path.is_symlink():
+                                    current_size += path.stat().st_size
+                            except FileNotFoundError:
+                                pass
                     size = max(size, current_size)
                     if time.monotonic() - start >= 20:
                         error = '20-second limit'
