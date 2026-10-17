@@ -10,8 +10,9 @@
 队友 `prepSteps` 沿用提取器的 `observable-teammate-teacher` 假设：按观察到且被接受的
 队友购物调用计步，没有真实安装独立 teacher 去验证 scheduler/清理/预算计步等价。
 
-输入接口来自独立工作树 `experiment-winning-labels/winning-labels/evidence/`，
-其 `17225e4` 尚在独立 review。程序始终记录 `interface-checked-independent-review-record-external`；
+部署输入使用 `experiment-code/winning-labels/verified-v2/`，提取器最终版本
+`38ffcde` 已独立复审通过，main 合入为 `db96898`。旧 `evidence/` 保留原始来源供审计。
+程序始终记录 `interface-checked-independent-review-record-external`；
 audit/哈希/契约通过不等于输入已批准，也不代替其独立 review。这里不提供“自动批准”开关。
 metadata 原有 provenance、limitations、完整终局、四席胜负和提取计数全部原样保留。
 
@@ -20,13 +21,13 @@ metadata 原有 provenance、limitations、完整终局、四席胜负和提取�
 `--root` 是数据部署根，须有 `game/` 或 `Stronghold-Protocol/` 中的唯一规则仓库；代码自动从 `--root` 或
 `--root/experiment-code` 查找，歧义时传 `--experiment-code`。所有相对路径参数（包括
 `--input-dir`）均相对 `--root`，也接受绝对路径。无开发工作树绝对路径硬编码。
-先由 main 将完整 evidence 放到下例的 `--root/winning-labels/evidence/`，将 primary
+先由 main 将完整 verified-v2 放到下例的 `--root/experiment-code/winning-labels/verified-v2/`，将 primary
 参考文件放到 `--root/experiments/`；若部署在代码目录内，应明确传对应路径。
 
 ```bash
 python3 -B experiment-code/survivor-study/run.py train \
   --root /data1/zsm/arknights \
-  --input-dir winning-labels/evidence \
+  --input-dir experiment-code/winning-labels/verified-v2 \
   --primary experiments/coop-training-win-primary-labels-reference.jsonl.gz \
   --out experiments/survivor-ablation-v1 \
   --parent experiments/bc-expansion-v1/all.pt
