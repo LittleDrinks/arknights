@@ -1,0 +1,10 @@
+test_baseline_is_original_and_masks (__main__.Contracts.test_baseline_is_original_and_masks) ... ok
+test_dataset_admission_and_truncated_tails (__main__.Contracts.test_dataset_admission_and_truncated_tails) ... ok
+test_full_terminal_admission (__main__.Contracts.test_full_terminal_admission) ... ok
+test_paired_training_cli_reload_and_state_preference (__main__.Contracts.test_paired_training_cli_reload_and_state_preference) ... ok
+test_planned_failure_denominator_cli (__main__.Contracts.test_planned_failure_denominator_cli) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 1.326s
+
+OK
