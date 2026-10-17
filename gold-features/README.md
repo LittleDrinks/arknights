@@ -23,7 +23,7 @@ GOLD_FEATURES_ROOT=/absolute/experiment-code GOLD_FEATURES_MODE=off \
 
 `convertBeforeAction(features, oldSchema, {timing: 'before-action', own}, mode)` 是纯离线接口，返回 `{schema, features}`。只能传该 sample **实际动作前**捕获的 own；timing 标签不能认证快照真实性。不能传终局 own、其他时刻 own，或用终局 gold 回填。旧自然 teacher demos 只有编码/action/round，没有逐 sample own 快照；history 的 `visiblePiecesAfter` 也不是替代品。旧数据必须重采样。
 
-`recapture.py` 是 Python 3.10 标准库 CLI，导入不运行游戏。接受 `collect-natural-coop-teachers.py` 已结束并冻结的 manifest（显式 SHA256、finishedAt，允许整体 incomplete/failed，但所选行必须 complete 且是合格正例）及 JSON gzip 路径列表；相对路径相对于 manifest 目录，文件名不作为胜例证据。核验完整 2048 seed/pool 计划身份、所有原 `rl/coop` 源码和 collector SHA、所选 gzip SHA/长度、原终局和正例资格。源码路径通过 `--root` 和 `--collector` 映射，旧 artifact 路径仍须在 manifest 所指位置。
+`recapture.py` 是 Python 3.10 标准库 CLI，导入不运行游戏。接受 `collect-natural-coop-teachers.py` 已结束并冻结的 manifest（显式 SHA256、finishedAt，允许整体 complete/incomplete，拒绝 failed，但所选行必须 complete 且是合格正例）及 JSON gzip 路径列表；相对路径相对于 manifest 目录，文件名不作为胜例证据。核验完整 2048 seed/pool 计划身份、所有原 `rl/coop` 源码和 collector SHA、所选 gzip SHA/长度、原终局和正例资格。源码路径通过 `--root` 和 `--collector` 映射，旧 artifact 路径仍须在 manifest 所指位置。
 
 ```sh
 python3.10 /absolute/experiment-code/gold-features/recapture.py \
