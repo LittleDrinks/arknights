@@ -45,11 +45,13 @@ complete 批次不得含 failed/not-run；失败行必须有 error，已运行�
 - 文件名绑定 pool/seed，compressed bytes/SHA 匹配，读到全部 gzip member 的真实 EOF，
   校验 CRC/trailer，拒绝截断、垃圾尾、多 JSON、重复 key、非有限数、缺失末尾换行。
 - 原 demo 字段、teacher、shop-v1 schema、RULES 一致；全部标签维度/有限值/mask/action
-  合法，round 为按序的 1..14 整数；accepted/missing/rejected steps 计数兼容原 recorder。
+  合法，round 为按序的 1..15 整数；accepted/missing/rejected steps 计数兼容原 recorder。
 - 完整 terminal 的 episode/summary/observation learner seat、四席身份、各席 alive/victory/
   roundsPassed/eliminatedRound、team victory、reward、诊断镜像及 row 结果逐项核对。
-  teacher 入场严格要求 summary、engine、action、controller、controllerDiagnostic、
-  partnerAction 的错误计数均为整数零；出现错误的 complete artifact 会使整次训练失败。
+  summary、engine、action 的错误计数须为整数零；控制器/伙伴拒绝须满足固定守卫已确认的
+  pure-validation、无状态变化/无效果派发形状及完整计数/镜像一致性，原始诊断不清零。
+  原生拒绝可为 {error: HAND_FULL} 而无 ok 字段；明确 ok:true 或未知/副作用拒绝仍失败。
+  第15轮隐藏关终局与标签保留审计；既定14轮positive selector将其排除而不阻断整批。
 - 固定 coop/ABYSS/budget128、train split、poolSeed313、三席 partner id/family、
   pool.json 的 JS-compatible SHA；manifest 中全体 rl/coop `.py/.mjs/.json` 的 capture SHA，
   以及唯一 collector 脚本 SHA 均与 `pins.json` 绑定。
@@ -134,3 +136,5 @@ python3 -B natural-win-bc/check.py
 
 
 采集器独立审计发现 lane 异常退出可能丢失尚未发布的整段结果，not-run 不能据此确认未执行。本入口因此拒绝整体 failed 批次，并在任何导入前核对全部 .json.gz 文件名恰好等于 manifest 声明的产物集合；未知/孤立/缺失产物需独立对账，不自动提升为训练正例。原始失败清单和文件均保留，不编辑仍在运行的采集器。
+
+复审修复将共享终局验证器的原生拒绝格式、死亡轮次/存活关系及主席 observation 对照一并修正，范围扩展到 survivor-study/common.py 和其合成 fixture；natural-win-bc/pins.json 已重新固定该依赖 SHA。既有游戏/rl/coop源码未改，历史训练/评估结果不重写。末尾冻结复核再次对全部 raw 文件集合做相等检查。

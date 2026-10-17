@@ -186,8 +186,14 @@ def terminal_contract(t, *, seed, steps, schema):
         require(type(a['rejected']) is int and a['rejected'] == len(a['rejections']), 'Partner rejection count')
         rejects.extend(a['rejections'])
     require(t['partnerActionErrors'] == sum(a['rejected'] for a in audits.values()), 'Partner rejection total')
-    require(all(r['diagnostic'] is True and r['reason'] == 'pure-validation' and r['result']['ok'] is False
-                for r in rejects), 'Non-diagnostic rejection')
+    # Native validation sometimes returns {error: CODE} with no `ok` property.
+    # Keep these actual rejections and all counters; accept only the already guarded
+    # pure-validation shape, never an explicit success or a missing error reason.
+    require(all(r['diagnostic'] is True and r['reason'] == 'pure-validation' and
+                isinstance(r.get('result'), dict) and
+                ('ok' not in r['result'] or r['result']['ok'] is False) and
+                isinstance(r['result'].get('error'), str) and bool(r['result']['error']) and
+                not r.get('pathdiff') for r in rejects), 'Non-diagnostic rejection')
     diagnostics = e['diagnostics']
     for k in ('partnerAudit', 'partnerActionErrors', 'controllerDiagnosticErrors', 'rejectedActions',
               'controllerBlockedMoves', 'controllerBlockedMoveReasons', 'filteredMoves'):
@@ -200,7 +206,16 @@ def terminal_contract(t, *, seed, steps, schema):
                 0 <= p['roundsPassed'] <= s['roundsPassed'] and
                 (p['eliminatedRound'] is None or type(p['eliminatedRound']) is int), 'Individual terminal outcome')
         require(all(k in p for k in ('lineup', 'bonds', 'stats')), 'Missing full player terminal')
+        require(p['victory'] is (s['victory'] and p['alive']), 'Individual/team survival mismatch')
+        require((p['alive'] and p['eliminatedRound'] is None and p['roundsPassed'] == s['roundsPassed']) or
+                (not p['alive'] and type(p['eliminatedRound']) is int and p['eliminatedRound'] >= 1 and
+                 p['roundsPassed'] == max(0, p['eliminatedRound'] - 1)), 'Elimination/rounds mismatch')
     require(t['observation']['public']['phase'] == 'RESULT' and t['observation']['own']['playerId'] == 'learner'
             and t['observation']['own']['seat'] == 0 and t['candidates'] == [], 'Terminal observation/seat')
     features(t['features'], dimensions(schema), terminal=True)
-    return next(p for p in ps if p['seat'] == 0)
+    primary = next(p for p in ps if p['seat'] == 0)
+    require(t['observation']['own'].get('alive') is primary['alive'], 'Primary observation/summary alive mismatch')
+    require(t['observation']['own'].get('lp') == primary.get('lp') and
+            type(primary.get('lp')) in (int, float) and
+            type(t['observation']['own'].get('lp')) in (int, float), 'Primary observation/summary LP mismatch')
+    return primary

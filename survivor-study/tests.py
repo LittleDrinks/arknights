@@ -34,9 +34,10 @@ def terminal(seed=50003, steps=68):
                              roundsPassed=14, reason='victory', players=[
                                  dict(playerId='learner' if i == 0 else f'partner-{i}', seat=i,
                                       victory=i in (1, 2), alive=i in (1, 2), roundsPassed=14 if i in (1, 2) else 10,
-                                      eliminatedRound=None if i in (1, 2) else 11, lineup=[], bonds=[], stats={})
+                                      eliminatedRound=None if i in (1, 2) else 11, lp=1 if i in (1, 2) else 0,
+                                      lineup=[], bonds=[], stats={})
                                  for i in range(4)]),
-                observation=dict(public=dict(phase='RESULT'), own=dict(playerId='learner', seat=0)),
+                observation=dict(public=dict(phase='RESULT'), own=dict(playerId='learner', seat=0, alive=False, lp=0)),
                 features=dict(global_=[]), candidates=[], engineErrors=0, actionErrors=0, controllerErrors=0, **diagnostics)
 
 

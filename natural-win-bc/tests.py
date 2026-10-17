@@ -30,12 +30,13 @@ def terminal(seed=30001, alive=True, split='train', pool='normal', steps=2):
                     manifestSHA256=POOL, seats=[dict(seat=i + 1, id=x, family=families[x]) for i, x in enumerate(team)])
     players = [dict(playerId='learner' if i == 0 else f'partner-{i}', seat=i, victory=alive or i > 0,
                     alive=alive or i > 0, roundsPassed=14 if alive or i > 0 else 10,
-                    eliminatedRound=None if alive or i > 0 else 11, lineup=[], bonds={}, stats={}) for i in range(4)]
+                    eliminatedRound=None if alive or i > 0 else 11, lp=1 if alive or i > 0 else 0,
+                    lineup=[], bonds={}, stats={}) for i in range(4)]
     return dict(done=True, schema=SCHEMA, rules=C.RULES, steps=steps, rounds=14, reward=1, victory=True,
                 episode=dict(seed=seed, mode='coop', difficulty='ABYSS', budget=128, diagnostics=diag, partners=partners),
                 summary=dict(seed=seed, modeId='mode_multi_abyss', difficulty='ABYSS', victory=True, errors=0,
                              roundsPassed=14, reason='victory', players=players),
-                observation=dict(public=dict(phase='RESULT'), own=dict(playerId='learner', seat=0)),
+                observation=dict(public=dict(phase='RESULT'), own=dict(playerId='learner', seat=0, alive=alive, lp=1 if alive else 0)),
                 features={'global': [0] * 90, 'candidates': [], 'mask': []}, candidates=[],
                 engineErrors=0, actionErrors=0, controllerErrors=0, **diag)
 
@@ -111,6 +112,12 @@ class Contracts(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'Unregistered or missing raw artifacts'):
             admit(directory, C.sha(directory / 'manifest.json'), GAME, POOL,
                   Evidence(C.new_output(self.base / 'orphan-rejected')))
+        orphan.unlink()  # This test's own temporary file only.
+        _, metadata = admit(directory, C.sha(directory / 'manifest.json'), GAME, POOL,
+                            Evidence(C.new_output(self.base / 'before-late-orphan')))
+        orphan.write_bytes(gzip.compress(b'{}\n'))
+        with self.assertRaisesRegex(ValueError, 'file set changed'):
+            recheck(directory, metadata['inputFiles'])
 
     def test_frozen_rejects_running_partial_plan_source_and_hash(self):
         directory, original = fixture(self.base)
@@ -148,6 +155,34 @@ class Contracts(unittest.TestCase):
         with self.assertRaises(ValueError):
             Evidence(C.new_output(self.base / 'small'), limit=1).put('x', b'xx')
 
+    def test_native_validation_shapes_and_hidden_round_are_auditable(self):
+        directory, m = fixture(self.base)
+        row = m['games'][0]
+        d = demo()
+        t = d['terminal']
+        rejection = dict(method='pickReward', diagnostic=True, reason='pure-validation', result={'error': 'HAND_FULL'})
+        audit = t['partnerAudit']['partner-1']
+        audit.update(rejected=1, rejections=[rejection])
+        t['partnerActionErrors'] = t['episode']['diagnostics']['partnerActionErrors'] = 1
+        before = copy.deepcopy(d)
+        self.assertTrue(complete_contract(d, row, GAME, POOL))
+        self.assertEqual(d, before)  # Never zero counters or normalize the saved raw response.
+        rejection['result']['ok'] = True
+        with self.assertRaisesRegex(ValueError, 'Non-diagnostic'):
+            complete_contract(d, row, GAME, POOL)
+        rejection['result']['ok'] = False
+        self.assertTrue(complete_contract(d, row, GAME, POOL))
+        rejection['diagnostic'] = False
+        with self.assertRaisesRegex(ValueError, 'Non-diagnostic'):
+            complete_contract(d, row, GAME, POOL)
+        hidden = demo()
+        hidden['terminal']['rounds'] = hidden['terminal']['summary']['roundsPassed'] = 15
+        for p in hidden['terminal']['summary']['players']:
+            p['roundsPassed'] = 15
+        hidden['samples'][-1]['round'] = 15
+        hidden_row = {**row, 'rounds': 15, 'learnerRounds': 15, 'eligiblePositive': False}
+        self.assertFalse(complete_contract(hidden, hidden_row, GAME, POOL))
+
     def test_semantics_full_terminal_row_and_labels(self):
         directory, m = fixture(self.base)
         row, original = m['games'][0], demo()
@@ -161,6 +196,9 @@ class Contracts(unittest.TestCase):
                  lambda d: d['terminal'].update(steps=3),
                  lambda d: d['terminal']['summary']['players'][0].pop('lineup'),
                  lambda d: d['terminal']['summary']['players'][0].update(alive=False),
+                 lambda d: d['terminal']['observation']['own'].update(alive=False),
+                 lambda d: d['terminal']['observation']['own'].update(lp=999),
+                 lambda d: d['terminal']['summary']['players'][1].update(alive=False, victory=False, eliminatedRound=999),
                  lambda d: d.update(rejectedLabels=1), lambda d: d.update(teacher='other'),
                  lambda d: d['samples'][0].update(action=True),
                  lambda d: d['samples'][0]['features']['mask'].__setitem__(0, False),

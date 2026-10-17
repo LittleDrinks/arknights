@@ -49,9 +49,10 @@ def complete_contract(data, row, game, pool_manifest):
     C.require(type(t['steps']) is int and len(samples) <= t['steps'] <= len(samples) + data['rejectedLabels'],
               'Teacher accepted/missing/rejected step accounting')
     primary = C.terminal_contract(t, seed=row['seed'], steps=t['steps'], schema=game['schema'])
-    C.require(1 <= t['rounds'] <= 14, 'ABYSS terminal rounds')
-    # Admission is stricter than model eval: every teacher error counter must be zero.
-    for key in ('engineErrors', 'actionErrors', 'controllerErrors', 'controllerDiagnosticErrors', 'partnerActionErrors'):
+    C.require(1 <= t['rounds'] <= 15, 'ABYSS terminal rounds')
+    # C.terminal_contract retains and verifies pure validation diagnostics and aliases.
+    # They are not successful actions and do not invalidate unrelated positive episodes.
+    for key in ('engineErrors', 'actionErrors'):
         C.require(type(t[key]) is int and t[key] == 0, 'Teacher errors: ' + key)
     C.require(type(t['summary']['errors']) is int and t['summary']['errors'] == 0, 'Summary errors')
     partners = t['episode']['partners']
@@ -64,14 +65,14 @@ def complete_contract(data, row, game, pool_manifest):
         C.require(p['victory'] is (t['victory'] and p['alive']) and
                   (not p['alive'] or p['eliminatedRound'] is None), 'Individual vs team outcome consistency')
     if t['victory']:
-        C.require(t['rounds'] == 14 and t['summary']['reason'] == 'victory', 'Incomplete team victory')
+        C.require(t['rounds'] in (14, 15) and t['summary']['reason'] == 'victory', 'Incomplete team victory')
         C.require(any(p['victory'] for p in t['summary']['players']) and
-                  all(not p['alive'] or p['roundsPassed'] == 14 for p in t['summary']['players']),
+                  all(not p['alive'] or p['roundsPassed'] == t['rounds'] for p in t['summary']['players']),
                   'Winning team survivor outcomes')
     dims, previous = C.dimensions(game['schema']), 0
     for sample in samples:
         C.require(set(sample) == {'features', 'action', 'round'} and type(sample['round']) is int and
-                  previous <= sample['round'] <= 14 and sample['round'] >= 1, 'Label round metadata/order')
+                  previous <= sample['round'] <= 15 and sample['round'] >= 1, 'Label round metadata/order')
         previous = sample['round']
         C.sample_contract({k: sample[k] for k in ('features', 'action')}, dims)
     positive = (t['victory'] and primary['victory'] and primary['alive'] and
@@ -139,6 +140,8 @@ def admit(directory, expected, game, pool_manifest, evidence):
 
 
 def recheck(directory, identities):
+    C.require({p.name for p in directory.glob('*.json.gz')} == set(identities) - {'manifest.json'},
+              'Frozen raw file set changed')
     for name, identity in identities.items():
         p = directory / name
         C.require(p.stat().st_size == identity['bytes'] and C.sha(p) == identity['sha256'], 'Frozen input drift: ' + name)

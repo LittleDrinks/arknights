@@ -29,3 +29,5 @@ original/mixed, 64 scheduled dev games; no heldout families and no sealed seeds.
 
 
 Main 接手后针对采集器独立审计 P2 增加整体 failed 拒绝及 raw 文件集合对账，防止执行未知的 not-run 被误当冻结来源。新增整批失败/孤立产物拒绝回归，合成契约重跑通过；未修改采集器、游戏或现有 learner，未运行生产训练。
+
+复审7531ad6的3P2/1P3已针对固定规则修复：纯validation原生无ok拒绝格式与诊断计数保留；15轮数据审计但14轮selector排除；死亡轮次/通过轮次/团队与个人结果、primary observation alive/LP一致性；末尾raw集合再核对。共享终局合同因此修改，并更新依赖pin。9项合成契约与9项旧survivor契约通过；另静态读取2真实positive+3真实HAND_FULL负例，前者均selected、后者均不selected，全部raw逐字节序列化内容未改。未重新运行游戏/训练；批次已自然截止1486complete/8timeoutfailed/554notrun，不是2048有效局。
