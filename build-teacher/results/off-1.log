@@ -1,0 +1,31 @@
+(node:270232) ExperimentalWarning: `--experimental-loader` may be removed in the future; instead use `register()`:
+--import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("/home/q2635/research/stronghold-agent-2026-10-17/experiment-build-teacher/build-teacher/loader.mjs", pathToFileURL("./"));'
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+| config | run | matches | wins | rounds passed | LP left | reached boss | leaks/match | bounties (leaked) | funds lost/prep | merges/bot | errors |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| solo:ABYSS | run | 1 | 0 (0 %) | 13.00 | 9.0 | 1 | 21.0 | 3 (0) | 1.07 | 3.00 | 0 |
+
+| config | run | shop level R4/7/10/13 | board value R4/7/10/13 | Σ bond tiers | activated layers | elites deployed |
+|---|---|---|---|---|---|---|
+| solo:ABYSS | run | 2.0 / 3.0 / 5.0 / 6.0 | 21.0 / 28.0 / 30.0 / 38.0 | 2.0 / 6.0 / 6.0 / 5.0 | 4 / 37 / 89 / 277 | 1.0 / 2.0 / 2.0 / 3.0 |
+
+| config | run | leaks per alive bot and round R1…R15 |
+|---|---|---|
+| solo:ABYSS | run | 1:0.0 2:0.0 3:0.0 4:6.0 5:0.0 6:1.0 7:0.0 8:0.0 9:0.0 10:0.0 11:1.0 12:13.0 13:0.0 14:0.0 |
+
+| run | bounty kill-chance estimate (bot.bountyKillChance) → share of bounty enemies actually killed, picks per bin |
+|---|---|
+| run | p 0–0.2: 100 % (1) · p 0.5–0.8: 100 % (1) · p 0.95–1: 100 % (1) |
+
+| config | run | bounty picks | p < 0.5 picked while a p ≥ 0.5 card was offered | drafts with no card p ≥ 0.5 |
+|---|---|---|---|---|
+| solo:ABYSS | run | 3 | 0 | 1 |
+
+| config | run | bot preps | prep CPU ms p50 / p95 | heuristics CPU ms p50 / p95 | Σ prep CPU s | Σ heuristics CPU s | per match: prep CPU s |
+|---|---|---|---|---|---|---|---|
+| solo:ABYSS | run | 14 | 48.9 / 96.9 | 48.9 / 96.9 | 0.8 | 0.8 | 0.79 |
+
+| config | run | bot preps | prep ms p50 / p95 | heuristics ms p50 / p95 | rehearsal ms p50 / p95 | R1–R10 preps: prep / heuristics p50 / p95 | 机变 pick ms p50 / p95 (n) | match wall s |
+|---|---|---|---|---|---|---|---|---|
+| solo:ABYSS | run | 14 | 31.4 / 61.1 | 31.4 / 61.1 | 0.0 / 0.0 | 10: 19.9 / 52.4 · 19.9 / 52.4 | 0.72 / 2.77 (3) | 2.4 |
