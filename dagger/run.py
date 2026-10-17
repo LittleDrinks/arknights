@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Current-state DAgger collection and warm-start BC; all artifacts must live in /tmp."""
 import argparse
+import os
 import gzip
 import hashlib
 import json
@@ -34,8 +35,9 @@ def source_hashes():
 
 def artifact(path):
     p = Path(path).resolve()
-    if not p.is_relative_to('/tmp'):
-        raise ValueError('Artifacts must be under /tmp')
+    allowed = Path(os.environ.get('DAGGER_OUTPUT_ROOT', '/tmp')).resolve()
+    if not p.is_relative_to(allowed):
+        raise ValueError(f'Artifacts must be under {allowed}')
     p.parent.mkdir(parents=True, exist_ok=True)
     if p.exists() or Path(str(p) + '.manifest.json').exists():
         raise ValueError(f'Refusing to overwrite artifact: {p}')
@@ -128,7 +130,9 @@ def collect(args):
 
 
 def load_samples(path, ckpt, limit, existing=False):
-    samples, header, completed = [], None, set()
+    samples, header, completed, observed = [], None, set(), set()
+    def key(row):
+        return (None if existing else row['episode'], row['seed'], row['difficulty'])
     with stream(path, 'r') as f:
         for line in f:
             row = json.loads(line)
@@ -144,24 +148,45 @@ def load_samples(path, ckpt, limit, existing=False):
             elif row['type'] == 'error':
                 raise ValueError(f'Failed collection must not train: {path}')
             elif row['type'] == 'episode':
+                if not header:
+                    raise ValueError('Metadata must precede terminal')
+                episode_key = key(row)
+                if episode_key in completed:
+                    raise ValueError('Duplicate terminal record')
                 terminal = row if existing else row['terminal']
                 if any(terminal.get(k, 0) for k in ['engineErrors', 'actionErrors', 'controllerErrors']):
                     raise ValueError('Error episode must not train')
                 if not existing and (not terminal['done'] or terminal['summary'] is None
                                      or terminal['victory'] != bool(terminal['summary']['victory'])):
                     raise ValueError('Incomplete/inconsistent terminal')
-                completed.add((row['seed'], row['difficulty']))
-            elif row['type'] == 'sample' and len(samples) < limit:
+                if not existing:
+                    expected_seed = header['seed'] + row['episode']
+                    ep = terminal['episode']
+                    summary = terminal['summary']
+                    if (type(row['episode']) is not int or not 0 <= row['episode'] < header['episodesRequested']
+                            or row['seed'] != expected_seed or row['difficulty'] != header['difficulty']
+                            or ep['seed'] != row['seed'] or ep['difficulty'] != row['difficulty']
+                            or ep['budget'] != header['budget'] or ep['mode'] != 'solo'
+                            or summary.get('seed', row['seed']) != row['seed']):
+                        raise ValueError('Mismatched terminal identity')
+                completed.add(episode_key)
+            elif row['type'] == 'sample':
                 if not header:
                     raise ValueError('Metadata must precede samples')
+                observed.add(key(row))
+                # Keep validating the entire stream, even after the optimization
+                # sample cap: a trailing unfinished/error episode invalidates it.
                 L.validate_checkpoint(ckpt, {'schema': header['schema'], 'rules': header['rules'], 'features': row['features']})
                 if not existing and (row['action'] != row['teacherIndex'] or row['teacherHash'] != header['teacherHash']
                                      or row['teacherVersion'] != header['teacherVersion']):
                     raise ValueError('Teacher provenance mismatch')
-                samples.append({**row, 'source': 'existing-BC' if existing else 'dagger-current-state',
-                                'sourceFile': str(Path(path).resolve())})
-    if not header or not samples or any((s['seed'], s['difficulty']) not in completed for s in samples):
+                if len(samples) < limit:
+                    samples.append({**row, 'source': 'existing-BC' if existing else 'dagger-current-state',
+                                    'sourceFile': str(Path(path).resolve())})
+    if not header or not samples or not observed <= completed:
         raise ValueError('Missing metadata, samples, or complete episode record')
+    if not existing and completed != {(i, header['seed']+i, header['difficulty']) for i in range(header['episodesRequested'])}:
+        raise ValueError('Missing requested full episodes')
     return samples, {'path': str(Path(path).resolve()), 'sha256': sha(path),
                      'source': 'existing-BC' if existing else 'dagger-current-state',
                      'samples': len(samples), 'metadata': header}
