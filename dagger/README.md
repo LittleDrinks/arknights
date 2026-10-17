@@ -33,7 +33,7 @@ node dagger/env.mjs
 
 ## 收集、聚合、微调
 
-已有 Python/PyTorch/Node 即可。所有输出强制在 `/tmp`，拒绝覆盖现有文件；推荐 `.jsonl.gz`。seed 沿用 rl 的 `1..4294967295`，整个 episode seed 区间也校验。以下是本次实际执行的收集/训练参数；已有文件须换新输出名才能复跑：
+已有 Python/PyTorch/Node 即可。默认输出限制在 `/tmp`；服务器可用 `DAGGER_OUTPUT_ROOT=/data1/zsm/arknights` 明确指定项目输出根，拒绝覆盖现有文件；推荐 `.jsonl.gz`。seed 沿用 rl 的 `1..4294967295`，整个 episode seed 区间也校验。以下是本次实际执行的收集/训练参数；已有文件须换新输出名才能复跑：
 
 ```bash
 python3 -B dagger/run.py collect \
@@ -84,3 +84,5 @@ smoke 执行契约测试、一个完整模型自主局、最多32条标签的4�
 两项 Node 测试通过：真实状态四次教师单步执行、冻结输入、重复query、原features/candidates逐项相等、所有 Match RNG state及env view不变；另验合成优先级、mask、保护销售和刷新预算。测试只使用自然 reset/step，不把 snapshot 当 clone；评分单测是明确的人工 fixture，不计自然战绩。
 
 本次完成一轮最小纠偏，没有验证多轮收敛、beta>0自然完整局、旧BC混合训练或更新后胜率。NORMAL失败不能解释为策略提升；没有ABYSS成功，不作强教师或通关承诺。seed101已用于本地收集/契约检查，seed102用于BC RNG，不作为未见seed证据。提交后等待独立review。
+
+数据准入修复：DAgger 每条终局必须匹配 episode 编号、外层 seed/difficulty、内部 terminal.episode 及 summary.seed；同文件拒绝重复终局。读取完整文件并跟踪所有已观察 episode，即使超过优化样本上限，尾部未完成局仍拒绝，且要求 metadata 声明的全部请求局都有完整终态。
