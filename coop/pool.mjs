@@ -55,6 +55,8 @@ export function poolConfig(env = process.env) {
 export function selectTeam(config, seed) {
   uint32(seed, 'seed');
   const rng = localRng(config.poolSeed, `partners/${seed}`), ids = MANIFEST.pools[config.pool];
-  return Array.from({ length: 3 }, (_, i) => MANIFEST.members.find(m => m.id ===
-    (config.fixed ? config.fixed[i] : ids[Math.floor(rng() * ids.length)])));
+  return Array.from({ length: 3 }, (_, i) => {
+    const id = config.fixed ? config.fixed[i] : ids[Math.floor(rng() * ids.length)];
+    return MANIFEST.members.find(m => m.id === id);
+  });
 }
