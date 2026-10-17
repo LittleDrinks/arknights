@@ -199,7 +199,7 @@ class Contracts(unittest.TestCase):
 
     def test_evidence_tamper_revokes_all_success_credit(self):
         mutations = ('raw', 'action', 'terminal', 'result', 'result-files', 'manifest',
-                     'add', 'delete', 'empty-dir', 'root-add', 'symlink', 'same-size')
+                     'add', 'delete', 'empty-dir', 'root-add', 'symlink', 'episode-symlink', 'same-size')
         for mutation in mutations:
             with self.subTest(mutation=mutation):
                 d = self.out / mutation
@@ -232,6 +232,10 @@ class Contracts(unittest.TestCase):
                     (d / 'extra').mkdir()
                 elif mutation == 'symlink':
                     (episode / 'extra').symlink_to(episode / 'terminal.json')
+                elif mutation == 'episode-symlink':
+                    moved = self.out / ('moved-' + mutation)
+                    episode.rename(moved)
+                    episode.symlink_to(moved, target_is_directory=True)
                 else:
                     p = episode / 'protocol.jsonl'
                     raw = p.read_bytes()

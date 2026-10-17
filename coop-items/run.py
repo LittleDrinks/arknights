@@ -231,6 +231,8 @@ def audit_evidence(out, rows, seals, manifest_identity, byte_limit, deadline=mat
     C.require(file_identity(out / 'manifest.json', deadline) == manifest_identity, 'Manifest SHA/size drift')
     by_id = {r['id']: r for r in rows}
     for ident, recorded in seals.items():
+        C.require((out / ident).is_dir() and not (out / ident).is_symlink(),
+                  'Evidence episode directory replaced or symlinked: ' + ident)
         C.require(all(p.is_file() and not p.is_symlink() for p in (out / ident).iterdir()),
                   'Unexpected evidence directory/symlink')
         current = inventory(out / ident, deadline)
