@@ -11,7 +11,8 @@ import hashlib
 import json
 import math
 import multiprocessing as mp
-from multiprocessing.connection import wait
+import queue
+import threading
 from pathlib import Path
 import shlex
 import signal
@@ -79,6 +80,7 @@ def actor(connection, worker, args, config, schema, rules, dimensions, parent_pi
             state = env.request('reset', seed=seed, mode=args.mode,
                                 difficulty=args.difficulty, budget=config['prep_budget'])
             validate_checkpoint(reference, state)
+            require_training_partners(state)
             if state['done']:
                 raise RuntimeError('Reset returned a terminal observation')
             episode += 1
@@ -148,7 +150,26 @@ def actor(connection, worker, args, config, schema, rules, dimensions, parent_pi
             connection.close()
 
 
-def receive_all(connections, processes, timeout, expected):
+def require_training_partners(state):
+    partners = state.get('episode', {}).get('partners')
+    if partners is not None:
+        if partners.get('split') != 'train' or partners.get('pool') == 'heldout':
+            raise ValueError('Evaluation/heldout partners cannot enter training')
+        for member in partners.get('seats', []):
+            if member.get('id') == 'random-v1' or member.get('family') == 'random-legal':
+                raise ValueError('Heldout partner family cannot enter training')
+
+
+def bounded_ipc(connections, processes, timeout, operation, expected):
+    # Pipe readability can mean only a partial length header/payload. Perform the
+    # entire blocking recv/send in daemon threads, so the controlling thread keeps
+    # checking deadlines and can kill/reap actors even if an IPC frame stalls.
+    completed = queue.Queue()
+    def transfer(worker, connection):
+        try: completed.put((worker, operation(worker, connection), None))
+        except BaseException as error: completed.put((worker, None, error))
+    for worker, connection in enumerate(connections):
+        threading.Thread(target=transfer, args=(worker, connection), daemon=True).start()
     pending = dict(enumerate(connections))
     results = {}
     deadline = time.monotonic() + timeout
@@ -156,22 +177,26 @@ def receive_all(connections, processes, timeout, expected):
         remaining = deadline - time.monotonic()
         if remaining <= 0:
             raise TimeoutError(f'{expected} barrier timed out; pending workers {sorted(pending)}')
-        readable = wait(list(pending.values()), timeout=min(remaining, 0.1))
-        for worker, connection in list(pending.items()):
-            if connection in readable:
-                try:
-                    result = connection.recv()
-                except EOFError as error:
-                    raise RuntimeError(f'Worker {worker} exited without {expected}') from error
-                if result['kind'] != expected or result['worker'] != worker:
-                    raise RuntimeError(f'Worker {worker} failed: {result}')
-                results[worker] = result
-                del pending[worker]
+        try: worker, result, error = completed.get(timeout=min(remaining, 0.1))
+        except queue.Empty: pass
+        else:
+            if error is not None: raise RuntimeError(f'Worker {worker} IPC failed during {expected}') from error
+            results[worker] = result
+            del pending[worker]
         # An already-replied actor dying also invalidates the whole arm.
         for worker, process in enumerate(processes):
             if not process.is_alive():
                 raise RuntimeError(f'Worker {worker} exited with code {process.exitcode}')
     return [results[worker] for worker in sorted(results)]
+
+
+def receive_all(connections, processes, timeout, expected):
+    def receive(worker, connection):
+        result = connection.recv()
+        if result['kind'] != expected or result['worker'] != worker:
+            raise RuntimeError(f'Worker {worker} failed: {result}')
+        return result
+    return bounded_ipc(connections, processes, timeout, receive, expected)
 
 
 def stop_actors(connections, processes):
@@ -339,6 +364,8 @@ def parse_args():
     parser.add_argument('--timeout', type=float, default=120, help='Per environment request deadline, seconds')
     parser.add_argument('--batch-timeout', type=float, default=600, help='Whole actor barrier deadline, seconds')
     args = parser.parse_args()
+    if os.environ.get('COOP_SPLIT', 'train') != 'train' or os.environ.get('COOP_POOL') == 'heldout':
+        parser.error('PPO training refuses evaluation splits and heldout partner pools')
     config = json.loads(Path(args.config).read_text())
     args.seed = args.seed if args.seed is not None else config.get('seed', 1)
     args.rollout = args.rollout if args.rollout is not None else config['rollout_steps']
@@ -404,9 +431,10 @@ def main():
                 quotient, remainder = divmod(count, args.workers)
                 counts = [quotient + (worker < remainder) for worker in range(args.workers)]
                 parameters, policy_sha = pack(model), digest(model)
-                for worker, connection in enumerate(connections):
+                def dispatch(worker, connection):
                     connection.send({'kind': 'sample', 'version': version, 'count': counts[worker],
                                      'parameters': parameters, 'policySHA256': policy_sha})
+                bounded_ipc(connections, processes, args.batch_timeout, dispatch, 'parameter send')
                 results = receive_all(connections, processes, args.batch_timeout, 'rollout')
                 for worker, result in enumerate(results):
                     if (result['version'] != version or result['policySHA256'] != policy_sha
