@@ -4,6 +4,7 @@ import {fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
 import {performance} from 'node:perf_hooks';
 import {PINS,RULES_COMMIT,defaultSpec,parseProfileText,sha256,transformSource} from './lib.mjs';
+import {verifyRules} from './provenance.mjs';
 
 const own={},forward=[];
 for(let i=2;i<process.argv.length;i++){
@@ -16,6 +17,7 @@ for(let i=2;i<process.argv.length;i++){
 if(!own.game||!own.out)throw new Error('Usage: node policy/run.mjs --game GAME --out FILE [--profile JSON] [--entry BENCH_WRAPPER] --configs ... --seeds ... --jobs ...');
 if(forward.includes('--json')||forward.includes('--compare'))throw new Error('Use --out; compare is not a run');
 const game=fs.realpathSync(own.game),out=path.resolve(own.out);
+const rulesProvenance=verifyRules(game);
 if(fs.existsSync(out))throw new Error('Output exists; use a new arm/run directory');
 fs.mkdirSync(path.dirname(out),{recursive:true});
 const profile=own.profile?fs.realpathSync(own.profile):null;
@@ -27,6 +29,7 @@ const transformed=transformSource(original,spec.rules);
 const entry=own.entry?fs.realpathSync(own.entry):path.join(game,PINS.botbench.relPath);
 const command=[process.execPath,'--import',fileURLToPath(new URL('./register.mjs',import.meta.url)),entry,...forward,'--json',out];
 const manifest={kind:'controlled upstream bot policy experiment',trainedModel:false,engineRulesCommit:RULES_COMMIT,
+  rulesProvenance,
   profile:spec,profileFileSha256:profile?sha256(fs.readFileSync(profile)):null,
   botOriginalSha256:PINS.botJs.sha256,botTransformedSha256:sha256(transformed.code),
   benchmarkOriginalSha256:PINS.botbench.sha256,entry,entrySha256:sha256(fs.readFileSync(entry)),
@@ -43,11 +46,29 @@ manifest.batchWallSeconds=(performance.now()-start)/1000;manifest.finishedAt=new
 manifest.exitCode=result.status;manifest.signal=result.signal;manifest.spawnError=result.error?String(result.error):null;
 manifest.botFileUnchanged=sha256(fs.readFileSync(path.join(game,PINS.botJs.relPath)))===PINS.botJs.sha256;
 manifest.status=result.status===0&&manifest.botFileUnchanged?'complete':'failed';
-if(manifest.status==='complete'){
-  const rows=JSON.parse(fs.readFileSync(out,'utf8'));manifest.games=rows.length;
-  manifest.victories=rows.filter(r=>r.victory===true).length;
-  manifest.engineErrors=rows.reduce((n,r)=>n+(r.errors||0),0);
-}
+try{
+  if(manifest.status==='complete'){
+    const rows=JSON.parse(fs.readFileSync(out,'utf8'));
+    if(!Array.isArray(rows)||rows.length===0)throw new Error('No nonempty result array');
+    const value=(key,fallback)=>{const i=forward.indexOf(key);return i<0?fallback:forward[i+1];};
+    const configs=String(value('--configs','solo:FUNNY,solo:HARD,coop4:FUNNY,coop4:HARD')).split(',');
+    const count=Math.max(1,Number(value('--seeds',10))||10),first=Number(value('--seed',1))||1;
+    const planned=new Set(configs.flatMap(config=>Array.from({length:count},(_,i)=>config+'|'+(first+i))));
+    const received=new Set();
+    for(const row of rows){
+      const key=row.config+'|'+row.seed;
+      if(!planned.has(key)||received.has(key))throw new Error('Unexpected or duplicate config/seed: '+key);
+      if(typeof row.victory!=='boolean'||!Number.isInteger(row.errors)||row.errors<0)throw new Error('Malformed outcome or error field: '+key);
+      received.add(key);
+    }
+    manifest.plannedGames=planned.size;manifest.games=rows.length;
+    manifest.victories=rows.filter(r=>r.victory===true&&r.errors===0).length;
+    manifest.engineErrors=rows.reduce((n,r)=>n+r.errors,0);
+    if(received.size!==planned.size)throw new Error('Missing planned games');
+    if(manifest.engineErrors>0)throw new Error('Engine errors present in batch');
+    manifest.rulesUnchangedAfterRun=verifyRules(game);
+  }
+}catch(error){manifest.status='failed';manifest.validationError=String(error);}
 save();
 console.log(JSON.stringify({profile:spec.name,status:manifest.status,games:manifest.games,wins:manifest.victories,out,manifest:manifestPath}));
 if(manifest.status!=='complete')process.exit(result.status||1);
