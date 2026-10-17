@@ -76,9 +76,13 @@ COOP_POOL=heldout COOP_SPLIT=eval python3 -B rl/learner.py \
 
 新策略的商店选择只看自己的当前合法候选；候选由父类逻辑产生，执行使用真实 `ps` 方法。布阵/选秀/装备是明确的固定 upstream 辅助模块，不把整个原 bot 宣称为隔离的纯 observation policy。original bot 仍使用其原生引擎启发式（包括内部估值），这些内部信息不会作为 primary observation/features 输出。
 
-固定部署模块沿用 `rl/controller.mjs`：禁止自动卖棋、普通装备、免费奖励、必要时真实 `resolveTemp`，不会创建资金、物品或战斗结果。coop 只增加可见容量过滤：无出售布阵器在棋盘满且无法撤回旧棋子时会提议超出部署容量的 move；`controller.mjs` 在调用引擎方法前过滤并返回明确拒绝，计入终局 `controllerBlockedMoves`。它不是成功动作、不进入动作轨迹，不清零实际错误。其他被引擎拒绝的 primary 控制器操作或队友操作会使整局失效。
+固定部署模块沿用 `rl/controller.mjs`：禁止自动卖棋、普通装备、免费奖励、必要时真实 `resolveTemp`，不会创建资金、物品或战斗结果。可见容量过滤保留：无出售布阵器在棋盘满且无法撤回旧棋子时会提议超出部署容量的 move；`controller.mjs` 在调用引擎方法前过滤并返回明确拒绝，计入终局 `controllerBlockedMoves`。它不是成功动作、不进入动作轨迹。
 
-`partnerAudit` 仅在真实终局返回：每个队友的逐轮 scheduled/ready/成功方法计数、动作摘要 hash、拒绝计数；不中途返回队友私有操作参数或商品身份。真实 `onEnd` 才设置 done；reward 仅来自完整 `summary.victory`，赢 +1、输 -1，非终局为 0。结束结果必须有 4 个玩家、boolean victory、0 summary errors；发生 engine/action/controller error 则拒绝该 rollout。超预算截断、层数、loss 或参数变化都不是胜利。
+原 bot 会尝试被引擎拒绝的操作；**不承诺没有拒绝**。`rejections.mjs` 按固定规则版本核实过的方法/错误码分类，并比较调用前后的内部状态（所有玩家的可变字段、共享库存/债务、UID、RNG、调度队列和 dirty 标记；不含规则引用、方法及惰性 deploy-map 缓存）。原版队友/teacher 的已知纯 validation 拒绝只记 diagnostic；固定原版 arrange 的 move 仅对 `BAD_TILE/BOARD_FULL` 使用此规则。调用过程中若进入 `dispatchItem`，即使回滚后状态相同也不豁免。未知拒绝、状态变化、异常，以及 primary 学习候选真正拒绝、自写 weak 策略操作错误仍使整 arm 失败。原版 `tryDo` 会吞掉异常，因此额外锁存 fatal 状态，不能靠捕获异常继续提交 rollout。
+
+计数不清零、不回滚、不把拒绝伪造成成功：`controllerErrors` 保留实际 primary 控制器拒绝总数，只有被确认的部分另记 `controllerDiagnosticErrors`；健康检查要求两者相等且没有 fatal。每席 `partnerAudit.rejected` 和总 `partnerActionErrors` 保留全部队友方法拒绝，`rejections` 保存 round/phase/method/args/result/diagnostic/reason；诊断拒绝不进入表示无效 rollout 的 `actionErrors`，不进入成功动作计数/hash。容量前置过滤仍单列，不冒充实际 engine 拒绝。
+
+`partnerAudit`、`partnerActionErrors`、`rejectedActions` 和 `controllerDiagnosticErrors` 仅在真实终局返回；不中途返回队友私有操作参数或商品身份，也不进入 observation/features。真实 `onEnd` 才设置 done；reward 仅来自完整 `summary.victory`，赢 +1、输 -1，非终局为 0。结束结果必须有 4 个玩家、boolean victory、无 summary errors。超预算截断、层数、loss 或参数变化都不是胜利。schema/checkpoint 格式保持不变；终局同时将诊断附加到 `episode.diagnostics`，现有 learner 的 `episode_result` 会原样保留它，批量产物因此包含拒绝计数和原因。非终局 episode 不含该字段。
 
 ## 后续交叉实验
 
@@ -91,15 +95,17 @@ COOP_POOL=heldout COOP_SPLIT=eval python3 -B rl/learner.py \
 | weak saver | weak | saver-v1,saver-v1,saver-v1 |
 | 新家族 heldout | heldout | random-v1,random-v1,random-v1 |
 
-评测全部设置 `COOP_SPLIT=eval`，两个模型使用相同 game seeds 与 pool seeds；只汇总完整无错误 `summary.victory`，同时报告局数和不确定性。heldout 不用于训练、选 checkpoint、调策略参数；当前一个新家族的 smoke 只证明接口，不证明家族泛化。无需 SSH，本次未做这些批量实验。
+评测全部设置 `COOP_SPLIT=eval`，两个模型使用相同 game seeds 与 pool seeds；只汇总通过上述健康检查的完整 `summary.victory`，同时报告 diagnostic 拒绝、局数和不确定性。heldout 不用于训练、选 checkpoint、调策略参数；当前一个新家族的 smoke 只证明接口，不证明家族泛化。无需 SSH，本次未做这些批量实验。
 
 ## 受限检查
 
 ```bash
-python3 -B coop/check.py                 # 默认 60 秒，Linux /proc 监控整个 worker 进程组
-python3 -B coop/check.py --only learner # 不重复已经通过的真实引擎局
+python3 -B coop/check.py --only rejections --seconds 8  # 拒绝分类与真实终局可见性
+python3 -B coop/check.py --only engine --seconds 17    # 原有固定 seed 引擎 suite
 ```
 
-监控器支持最高 90 秒单次上限，RSS 在 1.15 GiB 提前终止以给 1.2 GiB 软预算留余量，产物总计至多 20 MB；采样周期 50ms，属于监控预算而非内核硬限。Node 堆限制为 192 MiB。调用方还需累计多次检查的耗时；本次累计记录见 `VALIDATION.md`。所有模型/trace/log 只写新建的 `/tmp/coop-check-*`；`coop/artifacts/`、`coop/__pycache__/` 也在本目录 ignore 内。Python 使用 `-B`，不在 `rl/` 生成 bytecode。
+监控器默认和最高单次上限均为 30 秒，RSS 在 0.90 GiB 提前终止以给 1 GiB 预算留余量，产物总计至多 20 MB；采样周期 50ms，属于监控预算而非内核硬限。Node 堆限制为 192 MiB。调用方还需累计多次检查的耗时；本次累计记录见 `VALIDATION.md`。不带 `--only` 会顺序执行 engine、rejections 和旧 learner smoke，可能触发时间保护；不要在已使用本次预算后追加运行。所有模型/trace/log 只写新建的 `/tmp/coop-check-*`；`coop/artifacts/`、`coop/__pycache__/` 也在本目录 ignore 内。Python 使用 `-B`，不在 `rl/` 生成 bytecode。
 
-engine 测试固定真实 seed，覆盖 3 类 pool 的完整终局、weak 完整重放、主学习席位真实买卖、每个存活队友每轮调度并 ready、无越权经济动作、schema/可见性与 PRNG 隔离。learner smoke 只用 2 个真实 solo teacher 标签做 1 次 BC 更新，再进行 4 个 coop PPO transitions/1 次更新、1 次 coop demo 和 1 次完整 heldout eval；无批量训练。完整输出和实测边界见 `VALIDATION.md`。
+engine 测试固定真实 seed，覆盖 3 类 pool 的完整终局、weak 完整重放、主学习席位真实买卖、每个存活队友每轮调度并 ready、无越权经济动作、schema/可见性与 PRNG 隔离。旧 learner smoke 用 2 个真实 solo teacher 标签做 1 次 BC 更新，再进行 4 个 coop PPO transitions/1 次更新、1 次 coop demo 和 1 次完整 heldout eval；本次没有重跑它。完整输出和实测边界见 `VALIDATION.md`。
+
+本次检查还发现一个未改动的独立限制：未指定 `COOP_TEAM` 时，`selectTeam` 在 `find` 内反复取随机数，weak/seed 11 可产生 undefined 成员。此次只改拒绝处理，服务器 normal/mixed 重跑应沿用已声明的固定队伍；随机队伍选择另行修复，不据此声称任意池配置均已健壮。

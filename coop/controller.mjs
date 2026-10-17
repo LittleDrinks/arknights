@@ -1,7 +1,7 @@
 // Adapt only the no-sale controller's planner proposals. Original bot seats keep native prep.
 // A full lineup + full hand can prevent arrange from withdrawing its old choice; its next
 // proposal would then exceed the visible cap. Filter BEFORE submitting a real engine action.
-export function capacityFilteredBot(bot, onBlocked) {
+export function capacityFilteredBot(bot, onBlocked, arranging = new WeakSet()) {
   return { ...bot, arrange(m, ps, opts) {
     const move = ps.move;
     ps.move = (uid, to, dir) => {
@@ -16,6 +16,7 @@ export function capacityFilteredBot(bot, onBlocked) {
       }
       return move.call(ps, uid, to, dir);
     };
-    try { return bot.arrange(m, ps, opts); } finally { ps.move = move; }
+    arranging.add(ps);
+    try { return bot.arrange(m, ps, opts); } finally { ps.move = move; arranging.delete(ps); }
   } };
 }

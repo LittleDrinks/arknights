@@ -7,8 +7,10 @@ import { ShopEnv } from '../rl/env.mjs';
 import { MANIFEST, MANIFEST_SHA256, poolConfig, selectTeam, localRng, uint32 } from './pool.mjs';
 import { partnerPrep } from './partners.mjs';
 import { capacityFilteredBot } from './controller.mjs';
+import { checkedProposal } from './rejections.mjs';
 
 const copy = x => JSON.parse(JSON.stringify(x));
+const PLAYER_METHODS = ['buy', 'sell', 'refresh', 'levelUp', 'setReady', 'move', 'equip', 'pickReward', 'useArt', 'destroy', 'freeze'];
 export class CoopEnv extends ShopEnv {
   static async create(game, config = poolConfig()) {
     // Parent create owns the rule pin, clean-rules check and engine imports. It constructs no Match.
@@ -17,7 +19,8 @@ export class CoopEnv extends ShopEnv {
   }
   constructor(deps, config) {
     super(deps); this.poolConfig = config;
-    this.bot = capacityFilteredBot(deps.bot, () => { this.controllerBlockedMoves++; });
+    this.arranging = new WeakSet();
+    this.bot = capacityFilteredBot(deps.bot, () => { this.controllerBlockedMoves++; }, this.arranging);
   }
   reset({ seed = 1, mode = 'coop', difficulty = 'NORMAL', budget = 128, teacher = false } = {}) {
     // Existing learner.evaluate sends solo literally. Alias only; Match is ALWAYS coop.
@@ -30,7 +33,7 @@ export class CoopEnv extends ShopEnv {
     Object.assign(this, { summary: null, actionErrors: 0, controllerErrors: 0, controllerBlockedSales: 0,
       budgetForcedReady: 0, engineLogErrors: [], steps: 0, prepRound: 0, lastBondState: null,
       teacher, source: 'fixed-controller', demos: [], demoRejected: 0, partnerBlockedSales: 0, partnerActionErrors: 0,
-      controllerBlockedMoves: 0, rejectedActions: [] });
+      controllerBlockedMoves: 0, rejectedActions: [], controllerDiagnosticErrors: 0, fatalRejections: 0 });
     const team = selectTeam(this.poolConfig, seed);
     this.episode = { seed, mode: 'coop', difficulty, budget, partners: {
       manifest: MANIFEST.version, manifestSHA256: MANIFEST_SHA256, ...this.poolConfig,
@@ -46,12 +49,16 @@ export class CoopEnv extends ShopEnv {
       log: { info() {}, debug() {}, warn() {}, error: (...x) => this.engineLogErrors.push(x.map(String).join(' ')) } });
     this.ps = this.m.players.get('learner');
     this.installRecorder();
-    for (const method of ['move', 'equip', 'pickReward', 'destroy']) {
+    for (const method of PLAYER_METHODS) {
       const original = this.ps[method].bind(this.ps);
       this.ps[method] = (...args) => {
-        const r = original(...args);
-        if (!r?.ok) this.rejectedActions.push({ round: this.m.round, phase: this.m.phase, method, args, result: r });
-        return r;
+        const record = this.callPlayer(this.ps, method, args, original, this.teacher);
+        if (!record.result?.ok) {
+          this.rejectedActions.push(record);
+          // The inherited recorder still counts every actual fixed-controller rejection.
+          if (record.diagnostic && !this.teacher && this.source === 'fixed-controller') this.controllerDiagnosticErrors++;
+        }
+        return record.result;
       };
     }
     this.installPartners(team);
@@ -62,21 +69,39 @@ export class CoopEnv extends ShopEnv {
     this.assertHealthy();
     return this.view();
   }
+  callPlayer(ps, method, args, original, upstream) {
+    const arrange = method === 'move' && this.arranging.has(ps);
+    let checked;
+    try {
+      checked = upstream || arrange ? checkedProposal(ps, method, () => original(...args), { arrange: !upstream }) :
+        { result: original(...args), diagnostic: false, reason: 'non-upstream-action' };
+    } catch (e) {
+      // Upstream tryDo can swallow exceptions. Latch invalidity even in that case.
+      this.fatalRejections++;
+      throw e;
+    }
+    if (!checked.result?.ok && !checked.diagnostic) this.fatalRejections++;
+    return { round: this.m.round, phase: this.m.phase, method, args: copy(args), ...checked };
+  }
   installPartners(team) {
     const m = this.m, upstream = m.scheduleBotPrep.bind(m);
     for (const ps of m.order.slice(1)) {
-      const audit = this.partnerAudit[ps.playerId] = { rounds: {}, actions: 0, rejected: 0, hash: createHash('sha256') };
-      for (const method of ['buy', 'sell', 'refresh', 'levelUp', 'setReady', 'move', 'equip', 'pickReward', 'useArt', 'destroy', 'freeze']) {
+      const upstreamBot = team[ps.seat - 1].strategy === 'original';
+      const audit = this.partnerAudit[ps.playerId] = { rounds: {}, actions: 0, rejected: 0, rejections: [], hash: createHash('sha256') };
+      for (const method of PLAYER_METHODS) {
         const original = ps[method].bind(ps);
         ps[method] = (...args) => {
-          const r = original(...args);
+          const record = this.callPlayer(ps, method, args, original, upstreamBot), r = record.result;
           const row = audit.rounds[m.round] ||= { scheduled: 0, ready: 0, actions: {} };
           if (r?.ok) {
             audit.actions++;
             row.actions[method] = (row.actions[method] || 0) + 1;
             if (method === 'setReady' && args[0]) row.ready++;
             audit.hash.update(JSON.stringify([m.round, method, args]) + '\n');
-          } else { audit.rejected++; this.partnerActionErrors++; this.actionErrors++; }
+          } else {
+            audit.rejected++; audit.rejections.push(record); this.partnerActionErrors++;
+            if (!record.diagnostic) this.actionErrors++;
+          }
           return r;
         };
       }
@@ -99,8 +124,8 @@ export class CoopEnv extends ShopEnv {
     };
   }
   assertHealthy() {
-    if (this.engineErrors() || this.actionErrors || this.controllerErrors) {
-      throw new Error(`Invalid coop rollout: engine=${this.engineErrors()} action=${this.actionErrors} controller=${this.controllerErrors} rejected=${JSON.stringify(this.rejectedActions)}`);
+    if (this.engineErrors() || this.actionErrors || this.fatalRejections || this.controllerErrors !== this.controllerDiagnosticErrors) {
+      throw new Error(`Invalid coop rollout: engine=${this.engineErrors()} action=${this.actionErrors} controller=${this.controllerErrors} fatal=${this.fatalRejections} rejected=${JSON.stringify(this.rejectedActions)}`);
     }
     if (this.summary && (typeof this.summary.victory !== 'boolean' || this.summary.players?.length !== 4 || this.summary.errors)) {
       throw new Error('Incomplete/invalid coop summary');
@@ -109,13 +134,21 @@ export class CoopEnv extends ShopEnv {
   view() {
     this.assertHealthy();
     const v = super.view();
-    v.controller = `coop/visible-capacity-filter-v1+${v.controller}`;
+    v.controller = `coop/validation-diagnostics-v2+${v.controller}`;
     // Never return a teammate's private offers/actions while the learner can still act.
     if (v.done) {
       v.partnerAudit = Object.fromEntries(Object.entries(this.partnerAudit).map(([id, a]) =>
-        [id, { rounds: copy(a.rounds), actions: a.actions, rejected: a.rejected, actionSHA256: a.hash.copy().digest('hex') }]));
+        [id, { rounds: copy(a.rounds), actions: a.actions, rejected: a.rejected, rejections: copy(a.rejections), actionSHA256: a.hash.copy().digest('hex') }]));
       v.controllerBlockedMoves = this.controllerBlockedMoves;
       v.partnerBlockedSales = this.partnerBlockedSales;
+      v.partnerActionErrors = this.partnerActionErrors;
+      v.controllerDiagnosticErrors = this.controllerDiagnosticErrors;
+      v.rejectedActions = copy(this.rejectedActions);
+      // The unchanged learner's episode_result spreads episode metadata, so batch
+      // artifacts retain reasons as well as controllerErrors. Never attach mid-game.
+      v.episode.diagnostics = { partnerAudit: v.partnerAudit, partnerActionErrors: v.partnerActionErrors,
+        controllerDiagnosticErrors: v.controllerDiagnosticErrors, rejectedActions: v.rejectedActions,
+        controllerBlockedMoves: v.controllerBlockedMoves };
     }
     return v;
   }

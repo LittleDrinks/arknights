@@ -97,7 +97,7 @@ test('real coop terminals, pool behavior, seat ownership, per-round actions, rep
         assert(actions.length < 500);
         assert.equal(s.engineErrors, 0);
         assert.equal(s.actionErrors, 0);
-        assert.equal(s.controllerErrors, 0);
+        assert.equal(s.controllerErrors, e.controllerDiagnosticErrors);
         if (!s.done) { assert.equal(s.reward, 0); assert.equal(s.summary, null); }
       }
       assert(checkedPreps > 1);
@@ -109,7 +109,10 @@ test('real coop terminals, pool behavior, seat ownership, per-round actions, rep
       assert.equal(s.summary.errors, 0);
       assert.deepEqual(e.history.actions.filter(a => ['buy', 'sell', 'refresh', 'levelUp'].includes(a.type) && a.source !== 'policy'), []);
       assert(actions.some(a => a.type === 'buy') && actions.some(a => a.type === 'sell'));
-      for (const a of Object.values(s.partnerAudit)) assert.equal(a.rejected, 0);
+      for (const a of Object.values(s.partnerAudit)) {
+        assert.equal(a.rejected, a.rejections.length);
+        assert(a.rejections.every(r => r.diagnostic));
+      }
       const report = { pool, victory: s.victory, rounds: s.rounds, checkedPreps, steps: s.steps,
         engineErrors: s.engineErrors, actionErrors: s.actionErrors, controllerErrors: s.controllerErrors,
         partnerAudit: s.partnerAudit };
