@@ -8,6 +8,7 @@ import subprocess
 import tempfile
 import time
 import unittest
+from unittest.mock import patch
 
 from contracts_fit import (C, D, E, CODE, HERE, ARMS, identity, check_parent,
     project_off, recheck_inputs, safe_path, source_identity)
@@ -167,7 +168,7 @@ class Synthetic(unittest.TestCase):
         def fake(row, *args):
             seen.append(row['id'])
             if row['seed'] == 1:
-                raise RuntimeError('synthetic technical failure')
+                return {**row, 'status': 'failed', 'error': 'synthetic sealed technical failure'}
             return {**row, 'status': 'complete', 'teamVictory': True, 'learnerIndividualVictory': False}
         V.dispatch(rows, models, None, None, self.out, time.monotonic() + 2, 4, 1, 65536, None, job=fake)
         counts = V.summary(rows)
@@ -176,6 +177,36 @@ class Synthetic(unittest.TestCase):
         rows = V.schedule()
         V.dispatch(rows, models, None, None, self.out, time.monotonic() - 1, 4, 1, 65536, None, job=fake)
         self.assertEqual(V.summary(rows)['unrun'], 96)
+
+    def test_publication_mismatch_is_global_failure_and_stops_dispatch(self):
+        rows = V.schedule()
+        models = {n: (None, None) for n in V.MODELS}
+        seen = []
+        def peer(row, *args):
+            seen.append(row['id'])
+            directory = self.out / row['id']
+            directory.mkdir()
+            for name in ('protocol.jsonl', 'actions.jsonl', 'stderr.log', 'terminal.json'):
+                (directory / name).write_bytes(b'{}\n' if name != 'stderr.log' else b'')
+            result = {**row, 'status': 'complete', 'teamVictory': True,
+                      'learnerIndividualVictory': False, 'eof': True,
+                      'files': {p.name: identity(p) for p in directory.iterdir()}}
+            C.write(directory / 'result.json', {**result, 'teamVictory': False} if row['seed'] == 2 else result)
+            return result
+        with patch.object(E, 'game_job', side_effect=peer):
+            with self.assertRaisesRegex(ValueError, 'Unsealed game evidence invalidates run'):
+                V.dispatch(rows, models, None, None, self.out, time.monotonic()+2, 1, 1, 65536, None)
+        self.assertEqual(len(seen), 2)
+        self.assertEqual(rows[0]['status'], 'complete')
+        self.assertTrue(rows[1]['evidenceUnsealed'])
+        V.invalidate(rows, 'publication mismatch')  # Original CLI global exception path.
+        counts = V.summary(rows)
+        self.assertEqual((counts['denominator'], counts['technicalFailures'], counts['unrun'], counts['teamWins']),
+                         (96, 2, 94, 0))
+        directory = self.out / rows[1]['id']
+        (directory / 'result.json').write_bytes(b'not JSON')
+        (directory / 'extra').write_bytes(b'preserved untrusted evidence')
+        self.assertEqual(V.summary(rows)['teamWins'], 0)
 
     def test_original_protocol_python_peers(self):
         for suffix in ('', 'print("extra", flush=True)', 'import sys; sys.stderr.write("error")', 'raise SystemExit(1)'):

@@ -77,3 +77,5 @@ Linux affinity 将整个继承进程树限制在最多4个可用 CPU；Torch int
 ```
 
 监督器沿用已审 natural-win-bc 的 Linux `/proc` 资源监控方式，19s kill 阈值、测试进程树合计 RSS≤1GiB、临时输出≤5,000,000 bytes，结束清理。仅微型原 ActorCritic 的两 arm 合成更新、合成完整维度 OFF 投影、gzip/CRC/EOF、Python 假协议进程、模拟96项调度与文件漂移测试；不运行 Node/game/static loader，不导入 Match/Battle，不访问真实训练输入。Python3.10 AST 检查不是3.10 runtime 验收。执行记录见 `CHECKS.md`。
+
+原 E.game_job 正常返回并封存的技术失败保留逐局统计；若 job 抛出异常或发布 result 正文不匹配，则证据身份未封存：停止派发、收取已运行任务后按整批失败撤销全部完成局信用，保留未信任文件及96分母。不会把这类完整性错误降级成可忽略的普通输局。

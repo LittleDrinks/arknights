@@ -66,10 +66,11 @@ def verify_results(rows, out, control):
 
 
 def dispatch(rows, models, code, game_path, out, deadline, workers, timeout, byte_limit, pool, job=run_game):
+    unsealed = []
     with ThreadPoolExecutor(max_workers=workers) as executor:
         pending, index = {}, 0
         while pending or index < len(rows):
-            while len(pending) < workers and index < len(rows) and time.monotonic() < deadline:
+            while not unsealed and len(pending) < workers and index < len(rows) and time.monotonic() < deadline:
                 r = rows[index]
                 f = executor.submit(job, r, *models[r['model']], code, game_path, out,
                                     min(deadline, time.monotonic() + timeout), byte_limit, pool)
@@ -83,9 +84,15 @@ def dispatch(rows, models, code, game_path, out, deadline, workers, timeout, byt
                 try:
                     rows[i] = f.result()
                 except Exception as error:
-                    rows[i] = {**rows[i], 'status': 'failed', 'error': str(error)[:2000]}
+                    # Ordinary rollout failures are returned and sealed by E.game_job.
+                    # An escaping exception means publication/cleanup evidence is unknown.
+                    # Drain already running jobs, stop dispatching, then revoke all run credit.
+                    rows[i] = {**rows[i], 'status': 'failed', 'error': str(error)[:2000],
+                               'evidenceUnsealed': True}
+                    unsealed.append(rows[i]['id'] + ': ' + str(error)[:2000])
             safe_path(out / 'summary.json')
             C.write(out / 'summary.json', dict(status='running', creditGranted=False, **summary(rows), games=rows))
+    C.require(not unsealed, 'Unsealed game evidence invalidates run: ' + '; '.join(unsealed))
 
 
 def evaluate(L, trained, parent, code, game_path, game, pin, out, source, rows, deadline, guard,
