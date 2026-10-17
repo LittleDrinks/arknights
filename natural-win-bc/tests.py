@@ -175,6 +175,13 @@ class Contracts(unittest.TestCase):
         rejection['diagnostic'] = False
         with self.assertRaisesRegex(ValueError, 'Non-diagnostic'):
             complete_contract(d, row, GAME, POOL)
+        teacher = demo()
+        primary_rejection = dict(method='pickReward', diagnostic=True, reason='pure-validation', result={'error': 'HAND_FULL'})
+        teacher['terminal']['rejectedActions'] = [primary_rejection]
+        teacher['terminal']['episode']['diagnostics']['rejectedActions'] = [primary_rejection]
+        self.assertTrue(complete_contract(teacher, row, GAME, POOL))
+        with self.assertRaisesRegex(ValueError, 'Controller rejection accounting'):
+            C.terminal_contract(teacher['terminal'], seed=row['seed'], steps=2, schema=SCHEMA)
         hidden = demo()
         hidden['terminal']['rounds'] = hidden['terminal']['summary']['roundsPassed'] = 15
         for p in hidden['terminal']['summary']['players']:

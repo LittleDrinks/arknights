@@ -31,3 +31,5 @@ original/mixed, 64 scheduled dev games; no heldout families and no sealed seeds.
 Main 接手后针对采集器独立审计 P2 增加整体 failed 拒绝及 raw 文件集合对账，防止执行未知的 not-run 被误当冻结来源。新增整批失败/孤立产物拒绝回归，合成契约重跑通过；未修改采集器、游戏或现有 learner，未运行生产训练。
 
 复审7531ad6的3P2/1P3已针对固定规则修复：纯validation原生无ok拒绝格式与诊断计数保留；15轮数据审计但14轮selector排除；死亡轮次/通过轮次/团队与个人结果、primary observation alive/LP一致性；末尾raw集合再核对。共享终局合同因此修改，并更新依赖pin。9项合成契约与9项旧survivor契约通过；另静态读取2真实positive+3真实HAND_FULL负例，前者均selected、后者均不selected，全部raw逐字节序列化内容未改。未重新运行游戏/训练；批次已自然截止1486complete/8timeoutfailed/554notrun，不是2048有效局。
+
+生产首次导入 v1 在第261个审计记录 normal-30131 遇到 Controller rejection accounting 而停止，未创建模型：teacher 的 primary pickReward 有纯validation拒绝，但原 recorder 在 teacher 模式不计 controllerErrors。新增显式 teacher=True 仅用于 demo 终局校验，模型 eval 默认False保留原严格计数；所有拒绝仍逐条检查和保留。9项合成回归通过；正对全部1486complete记录做只读并行检查，不在首错处停止或拟合模型。实际服务器原监控器还有临时目录删除竞态，原失败保留，外部 tools/validate-natural-server.py 使用 os.walk 监控同9项测试通过3.21s/292MiB；不在运行中改源文件。

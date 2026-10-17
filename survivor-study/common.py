@@ -164,7 +164,7 @@ def sample_contract(s, dims):
     require(type(a) is int and 0 <= a < len(s['features']['mask']) and s['features']['mask'][a], 'Illegal BC action')
 
 
-def terminal_contract(t, *, seed, steps, schema):
+def terminal_contract(t, *, seed, steps, schema, teacher=False):
     require(t['done'] is True and t['schema'] == schema and t['rules'] == RULES, 'Terminal/schema/rules')
     require(t['steps'] == steps and type(t['steps']) is int, 'Terminal steps')
     e, s = t['episode'], t['summary']
@@ -177,8 +177,12 @@ def terminal_contract(t, *, seed, steps, schema):
     for k in ('engineErrors', 'actionErrors'):
         require(type(t[k]) is int and t[k] == 0, 'Terminal ' + k)
     require(t.get('fatalRejections', 0) == 0, 'Fatal rejection')  # Pinned CoopEnv.assertHealthy also latches fatal.
+    require(type(teacher) is bool, 'Explicit terminal collection mode')
     require(type(t['controllerErrors']) is int and t['controllerErrors'] >= 0 and
-            t['controllerErrors'] == t['controllerDiagnosticErrors'] == len(t['rejectedActions']), 'Controller rejection accounting')
+            type(t['controllerDiagnosticErrors']) is int and
+            t['controllerErrors'] == t['controllerDiagnosticErrors'] and
+            (t['controllerErrors'] == 0 if teacher else t['controllerErrors'] == len(t['rejectedActions'])),
+            'Controller rejection accounting')
     audits = t['partnerAudit']
     require(set(audits) == {'partner-1', 'partner-2', 'partner-3'}, 'Partner audit seats')
     rejects = list(t['rejectedActions'])

@@ -48,7 +48,7 @@ def complete_contract(data, row, game, pool_manifest):
               0 <= data['rejectedLabels'] <= 4096, 'Label/rejection bounds')
     C.require(type(t['steps']) is int and len(samples) <= t['steps'] <= len(samples) + data['rejectedLabels'],
               'Teacher accepted/missing/rejected step accounting')
-    primary = C.terminal_contract(t, seed=row['seed'], steps=t['steps'], schema=game['schema'])
+    primary = C.terminal_contract(t, seed=row['seed'], steps=t['steps'], schema=game['schema'], teacher=True)
     C.require(1 <= t['rounds'] <= 15, 'ABYSS terminal rounds')
     # C.terminal_contract retains and verifies pure validation diagnostics and aliases.
     # They are not successful actions and do not invalidate unrelated positive episodes.
