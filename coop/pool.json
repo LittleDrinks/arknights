@@ -1,0 +1,16 @@
+{
+  "version": "coop-heuristics-v1",
+  "kind": "frozen-heuristics-not-FCP-checkpoints",
+  "members": [
+    {"id": "original-v1", "family": "upstream-bot", "split": "train", "strategy": "original"},
+    {"id": "buy2-v1", "family": "first-offer-buy2", "split": "train", "strategy": "buy2"},
+    {"id": "saver-v1", "family": "level-first-saver", "split": "train", "strategy": "saver"},
+    {"id": "random-v1", "family": "random-legal", "split": "heldout", "strategy": "random"}
+  ],
+  "pools": {
+    "normal": ["original-v1"],
+    "mixed": ["original-v1", "buy2-v1", "saver-v1"],
+    "weak": ["buy2-v1", "saver-v1"],
+    "heldout": ["random-v1"]
+  }
+}
