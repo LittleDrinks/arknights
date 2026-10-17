@@ -45,3 +45,6 @@ a14e014f082fc0bca8bc7eec5eab76c80d06972ae64f493f359bb24db7f4e726
 ```
 
 真实服务器 recapture、真实全轨迹一致性、训练和实际终极通关率均**未执行/未验证**。此记录仅支持 seam 与拒收机制的合成验证；不支持胜率、收益或合法状态表示不可能性结论。
+
+
+Main 修复7a53037复审3P2：整体failed拒绝/前后raw集合；固定486游戏树+package+manifestSHA前后校验并写provenance；CPU float32显式构造。7项Python3.10合成通过，实际本地486文件身份函数核对通过，无真实游戏。新dtype回归最初在保持global float64时调用旧forward失败，定位为原padding默认dtype限制；现测试在float64下验证返回参数/保存状态均CPU float32、全局dtype及RNG不变，再恢复原正常float32环境执行forward；限制在README明示。

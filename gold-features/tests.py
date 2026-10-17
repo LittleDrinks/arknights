@@ -15,6 +15,24 @@ from recapture import verify_recapture, same, source_bindings, unpack, capture, 
 
 
 class GoldTests(unittest.TestCase):
+    def test_float64_default_does_not_change_returned_model_dtype(self):
+        schema = dict(version='shop-v1', ids=['a'], bonds=[], bands=[])
+        parent = ActorCritic(103, 16, 4).float()
+        checkpoint = dict(model=parent.state_dict(), schema=schema, dimensions=[103, 16, 4], metadata={})
+        old_dtype, before = torch.get_default_dtype(), torch.get_rng_state()
+        try:
+            torch.set_default_dtype(torch.float64)
+            model, ckpt = warm_start(checkpoint, ActorCritic)
+            self.assertTrue(all(p.dtype == torch.float32 and p.device.type == 'cpu' for p in model.parameters()))
+            self.assertTrue(all(v.dtype == torch.float32 for v in ckpt['model'].values()))
+            self.assertTrue(torch.equal(before, torch.get_rng_state()))
+            self.assertEqual(torch.get_default_dtype(), torch.float64)
+        finally:
+            torch.set_default_dtype(old_dtype)
+        # Original ActorCritic allocates candidate padding with the ambient dtype.
+        # Restore its normal float32 execution context without changing any global in warm_start.
+        model([{'global': [0.] * 106, 'candidates': [[0.] * 16], 'mask': [True]}])
+
     def test_warm_start(self):
         torch.manual_seed(41)
         schema = dict(version='shop-v1', ids=['a', 'b', 'item'], bonds=[], bands=[])
@@ -167,7 +185,7 @@ class GoldTests(unittest.TestCase):
                     feature['global'] += [0, 0, 0] if environment['GOLD_FEATURES_MODE'] == 'off' else [0.693, 0, 0]
                 return (json.dumps(new) + '\n').encode()
 
-            with patch('recapture.capture', side_effect=fake_capture):
+            with patch('recapture.capture', side_effect=fake_capture), patch('recapture.game_identity', return_value={'rules': RULES, 'files': 486}):
                 main(argv)
                 with self.assertRaises(FileExistsError):
                     main(argv)
@@ -181,10 +199,20 @@ class GoldTests(unittest.TestCase):
                 self.assertEqual(sha(saved), row['artifactSHA256'])
                 self.assertEqual(sha(gzip.decompress(saved)), row['rawSHA256'])
                 self.assertEqual(row['sourceSHA256'], sha(packed))
+            # A failed collection cannot enter recapture even if a selected row looks good.
+            original_manifest = manifest_file.read_bytes()
+            manifest['status'] = 'failed'
+            manifest_file.write_text(json.dumps(manifest))
+            rejected_args = list(argv)
+            rejected_args[rejected_args.index('--manifest-sha256') + 1] = sha(manifest_file.read_bytes())
+            rejected_args[rejected_args.index('--out') + 1] = str(directory / 'failed-source')
+            with patch('recapture.capture', side_effect=AssertionError('must not start')), self.assertRaisesRegex(ValueError, 'finalized frozen'):
+                main(rejected_args)
+            manifest_file.write_bytes(original_manifest)
             # Failures leave a bounded failed manifest, never an accepted dataset.
             failed = directory / 'failed'
             argv[argv.index('--out') + 1] = str(failed)
-            with patch('recapture.capture', return_value=raw), self.assertRaisesRegex(ValueError, 'differs'):
+            with patch('recapture.capture', return_value=raw), patch('recapture.game_identity', return_value={'rules': RULES, 'files': 486}), self.assertRaisesRegex(ValueError, 'differs'):
                 main(argv)
             rejection = json.loads((failed / 'manifest.json').read_bytes())
             self.assertEqual(rejection['status'], 'failed')

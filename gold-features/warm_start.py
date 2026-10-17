@@ -40,7 +40,8 @@ def warm_start(checkpoint, actor_critic, *, generator=None):
     with torch.random.fork_rng(devices=[]):
         if generator is not None:
             torch.set_rng_state(generator.get_state())
-        model = actor_critic(old_g + added, old_c, dimensions[2])
+        with torch.device('cpu'):
+            model = actor_critic(old_g + added, old_c, dimensions[2]).to(device='cpu', dtype=torch.float32)
         model.load_state_dict(state, strict=True)
     result = deepcopy(checkpoint)
     result.update(model=state, dimensions=list(model.dimensions),

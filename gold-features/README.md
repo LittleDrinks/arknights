@@ -57,3 +57,6 @@ on_model, on_checkpoint = warm_start(parent_checkpoint, ActorCritic)
 下一步由 main 接回已审 `natural-win-bc`：先真实 paired recapture 全字段验收，再用同一 warm start、冻结训练数据/超参和配对评测计划做消融，报告实际终极通关率及分母。当前没有接入/运行该框架，没有训练、真实 Match/Battle、胜率或泛化结论。
 
 本地验证：`timeout 15s node --max-old-space-size=128 gold-features/tests.mjs`；`PYTHONDONTWRITEBYTECODE=1 timeout 15s /path/to/python3.10 gold-features/tests.py`。全为小维度合成或 mock；Python 只做 forward/backward，未执行 optimizer step。有限实测记录见 `CHECKS.md`。
+
+
+独立复审后的准入修复：只接收 complete/incomplete 冻结批次，拒绝整体 failed；前后对全部原始 .json.gz 文件集合对账。重采前后核对固定 486 个游戏规则/包文件的完整集合和每项 SHA，以及规则仓库 HEAD；规则清单本身绑定 SHA 236708b9…3270，gameIdentity 写入结果。warm-start 显式构造 CPU float32 参数，即使调用时全局 default dtype 为 float64，也不修改该默认设置或消费 RNG。原 ActorCritic forward 的 padding 仍依赖默认 dtype，其正常执行环境应为 float32；本模块不改原模型代码来支持全局 float64 推理。

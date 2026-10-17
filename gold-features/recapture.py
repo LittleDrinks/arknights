@@ -16,6 +16,7 @@ VERSION = 'shop-gold-v2'
 RULES = '6ab2468279e926d107788f63d7fe219b85f67b4a'
 TEAMS = {'normal': ['original-v1'] * 3, 'mixed': ['original-v1', 'buy2-v1', 'saver-v1']}
 HERE = Path(__file__).resolve().parent
+RULE_MANIFEST_SHA256 = '236708b90c8e51cf3af1874e8db192a64b0523423cc2ba1c5c1399ace3d63270'
 
 
 def sha(raw):
@@ -50,6 +51,30 @@ def unpack(path, limit):
 def require(condition, message):
     if not condition:
         raise ValueError(message)
+
+
+def game_identity(root, game):
+    """Pinned complete static file set, including packages and untracked rule data."""
+    raw = (root / 'policy/pins/rules-manifest.json').read_bytes()
+    require(sha(raw) == RULE_MANIFEST_SHA256, 'game rules manifest SHA mismatch')
+    pin = parse(raw)
+    require(pin['rulesCommit'] == RULES and len(pin['files']) == 486, 'game rules pin')
+    actual = {str(p.relative_to(game)) for folder in ('server', 'shared', 'data')
+              for p in (game / folder).rglob('*') if p.is_file() and p.suffix in ('.js', '.mjs', '.json')}
+    actual.update(('package.json', 'package-lock.json'))
+    require(actual == set(pin['files']), 'game source file set differs')
+    for name in sorted(actual):
+        require(sha((game / name).read_bytes()) == pin['files'][name], 'game file SHA mismatch: ' + name)
+    head = subprocess.check_output(['git', '-C', str(game), 'rev-parse', 'HEAD'], timeout=5, text=True).strip()
+    require(head == RULES, 'game HEAD mismatch')
+    return dict(path=str(game), rules=RULES, files=486, treeSHA256=pin['treeSha256'],
+                manifestSHA256=RULE_MANIFEST_SHA256)
+
+
+def raw_file_set(directory, manifest):
+    declared = {r['artifact'] for r in manifest['games'] if 'artifact' in r}
+    found = {p.name for p in directory.glob('*.json.gz')}
+    require(found == declared, 'unregistered or missing raw artifacts; independent reconciliation required')
 
 
 def same(old, new, path='$'):
@@ -221,12 +246,14 @@ def main(argv=None):
     manifest_raw = read_bounded(manifest_path, args.max_bytes)
     require(sha(manifest_raw) == args.manifest_sha256, 'frozen manifest SHA256 mismatch')
     manifest = parse(manifest_raw)
-    require(manifest['status'] in ('complete', 'incomplete', 'failed') and manifest.get('finishedAt') and
+    require(manifest['status'] in ('complete', 'incomplete') and manifest.get('finishedAt') and
             manifest['planned'] == 2048 and
             manifest['pairedTrainingSeeds'] == 1024 and len(manifest['games']) == 2048 and
             {(r['seed'], r['pool']) for r in manifest['games']} ==
             {(seed, pool) for seed in range(30001, 31025) for pool in TEAMS},
             'expected finalized frozen naturalteacher manifest')
+    raw_file_set(manifest_path.parent, manifest)
+    identity = game_identity(root, args.game.resolve())
     bindings = source_bindings(manifest, root, collector)
     selection_raw = read_bounded(selection_path, args.max_bytes)
     selected = parse(selection_raw)
@@ -268,7 +295,7 @@ def main(argv=None):
                   selection=dict(path=str(selection_path), sha256=sha(selection_raw)), sources=bindings,
                   implementation={p.name: sha(p.read_bytes()) for p in HERE.iterdir()
                                   if p.suffix in ('.mjs', '.py')},
-                  command=command, game=str(args.game.resolve()),
+                  command=command, game=str(args.game.resolve()), gameIdentity=identity,
                   fixedConfig=dict(split='train', poolSeed=313, teams=TEAMS, difficulty='ABYSS', budget=128),
                   limits=dict(seconds=args.seconds, perInputBytes=args.max_bytes, outputBytes=args.output_bytes),
                   results=[])
@@ -303,6 +330,8 @@ def main(argv=None):
                               comparison='whole old response equal after removing only schema/global extension')
         require(time.monotonic() < deadline, 'recapture total time limit')
         source_bindings(manifest, root, collector)
+        require(game_identity(root, args.game.resolve()) == identity, 'game identity changed during recapture')
+        raw_file_set(manifest_path.parent, manifest)
         require(read_bounded(manifest_path, args.max_bytes) == manifest_raw and
                 read_bounded(selection_path, args.max_bytes) == selection_raw, 'frozen inputs changed')
         require(all(sha(read_bounded(p, args.max_bytes)) == r['artifactSHA256'] for p, r in plan), 'old gzip changed')
