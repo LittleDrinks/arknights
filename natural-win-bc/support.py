@@ -111,7 +111,10 @@ def check_parent(root, path, expected):
 
 
 def model_guard(L, model, ckpt, game):
+    dims = ckpt.get('dimensions')
+    C.require(type(dims) is list and len(dims) == 3 and all(type(n) is int for n in dims) and
+              1 <= dims[2] <= 1024 and model.dimensions == dims, 'Original ActorCritic dimension contract')
     C.require(ckpt['schema'] == game['schema'] and ckpt['rules'] == C.RULES and
-              ckpt['dimensions'][:2] == C.dimensions(game['schema']) and ckpt['dimensions'][2] == 64,
+              dims[:2] == C.dimensions(game['schema']) and type(model) is L.ActorCritic,
               'Original ActorCritic dimensions/schema/rules')
     C.require(all(L.torch.isfinite(v).all().item() for v in model.state_dict().values()), 'Nonfinite model')

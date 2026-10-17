@@ -6,7 +6,7 @@ import signal
 import time
 
 from support import (C, MIB, REVIEW, LIMITATIONS, Evidence, source_identity, game_identity,
-                     check_parent, pool_sha)
+                     check_parent, pool_sha, model_guard)
 from admission import admit, recheck
 from evaluation import schedule, summary, evaluate
 
@@ -64,10 +64,13 @@ def main():
             C.require(game_identity(root, code)[1] == game, 'Game/static-data drift')
             check_parent(root, parent, args.parent_sha256)
         if args.command == 'train':
+            L = C.learner(code)
+            initial, checkpoint = L.load_checkpoint(parent)
+            model_guard(L, initial, checkpoint, game)
+            del initial, checkpoint
             directory = C.relative(root, args.input_dir)
             evidence = Evidence(out)
             samples, metadata = admit(directory, args.manifest_sha256, game, pool_sha(code), evidence)
-            L = C.learner(code)
             from training import train as fit
             report = fit(L, parent, samples, metadata, out, source, game, evidence)
             guard()

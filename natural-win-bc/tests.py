@@ -10,7 +10,7 @@ import time
 import unittest
 from unittest.mock import patch
 
-from support import C, E, CODE, HERE, PINS, MIB, Evidence, source_identity, game_identity, check_parent
+from support import C, E, CODE, HERE, PINS, MIB, Evidence, source_identity, game_identity, check_parent, model_guard
 from admission import PLAN, admit, frozen, complete_contract, read_artifact, recheck
 from training import train
 from evaluation import schedule, summary, evaluate
@@ -74,6 +74,14 @@ def fixture(base):
 
 
 class Contracts(unittest.TestCase):
+    def test_parent_guard_uses_checkpoint_hidden_dimension(self):
+        for hidden in (64, 128):
+            model = self.L.ActorCritic(90, 15, hidden)
+            checkpoint = dict(schema=SCHEMA, rules=C.RULES, dimensions=[90, 15, hidden])
+            model_guard(self.L, model, checkpoint, GAME)
+            with self.assertRaises(ValueError):
+                model_guard(self.L, model, {**checkpoint, 'dimensions': [90, 15, 0]}, GAME)
+
     @classmethod
     def setUpClass(cls):
         cls.L = C.learner(CODE)
