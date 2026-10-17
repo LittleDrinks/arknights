@@ -1,0 +1,15 @@
+{
+  "filesSHA256": {
+    "controller-v2/control.mjs": "2077b5886e17d38c4b9af5990450ead0994791d32af69ceafd8d78492b5f8f13",
+    "controller-v2/loader.mjs": "a962984afc973c23b784afe463b81953ccdc129edf8f417ae981582e5f6226d2",
+    "controller-v2/control.test.mjs": "303bafb167a832dcf2d4a77f125645f3a54a9249f880dad5311bbd6d383d7b29",
+    "rl/env.mjs": "723e397fabeea4e473b65523aaadbadba7b08af7fea27ec4f29fa38c3cefc4b5",
+    "rl/controller.mjs": "0385f6272d87faffc2079ff1df3688386237f8792c9eff0e8676c27dbdf8e06d",
+    "rl/features.mjs": "78f6c7a8bf99d35b6feb858536dc2d33fc50f36e6626ef9ab55d8903de9499da",
+    "rl/learner.py": "a14e014f082fc0bca8bc7eec5eab76c80d06972ae64f493f359bb24db7f4e726"
+  },
+  "gameHEAD": "6ab2468279e926d107788f63d7fe219b85f67b4a",
+  "gameTrackedRulesStatus": "",
+  "baseHEAD": "fac05305843b743ac8df05f59e80447785c41995",
+  "checkpointSHA256": "ca20165cf3cba2d240de04bc31c2c3556ed7feb86fca356371e12d7336c693bb"
+}
