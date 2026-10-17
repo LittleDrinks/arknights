@@ -138,7 +138,8 @@ class Contracts(unittest.TestCase):
             terminal.update(done=True, schema=SCHEMA, rules=RULES,
                             episode={k: old[k] for k in ('seed', 'difficulty', 'mode', 'budget')},
                             summary={'victory': False, 'roundsPassed': 1, 'seed': old['seed'], 'difficulty': 'NORMAL',
-                                     'reason': 'synthetic', 'players': [{'playerId': 'learner'}]},
+                                     'reason': 'synthetic', 'errors': 0,
+                                     'players': [{'playerId': 'learner', 'victory': False, 'roundsPassed': 1}]},
                             observation={'own': {}, 'public': {}, 'history': {}}, reward=-1,
                             controller='upstream-drafts+no-sale-arrange+regular-equipment+free-rewards/v1',
                             candidates=[], features={'global': [0.] * 90, 'candidates': [], 'mask': []})

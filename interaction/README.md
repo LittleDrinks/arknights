@@ -36,7 +36,7 @@
   "sampleCount": 16014,
   "episodeCount": 192,
   "episodes": [
-    {"seed": 12345, "difficulty": "NORMAL", "mode": "solo", "budget": 128,
+    {"seed": 10001, "difficulty": "NORMAL", "mode": "solo", "budget": 128,
      "split": "train", "samples": 83, "victory": false}
   ],
   "provenance": {
@@ -71,7 +71,7 @@
 python3 -B interaction/train.py \
   --data /data1/zsm/arknights/experiments/bc-expansion-v1/all.jsonl \
   --manifest interaction/artifacts/original-16k.manifest.json \
-  --game /data1/zsm/arknights/Stronghold-Protocol \
+  --game /data1/zsm/arknights/game \
   --allow-legacy-metadata \
   --epochs 24 --lr .0005 --batch-size 64 --hidden 128 \
   --init-seed 101 --order-seed 101 \
@@ -92,7 +92,7 @@ server 批量由主线程明确设定其允许的较大预算，例如：
 python3 -B interaction/eval.py \
   --checkpoint interaction/artifacts/paired-16k/concat-baseline.pt \
   --checkpoint interaction/artifacts/paired-16k/interaction.pt \
-  --game /data1/zsm/arknights/Stronghold-Protocol \
+  --game /data1/zsm/arknights/game \
   --wall-seconds 3600 --max-output-bytes 500000000 \
   --out interaction/artifacts/dev-16
 ```
@@ -130,3 +130,5 @@ python3 -B interaction/guard.py --out interaction/artifacts/real-new --real-only
 `evidence/` 保留合成测试报告/参数记录、真实完整 terminal/trace/eval 清单和资源报告；小型 checkpoint 留在被忽略的 `interaction/artifacts/`，未提交权重或生产数据。生产 manifest 来源审核、server 16k 两 arm 训练、64 项 dev 批量评估均未执行。完成此提交后停止，等待独立 review。
 
 证据源码摘要固定于实际执行时：真实局之后仅补充了 `check.py` 的合法 mask BC 更新断言，未修改模型/训练/评估/准入生产路径；旧真实证据保留原始 SHA，不用新摘要覆盖。最终合成运行的源码清单见 `evidence/synthetic-train.json`。
+
+独立审查后的终局准入修复：完整 solo terminal 要求 summary.errors 为严格整数0，唯一 learner 的 victory/roundsPassed 与顶层一致，嵌套 episode/summary 的 seed 与 budget 必须为正确范围的整数，禁止 Python bool/float 等值冒充。生产192局身份必须恰为10001..10064×三难度，不能通过自行标 train 混入验证集。`python3 -B interaction/terminal_check.py` 用真实保存终态检查11种损坏拒收；修复后5项合成契约通过（3.348秒，进程树RSS699621376 bytes），未新增真实仿真。原始证据文件保留，当前完整source身份由每次运行动态记录。

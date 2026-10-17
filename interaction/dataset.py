@@ -22,6 +22,12 @@ def full_terminal(terminal, expected, schema):
             'Full env.view terminal required, not a summary excerpt')
     require(terminal.get('done') is True, 'Incomplete terminal')
     require(terminal.get('schema') == schema and terminal.get('rules') == RULES, 'Terminal schema/rules')
+    episode = terminal.get('episode')
+    require(isinstance(episode, dict) and set(episode) == {'seed', 'difficulty', 'mode', 'budget'},
+            'Terminal episode fields')
+    identity(episode)
+    require(episode.get('mode') == 'solo' and type(episode.get('budget')) is int and
+            1 <= episode['budget'] <= 1024, 'Terminal episode mode/budget')
     require(terminal.get('episode') == expected, 'Terminal episode identity')
     for key in COUNTERS:
         require(type(terminal.get(key)) is int and terminal[key] >= 0, 'Terminal counter: ' + key)
@@ -34,6 +40,9 @@ def full_terminal(terminal, expected, schema):
             {'own', 'public', 'history'} <= set(terminal['observation']), 'Missing complete terminal observation')
     summary = terminal.get('summary')
     require(isinstance(summary, dict) and bool(summary) and
+            type(summary.get('seed')) is int and 1 <= summary['seed'] <= 0xffffffff and
+            type(summary.get('roundsPassed')) is int and summary['roundsPassed'] >= 0 and
+            type(summary.get('errors')) is int and summary['errors'] == 0 and
             summary.get('victory') is terminal['victory'] and
             summary.get('roundsPassed') == terminal['rounds'] and
             summary.get('seed') == expected['seed'] and summary.get('difficulty') == expected['difficulty'],
@@ -41,6 +50,10 @@ def full_terminal(terminal, expected, schema):
     require(isinstance(summary.get('reason'), str) and isinstance(summary.get('players'), list) and
             len(summary['players']) == 1 and isinstance(summary['players'][0], dict) and
             summary['players'][0].get('playerId') == 'learner', 'Incomplete solo terminal summary')
+    player = summary['players'][0]
+    require(type(player.get('victory')) is bool and player['victory'] is terminal['victory'] and
+            type(player.get('roundsPassed')) is int and player['roundsPassed'] == terminal['rounds'],
+            'Solo player outcome differs from terminal')
     require(terminal.get('candidates') == [] and terminal.get('features', {}).get('candidates') == [] and
             terminal.get('features', {}).get('mask') == [], 'Terminal still has candidates')
     validate_features(terminal['features'], schema_dimensions(schema), terminal=True)
@@ -85,6 +98,8 @@ def load_dataset(data_path, manifest_path, *, allow_legacy=False, synthetic=Fals
                 0 < manifest['sampleCount'] <= 128 and len(expected) <= 16, 'Small synthetic data only')
     else:
         require(manifest['sampleCount'] == 16014 and len(expected) == 192, 'Original 16014 labels / 192 demos only')
+        require(set(expected) == {(difficulty, seed) for difficulty in ('NORMAL', 'HARD', 'ABYSS')
+                                  for seed in range(10001, 10065)}, 'Original frozen training seed block required')
         require(manifest.get('teacher') == 'upstream-bot/rehearsal=0', 'Original teacher required')
     # Hash the SAME bytes we parse, through EOF. There is no max-samples early exit.
     digest = hashlib.sha256()
