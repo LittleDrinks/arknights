@@ -36,12 +36,12 @@ with tempfile.TemporaryDirectory(prefix='natural-bc-synthetic-') as tmp:
                     ids.update(extra)
                 peak = max(peak, sum(proc.get(pid, (0, 0))[1] for pid in ids))
                 size = 0
-                for p in Path(tmp).rglob('*'):
-                    try:
-                        if p.is_file():
-                            size += p.stat().st_size
-                    except FileNotFoundError:
-                        pass
+                for directory, _, files in os.walk(tmp):
+                    for name in files:
+                        try:
+                            size += (Path(directory) / name).stat().st_size
+                        except FileNotFoundError:
+                            pass
                 disk_peak = max(disk_peak, size)
                 if time.monotonic() - started >= 19 or peak > 1024**3 or disk_peak > 5_000_000:
                     raise RuntimeError('Synthetic test resource bound exceeded')
