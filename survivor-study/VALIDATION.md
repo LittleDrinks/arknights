@@ -40,3 +40,6 @@ Not validated here: server deployment, designated bc-expansion `all.pt` provenan
 admission, real-size training runtime/memory, or the real 128-game dev evaluation. Main must execute
 the documented train then eval commands after integration. Passing synthetic contracts makes no
 claim about expert quality, win rate, heldout families or unseen-seed generalization.
+
+
+Main 部署适配（实施者已停止后）：server venv 是 Python 3.10，替换 3.11 才引入的 hashlib.file_digest 为等价流式 SHA256；规则目录支持授权服务器的 game/ 与本地 Stronghold-Protocol/，须恰好存在一个。inputReviewStatus 改为中性 interface-checked-independent-review-record-external，独立批准记录单独保存，不把源码内旧待审状态当当前事实。原训练/评估/输入严格性不变；再次9项合成契约通过，实际服务器训练尚未执行。

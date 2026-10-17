@@ -127,7 +127,7 @@ class Contracts(unittest.TestCase):
         # Outcomes/candidate quality have no effect on selection.
         altered = [{**l, 'candidateIndex': 0, 'futureVictory': False} for l in data['labels']]
         self.assertEqual(select68(altered), (selected, strata))
-        self.assertEqual(data['inputReviewStatus'], 'unapproved-independent-review-17225e4')
+        self.assertEqual(data['inputReviewStatus'], 'interface-checked-independent-review-record-external')
 
     def test_bad_hash_and_full_eof(self):
         _, input_dir, primary = self.admitted()

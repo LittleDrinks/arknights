@@ -23,7 +23,7 @@ LIMITATIONS = [
     'Survivor selection is outcome-conditioned and has survivorship bias.',
     'Teammate teacher steps assume observed accepted partner shopping calls, not a real installed teacher.',
     'primary68 is a failed learner trajectory control, not positive expert data.',
-    'winning-labels 17225e4 is independently under review; interface checks do not approve its inputs.',
+    'Input interface checks alone do not approve trajectories; retain the independent extractor review separately.',
     'Normal and mixed contain training families; neither is heldout-family evaluation.',
 ]
 
@@ -54,8 +54,11 @@ def digest(data):
 
 
 def sha(path):
+    value = hashlib.sha256()
     with Path(path).open('rb') as f:
-        return hashlib.file_digest(f, 'sha256').hexdigest()
+        for block in iter(lambda: f.read(65536), b''):
+            value.update(block)
+    return value.hexdigest()
 
 
 def write(path, value):
@@ -105,7 +108,10 @@ def clean_env():
 
 
 def game_identity(root, code):
-    game = root / 'Stronghold-Protocol'
+    candidates = [p for p in (root / 'game', root / 'Stronghold-Protocol') if (p / 'server/match/Match.js').exists()]
+    # Local research and the authorized server use different checkout directory names.
+    require(len(candidates) == 1, 'Exactly one game or Stronghold-Protocol checkout required')
+    game = candidates[0]
     pin = parse((code / 'policy/pins/rules-manifest.json').read_bytes())
     require(pin['rulesCommit'] == RULES, 'Rules manifest revision')
     files = {str(p.relative_to(game)) for folder in ('server', 'shared', 'data')

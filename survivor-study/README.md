@@ -11,13 +11,13 @@
 队友购物调用计步，没有真实安装独立 teacher 去验证 scheduler/清理/预算计步等价。
 
 输入接口来自独立工作树 `experiment-winning-labels/winning-labels/evidence/`，
-其 `17225e4` 尚在独立 review。程序始终记录 `unapproved-independent-review-17225e4`；
+其 `17225e4` 尚在独立 review。程序始终记录 `interface-checked-independent-review-record-external`；
 audit/哈希/契约通过不等于输入已批准，也不代替其独立 review。这里不提供“自动批准”开关。
 metadata 原有 provenance、limitations、完整终局、四席胜负和提取计数全部原样保留。
 
 ## 两个服务器命令
 
-`--root` 是数据部署根，必须有 `Stronghold-Protocol/`；代码自动从 `--root` 或
+`--root` 是数据部署根，须有 `game/` 或 `Stronghold-Protocol/` 中的唯一规则仓库；代码自动从 `--root` 或
 `--root/experiment-code` 查找，歧义时传 `--experiment-code`。所有相对路径参数（包括
 `--input-dir`）均相对 `--root`，也接受绝对路径。无开发工作树绝对路径硬编码。
 先由 main 将完整 evidence 放到下例的 `--root/winning-labels/evidence/`，将 primary

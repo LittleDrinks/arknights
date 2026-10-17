@@ -153,4 +153,4 @@ def admit(input_dir, primary, *, source, game):
             'selections': selections, 'strata': strata, 'metadata': m, 'audit': audit, 'labels': labels,
             'inputSHA': identities, 'rawInputSHA256': digest(encoded(identities)),
             'rawCaptureHashStatus': 'Declared by extractor; original raw capture not re-read by this command.',
-            'inputReviewStatus': 'unapproved-independent-review-17225e4'}
+            'inputReviewStatus': 'interface-checked-independent-review-record-external'}
