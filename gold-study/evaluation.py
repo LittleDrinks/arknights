@@ -26,6 +26,33 @@ def summary(rows):
                        for m in MODES for p in C.TEAMS})
 
 
+def verify_evaluation_evidence(rows, out):
+    """Reconcile the evidence of finished games before granting final success credit."""
+    required = {'protocol.jsonl', 'actions.jsonl', 'stderr.log', 'terminal.json'}
+    for row in rows:
+        if row['status'] == 'unrun':
+            continue
+        if 'files' not in row:
+            C.require(row['status'] == 'failed', 'Completed game lacks evaluation evidence')
+            continue
+        directory = out / row['id']
+        files = row['files']
+        C.require(row['status'] != 'complete' or required <= set(files), 'Incomplete evaluation evidence')
+        C.require({p.name for p in directory.iterdir()} == set(files) | {'result.json'},
+                  'Evaluation evidence file set drift')
+        for name, identity in files.items():
+            C.require('/' not in name and name not in ('.', '..', 'result.json'), 'Evaluation evidence name')
+            path = directory / name
+            C.require(path.is_file() and not path.is_symlink() and path.stat().st_size == identity['bytes'] and
+                      C.sha(path) == identity['sha256'], 'Evaluation evidence drift: ' + row['id'] + '/' + name)
+        saved = directory / 'result.json'
+        identity = row['resultFile']
+        C.require(saved.is_file() and not saved.is_symlink() and saved.stat().st_size == identity['bytes'] and
+                  C.sha(saved) == identity['sha256'], 'Evaluation result file drift')
+        C.require(read_json(saved, 16384) == {k: v for k, v in row.items() if k != 'resultFile'},
+                  'Evaluation result metadata drift')
+
+
 def game_job(row, model, ckpt, code, game, out, deadline, byte_limit, pool_manifest):
     result, steps, started, channel = dict(row), 0, time.monotonic(), None
     directory = out / row['id']
@@ -76,6 +103,8 @@ def game_job(row, model, ckpt, code, game, out, deadline, byte_limit, pool_manif
         result['files'] = {p.name: dict(sha256=C.sha(p), bytes=p.stat().st_size) for p in sorted(directory.iterdir()) if p.is_file()}
         C.require(len(C.encoded(result)) <= 16384, 'Per-game result metadata reserve')
         C.write(directory / 'result.json', result)
+        result['resultFile'] = dict(sha256=C.sha(directory / 'result.json'), bytes=(directory / 'result.json').stat().st_size)
+        C.require(len(C.encoded(result)) <= 16384, 'Per-game result metadata reserve')
     return result
 
 
@@ -156,6 +185,7 @@ def evaluate(L, trained, parent, code, game_path, game, out, source, rows, deadl
                     rows[i] = {**rows[i], 'status': 'failed', 'error': str(error)[:2000]}
             C.write(out / 'summary.json', dict(status='running', **summary(rows), games=rows))
     guard()
+    verify_evaluation_evidence(rows, out)
     check_evidence()
     recheck(metadata)
     for name, (model, _) in models.items():

@@ -301,13 +301,28 @@ class Tests(unittest.TestCase):
             evidence.put('warmBaseline.pt', b'must not overwrite')
         rows = V.schedule()
         def job(row, *args):
-            return {**row, 'status': 'failed' if row['seed'] == 2 else 'complete',
-                    'teamVictory': True, 'learnerIndividualVictory': False}
+            directory = args[4] / row['id']
+            directory.mkdir()
+            for name in ('protocol.jsonl', 'actions.jsonl', 'stderr.log', 'terminal.json'):
+                (directory / name).write_bytes(b'{}\n')
+            result = {**row, 'status': 'failed' if row['seed'] == 2 else 'complete',
+                      'teamVictory': True, 'learnerIndividualVictory': False,
+                      'files': {p.name: dict(bytes=p.stat().st_size, sha256=C.sha(p)) for p in directory.iterdir()}}
+            C.write(directory / 'result.json', result)
+            result['resultFile'] = dict(sha256=C.sha(directory / 'result.json'), bytes=(directory / 'result.json').stat().st_size)
+            return result
         with patch.object(V, 'game_job', side_effect=job):
             V.evaluate(L, out, parent, CODE, self.base, GAME, C.new_output(self.base / 'eval'),
                        {'synthetic': True}, rows, time.monotonic() + 2, lambda: None)
         s = V.summary(rows)
         self.assertEqual((s['denominator'], s['complete'], s['failed'], s['learnerWins']), (96, 90, 6, 0))
+        drift_out = C.new_output(self.base / 'eval-raw-drift')
+        drift_rows = V.schedule()
+        def corrupt_raw():
+            (drift_out / drift_rows[0]['id'] / 'protocol.jsonl').write_bytes(b'changed after game\n')
+        with patch.object(V, 'game_job', side_effect=job), self.assertRaisesRegex(ValueError, 'Evaluation evidence drift'):
+            V.evaluate(L, out, parent, CODE, self.base, GAME, drift_out,
+                       {'synthetic': True}, drift_rows, time.monotonic() + 2, corrupt_raw)
         rows = V.schedule()
         with patch.object(V, 'game_job') as jobs:
             V.evaluate(L, out, parent, CODE, self.base, GAME, C.new_output(self.base / 'expired'),

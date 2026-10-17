@@ -38,3 +38,5 @@ elapsed=3.32 maxRSS_KiB=760784
 Main rebase: moved isolated module onto fbd7c2b to use the reviewed parent-width fix and race-safe monitor; refreshed exact dependency hashes. Original game/rl/coop and gold feature code unchanged. Worker source commit7814f0b preserved; final review uses integration ref.
 
 After rebase, updated the stale expected base constant in the syntax/pin test; 9 synthetic contracts pass in 2.82s, peak process RSS635652KiB. No real game or production training in this checkout.
+
+复审1710f9c发现评估结束时缺少本轮raw/action/terminal重验。修复新增所有完成/有元数据的失败局目录集合/每文件大小及SHA核对，result.json自身大小/SHA由外层row记录，且正文与row字段一致；缺失/改写/多余文件或结果漂移触发现有CLI全局撤销胜场路径。真实96调度的mock jobs现在生成完整小证据，末尾guard改写protocol的回归被拒绝。9合成契约通过3.53秒/637056KiB，无真实对局或训练。

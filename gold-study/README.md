@@ -85,3 +85,5 @@ env PYTHONDONTWRITEBYTECODE=1 CUDA_VISIBLE_DEVICES='' \
 ```
 
 只用 tiny vocabulary + 498个合成标签、原 learner 每 arm200次更新、fakeProtocol、Python mock children；测试不导入游戏/static loader，不运行真实采样。全套外部18s timecap、RSS检查<1GiB，每测试仅在完成后检查其自有临时目录<5MB并清理；不复用自然研究的 rglob 并发 monitor。验证记录见 `CHECKS.md`。
+
+最终评估发布前重新核对每局协议、动作、终局和结果元数据的文件集合、大小与SHA；与外层resultFile摘要绑定的result.json正文亦须一致。完整局缺证据、既有文件漂移、未知新增文件均进入全局失败和胜场撤销路径，保留原始异常文件。
