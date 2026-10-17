@@ -34,3 +34,5 @@ elapsed=3.32 maxRSS_KiB=760784
 第一轮有一项测试调用漏传必需的 `--trained`，因此 argparse 拒绝；这是测试调用错误，已修复。该轮 elapsed4.07s / maxRSS758212KiB。第二轮全部通过，elapsed3.33s / maxRSS756912KiB；随后补训练发布物末尾核验、每局结果预算预留及同498合成标签的次数断言，最终结果如上。三轮合计约10.72s，无扩大到真实数据的验证。
 
 未验证：服务器实际六个自然胜局重采、全量真实训练性能/耗时、真实96局结果、胜率改善和泛化。main 必须先完成真实 paired recapture 并独立接受 source，再按 README 顺序运行。
+
+Main rebase: moved isolated module onto fbd7c2b to use the reviewed parent-width fix and race-safe monitor; refreshed exact dependency hashes. Original game/rl/coop and gold feature code unchanged. Worker source commit7814f0b preserved; final review uses integration ref.
