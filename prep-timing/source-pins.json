@@ -1,0 +1,132 @@
+{
+  "base": "25c6af63cbb819bb4a4ed9682bed2824f27a4ec5",
+  "helpers": [
+    "coop-items/run.py",
+    "survivor-study/common.py",
+    "survivor-study/evaluate.py",
+    "survivor-study/static.mjs",
+    "policy/pins/rules-manifest.json"
+  ],
+  "files": {
+    "coop/.gitignore": {
+      "bytes": 24,
+      "sha256": "553d888952a23e007d8de3f17e3a76af89c1cd62525beb7d8527ecb5b2bdc867"
+    },
+    "coop/README.md": {
+      "bytes": 13826,
+      "sha256": "e33cb72f4cf8b1ec4e0ea7aaffe213de30499bcafa114263371934325ef1a788"
+    },
+    "coop/VALIDATION.md": {
+      "bytes": 15159,
+      "sha256": "475ed8d9bb1f400b312a80e6611d56eb6fbdd5481920eadd1c2bdbfb2c7399a4"
+    },
+    "coop/check.py": {
+      "bytes": 4095,
+      "sha256": "a4aa70e2da05b3b17afe5097bc9cc21afe743789a1ff2f7197792e191800039f"
+    },
+    "coop/controller.mjs": {
+      "bytes": 1450,
+      "sha256": "815f441b51a1e13d9f712f3f30bc393c7963a21893cb9e4a5c96474514f5f133"
+    },
+    "coop/env.mjs": {
+      "bytes": 11807,
+      "sha256": "437c9669d08aff2bf60d6a9db98e1f94846d73ead27fb876c146bdbf6302f20c"
+    },
+    "coop/env.test.mjs": {
+      "bytes": 7640,
+      "sha256": "82d95af1a143a18664a593fe1ee57803c5f19e7fd20f600d8e6d50882a55a241"
+    },
+    "coop/partners.mjs": {
+      "bytes": 2032,
+      "sha256": "0863504cac8ff7b98d031d9a7ce81520fce3239018630b32f4778b390ee8b827"
+    },
+    "coop/pool.json": {
+      "bytes": 649,
+      "sha256": "738349b6432bc1c5c91fe3a9384e179a935855bf2b4a6f5a0171ad0701904cc7"
+    },
+    "coop/pool.mjs": {
+      "bytes": 3560,
+      "sha256": "986fe78da3001971e4dffae14103b9229de68945734d8cfe4a7a87d0ad6c251d"
+    },
+    "coop/preflight.mjs": {
+      "bytes": 2578,
+      "sha256": "b436c3e96782115c3c38c8cceee6cdbb4c3504bc5f68aa87002799e359d0feb4"
+    },
+    "coop/preflight.test.mjs": {
+      "bytes": 8674,
+      "sha256": "f6364a018918a23f52e9820305c3afb359b5c9b0d3316dcbec758abda55b10c1"
+    },
+    "coop/rejections.mjs": {
+      "bytes": 5507,
+      "sha256": "2979eb85a90c33e3018e1add9266fbdca2d25a4750609cf47fde954c5364860c"
+    },
+    "coop/rejections.test.mjs": {
+      "bytes": 11968,
+      "sha256": "f703f497f1b3fbce30665644fbbc46835259c52c3e48f2ca278b4035c29dcd3c"
+    },
+    "coop/smoke.py": {
+      "bytes": 4008,
+      "sha256": "54c26baf915c0c63f9b8f38c289ddf6feb05ce647d559c49e2b5ff57c6fa10cf"
+    },
+    "coop-items/run.py": {
+      "bytes": 20837,
+      "sha256": "4b84137816e2c1e509b432bafb572c3fd2a72092588f7b92e7a7a77786edddfa"
+    },
+    "policy/pins/rules-manifest.json": {
+      "bytes": 54284,
+      "sha256": "236708b90c8e51cf3af1874e8db192a64b0523423cc2ba1c5c1399ace3d63270"
+    },
+    "rl/.gitignore": {
+      "bytes": 54,
+      "sha256": "6c763a0f19f811006914b20635e9e4bd218cbb0ac35a80642cacb30341806d37"
+    },
+    "rl/README.md": {
+      "bytes": 9358,
+      "sha256": "465c411cb1b51cbdf2573399c4cdb15f3f708c55a8aa08defc1c862993ea03a6"
+    },
+    "rl/SMOKE.md": {
+      "bytes": 4449,
+      "sha256": "ebb1906c869f0751b790ab94ebfe9c513ef79c0b8409792a7a2c1073d1dfb381"
+    },
+    "rl/config.json": {
+      "bytes": 239,
+      "sha256": "a38b17d27cb0c2a323f170ea3bed6e7e6010d8d9f77d29eb3ef6d4ad1f9c2bfc"
+    },
+    "rl/controller.mjs": {
+      "bytes": 2392,
+      "sha256": "0385f6272d87faffc2079ff1df3688386237f8792c9eff0e8676c27dbdf8e06d"
+    },
+    "rl/env.mjs": {
+      "bytes": 12980,
+      "sha256": "723e397fabeea4e473b65523aaadbadba7b08af7fea27ec4f29fa38c3cefc4b5"
+    },
+    "rl/env.test.mjs": {
+      "bytes": 3450,
+      "sha256": "331ce52941524a62da91c3b6dc540cfac29f082c85d32a108ce67fa03917d974"
+    },
+    "rl/features.mjs": {
+      "bytes": 3962,
+      "sha256": "78f6c7a8bf99d35b6feb858536dc2d33fc50f36e6626ef9ab55d8903de9499da"
+    },
+    "rl/learner.py": {
+      "bytes": 18890,
+      "sha256": "a14e014f082fc0bca8bc7eec5eab76c80d06972ae64f493f359bb24db7f4e726"
+    },
+    "rl/smoke.py": {
+      "bytes": 5011,
+      "sha256": "b5c3fee409d2981437799b755372b9ab68bd9297c04944dce275fbe6f3cfef25"
+    },
+    "survivor-study/common.py": {
+      "bytes": 12019,
+      "sha256": "c7390529bc2e2e656c604814b3d7217bf1a0ef6108418aca031d4e483ed7b6d7"
+    },
+    "survivor-study/evaluate.py": {
+      "bytes": 17716,
+      "sha256": "1dc2e7249a5a71e08e5815aed8b36da199ea7606f841231060e0ca121185868f"
+    },
+    "survivor-study/static.mjs": {
+      "bytes": 661,
+      "sha256": "079eba225ecfc24c533f079be91b826ee5ceb31d274d4b8493e2bf99f1f63434"
+    }
+  }
+}
