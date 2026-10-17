@@ -500,12 +500,13 @@
     "teacher/observe.mjs": "c6f0c085b6820b307ac8ed920dc35397d0b8655d7f91d71678c3599d0cd05d92"
   },
   "implementation": {
-    "README.md": "4a027c53decd0c0ab2928c7829ff46f57639c0b3da604cc08d278a9a74423229",
+    "README.md": "80275f1a330cc36819a237183b53b8ca4f4e6601438636e193d6a07a6244d52e",
     "contracts.test.mjs": "5b01d6b8e17eb5d24c19b2bbc1d6d45be6817c9f2c5725ff9368e265e59098eb",
     "loader.mjs": "d8aaa4172e585faf79fc7b18328c5c2b808d2f35a6b72ae148bb4e6160b0a3e0",
     "observe.mjs": "a5570af7931be8e2e9bd5ac97c6facf3b5ad1fcdb930a8350f63d2997ea8a31a",
     "policy.mjs": "5c4fcf001ba616b79a53e425e8f9b20595a4015bd9290d4ee9b0c4f40040af2c",
-    "run.py": "03c3e9aa2e25cf4d34248bb6ec8aa9a7b9136667b5c1b44d17a77b27ba1889cf",
-    "verify.py": "39cf7edd9b636b6618b5c397bf9486aba43b8f78cd4e9632df61dabcc7a38cb1"
+    "run.py": "f27bdd8799182bc50bbd966eff5e91a96a517f77ed9d25e89f37a252994ade2e",
+    "verify.py": "39cf7edd9b636b6618b5c397bf9486aba43b8f78cd4e9632df61dabcc7a38cb1",
+    "runner.test.py": "830c1ea3733c542391519a6012fa3fb8f0bd629d55a6932ce020281dc1ab8779"
   }
 }

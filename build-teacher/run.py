@@ -47,6 +47,11 @@ def preflight():
 def size_tree(path):
     return sum(p.stat().st_size for p in path.rglob('*') if p.is_file())
 
+def write_ledger(path, value):
+    temp = path.with_suffix(path.suffix + '.tmp')
+    temp.write_text(json.dumps(value, indent=2)+'\n')
+    temp.replace(path)
+
 def rss(pid):
     try:
         lines = Path(f'/proc/{pid}/status').read_text().splitlines()
@@ -147,62 +152,62 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
     env = {k:v for k,v in os.environ.items() if not k.startswith('ARK_') and k != 'NODE_OPTIONS'}
     env['ARK_BUILD_GAME_ROOT'] = str(GAME)
-    records, total, peak, reason = [], 0.0, 0, None
-    # Child-wall sum deliberately includes Node imports, observer, and original benchmark.
-    for case in cases:
-        for seed in range(args.seed, args.seed + args.seeds):
-            if total >= args.seconds - 0.25:
-                records.append({'label':f'{case}-{seed}', 'status':'not-run-budget'})
-                continue
-            label = f'{case}-{seed}'
-            child_env = {**env, **(CASES[case] or {}), 'ARK_BUILD_TRACE':str(out / f'{label}.jsonl')}
-            cmd = ['node', '--max-old-space-size=384']
-            if case != 'upstream':
-                cmd += ['--loader', str(HERE / 'loader.mjs')]
-            cmd += ['--import', str(HERE / 'observe.mjs'), str(GAME / 'tools/botbench.mjs'),
-                    '--configs', 'solo:ABYSS', '--seed', str(seed), '--seeds', '1', '--rehearsal', '0',
-                    '--jobs', '1', '--json', str(out / f'{label}.json'), '--quiet']
-            record = {'label':label, 'case':case, 'seed':seed, 'status':'running', 'command':cmd}
-            records.append(record)
-            # Ledger written BEFORE spawning, so interrupted attempts remain visible.
-            (out / 'budget.json').write_text(json.dumps({'childWallSeconds':total, 'server':args.server, 'records':records}, indent=2))
-            started = time.monotonic()
-            reason = None
-            with (out / f'{label}.log').open('wb') as log:
-                proc = subprocess.Popen(cmd, env=child_env, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
-                while proc.poll() is None:
-                    elapsed = time.monotonic() - started
-                    current_rss = rss(proc.pid) + rss(os.getpid())
-                    peak = max(peak, current_rss)
-                    # Margins below user maxima leave room for polling/termination/summary.
-                    if total + elapsed >= args.seconds: reason = 'timeout'
-                    elif current_rss > 700 * 1024**2: reason = 'rss-limit'
-                    elif size_tree(out) > args.output_mib * 1024**2: reason = 'output-limit'
-                    if reason:
-                        os.killpg(proc.pid, signal.SIGKILL)
-                        break
-                    time.sleep(0.025)
-                proc.wait()
-            elapsed = time.monotonic() - started
-            total += elapsed
-            record.update(status=reason or ('complete' if proc.returncode == 0 else 'failed'),
-                          exit=proc.returncode, childWallSeconds=elapsed)
-            ledger = {'childWallSeconds':total, 'peakSampledAggregateRssBytes':peak,
-                'childHighWaterRssKiB':resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,
-                'outputBytes':size_tree(out), 'server':args.server, 'records':records}
-            (out / 'budget.json').write_text(json.dumps(ledger, indent=2)+'\n')
-            print(f'{label}: {record["status"]}; cumulative child wall {total:.3f}s', flush=True)
-            if reason:
-                break
-        if reason:
-            break
+    records = [{'label':f'{case}-{seed}', 'case':case, 'seed':seed, 'status':'not-run'}
+               for case in cases for seed in range(args.seed, args.seed + args.seeds)]
+    total, peak, reason = 0.0, 0, None
+    # Persist the ENTIRE planned denominator before any child can fail or time out.
+    write_ledger(out / 'plan.json', {'plannedGames':len(records), 'records':records})
+    write_ledger(out / 'budget.json', {'plannedGames':len(records), 'childWallSeconds':0,
+        'server':args.server, 'records':records})
+    for record in records:
+        case, seed = record['case'], record['seed']
+        if reason or total >= args.seconds - 0.25:
+            record.update(status='not-run-budget', stopReason=reason or 'time-budget')
+            continue
+        label = f'{case}-{seed}'
+        child_env = {**env, **(CASES[case] or {}), 'ARK_BUILD_TRACE':str(out / f'{label}.jsonl')}
+        cmd = ['node', '--max-old-space-size=384']
+        if case != 'upstream':
+            cmd += ['--loader', str(HERE / 'loader.mjs')]
+        cmd += ['--import', str(HERE / 'observe.mjs'), str(GAME / 'tools/botbench.mjs'),
+                '--configs', 'solo:ABYSS', '--seed', str(seed), '--seeds', '1', '--rehearsal', '0',
+                '--jobs', '1', '--json', str(out / f'{label}.json'), '--quiet']
+        record.update(status='running', command=cmd)
+        # Ledger written BEFORE spawning, so interrupted attempts remain visible.
+        write_ledger(out / 'budget.json', {'plannedGames':len(records), 'childWallSeconds':total, 'server':args.server, 'records':records})
+        started = time.monotonic()
+        reason = None
+        with (out / f'{label}.log').open('wb') as log:
+            proc = subprocess.Popen(cmd, env=child_env, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
+            while proc.poll() is None:
+                elapsed = time.monotonic() - started
+                current_rss = rss(proc.pid) + rss(os.getpid())
+                peak = max(peak, current_rss)
+                # Margins below user maxima leave room for polling/termination/summary.
+                if total + elapsed >= args.seconds: reason = 'timeout'
+                elif current_rss > 700 * 1024**2: reason = 'rss-limit'
+                elif size_tree(out) > args.output_mib * 1024**2: reason = 'output-limit'
+                if reason:
+                    os.killpg(proc.pid, signal.SIGKILL)
+                    break
+                time.sleep(0.025)
+            proc.wait()
+        elapsed = time.monotonic() - started
+        total += elapsed
+        record.update(status=reason or ('complete' if proc.returncode == 0 else 'failed'),
+                      exit=proc.returncode, childWallSeconds=elapsed)
+        ledger = {'plannedGames':len(records), 'childWallSeconds':total, 'peakSampledAggregateRssBytes':peak,
+            'childHighWaterRssKiB':resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,
+            'outputBytes':size_tree(out), 'server':args.server, 'records':records}
+        write_ledger(out / 'budget.json', ledger)
+        print(f'{label}: {record["status"]}; cumulative child wall {total:.3f}s', flush=True)
     result = summarize(out, records)
     (out / 'summary.json').write_text(json.dumps(result, ensure_ascii=False, indent=2)+'\n')
     # Include the derived summary in the final output measurement.
-    ledger = {'childWallSeconds':total, 'peakSampledAggregateRssBytes':peak,
+    ledger = {'plannedGames':len(records), 'childWallSeconds':total, 'peakSampledAggregateRssBytes':peak,
         'childHighWaterRssKiB':resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,
         'outputBytes':size_tree(out), 'server':args.server, 'records':records}
-    (out / 'budget.json').write_text(json.dumps(ledger, indent=2)+'\n')
+    write_ledger(out / 'budget.json', ledger)
     print(json.dumps({'realControls':result['realControls'], 'outputBytes':size_tree(out)}, ensure_ascii=False))
     controls_ok = all(all(v.values()) for v in result['realControls'].values())
     bad_runs = any(c.get('status') != 'complete' or not c.get('completed') or c.get('errors') or c.get('parseErrors') for c in result['cases'])

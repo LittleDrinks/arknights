@@ -141,3 +141,5 @@ ARK_BUILD_GAME_ROOT=/absolute/path/to/Stronghold-Protocol \
 - overflow hook 只封原 bot 的主动收尾路径；游戏自身其它生命周期不改。无战斗合约覆盖“全受保护仍合法卖出退款”；自然运行没有该紧急情形。
 - 本次只验收 solo、rehearsal0、一个固定自然种子；合作/非零rehearsal/heldout大量跑分未执行。server入口可用不等于服务器验证完成。
 - 不把构造 fixture、字幕作者自述、静态机制或本弱启发式称为“强模型”。需要独立 review 后才决定改策略、扩测试或作为教师数据来源。提交后停止，等待 review。
+
+独立审查后的 runner 修复：启动任何子进程前，`plan.json` 固化全部 case/seed 与计划分母，`budget.json` 原子替换并始终保留所有条目。超时后的未执行局标 `not-run-budget`；spawn 异常时计划与未完成账本也保留，不从分母消失。`PYTHONDONTWRITEBYTECODE=1 python3 build-teacher/runner.test.py` 注入首局超时及进程创建失败，两例均保留4局，未运行模拟。原8局自然档案保持原样。
