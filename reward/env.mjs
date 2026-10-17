@@ -24,7 +24,7 @@ const decorate=state=>{
 for await(const line of readline.createInterface({input:process.stdin,crlfDelay:Infinity})){
   try{
     const req=JSON.parse(line);let result;
-    if(req.cmd==='reset'){paidRounds=0;result=env.reset(req);result={...result,reward:0};}
+    if(req.cmd==='reset'){result=env.reset(req);paidRounds=0;result={...result,reward:0};}
     else if(req.cmd==='step')result=decorate(env.step(req.candidateIndex));
     else if(req.cmd==='demo')result=env.demo(req);
     else if(req.cmd==='close'){env.close();console.log(JSON.stringify({ok:true}));break;}
