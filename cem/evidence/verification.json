@@ -31,7 +31,7 @@
   "cleanupVerified": true,
   "limitation": "Original run failed only the legacy resource upper-bound check. SELF ru_maxrss inherits pre-exec launcher history. Current /proc VmHWM fix is regression-tested without simulation. Original parent VmHWM was not recorded; no corrected retrospective hard RSS bound or post-fix game run is claimed.",
   "originalRunnerSha256": "fb54c64a12221ef1830082d800436be01e86b550eaef092483554860fac7bc18",
-  "correctedRunnerSha256": "295c57147a8b0ce941f8bf8296c370f46be6bd0aa2b8849c6fdc0dbf1b08fbcf",
+  "correctedRunnerSha256": "ebb0a258e40149b23f3927cd335fc7c882730c776dc98a712466fd10ab6935a6",
   "rawSha256": [
     {
       "file": "raw/smoke-vanilla.json",

@@ -88,3 +88,5 @@ JS 契约核对真实 pinned source/default 字节等价、严格 schema 边界�
 本次仅两局自然 smoke，见 `evidence/smoke/`：两个 seed=20017 结果完全等价，均 `victory=false`、roundsPassed=10、reason=eliminated；模拟包络 5.610 秒，采样总 RSS 峰值 258.18 MiB，最大游戏子进程 RSS 239.15 MiB，cleanup 已验证。未训练 CEM、未运行 dev/val/sealed；无改善结论。
 
 **原始 smoke manifest 保持 `failed`**：两局及等价检查均通过，但旧资源上界错误地加了 `getrusage(SELF).ru_maxrss`，该值继承了启动器 pre-exec 高水位，误报约 863 MiB。无游戏复现实验证实 `/proc/VmHWM` 与其不同；已改用当前地址空间高水位，并加入回归测试。保留执行时 runner 原文 `evidence/smoke-runner-before-resource-fix.py.txt`（hash 与原 manifest 对应）。修复后没有重跑游戏；`evidence/verification.json` 独立复核原始输出，不能将其写成修复后完整 smoke 已运行。
+
+独立审查后修复并发记账：每局先在局部 pending 对象完成 raw/outcome/audit/hash 校验，再持同一 RLock 一次发布到共享 rows；其他 worker 的 accounting/save 只能看到 running 或完整完成记录。新增双线程故障夹具在 validate_record 中暂停首局并让另一 worker 保存，确认不再出现 complete 缺 outcome 的 KeyError。15项Python测试通过，全部无游戏；原始两局smoke/failed状态不变，offline证据仅刷新当前runner hash。

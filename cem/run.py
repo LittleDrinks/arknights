@@ -277,6 +277,7 @@ class Experiment:
             return
         with self.lock:
             row['status'] = 'running'
+            pending = dict(row)
             self.save()
         raw = self.a.out/'raw'/f"{row['id']}.json"
         audit = raw.with_suffix('.audit.json')
@@ -293,13 +294,13 @@ class Experiment:
             if profile is not None and digest(profile) != expected_profile_hash:
                 raise ValueError('Profile drift before game')
             run = self.supervisor.launch(command, env, raw.with_suffix('.log'), self.a.timeout, simulation=True)
-            row.update(run)
-            row['raw'] = str(raw.relative_to(self.a.out))
+            pending.update(run)
+            pending['raw'] = str(raw.relative_to(self.a.out))
             if run['status'] == 'complete':
                 rows = json.loads(raw.read_text())
                 if not isinstance(rows, list) or len(rows) != 1:
                     raise ValueError('Expected exactly one raw record')
-                row['outcome'] = validate_record(rows[0], row['seed'])
+                pending['outcome'] = validate_record(rows[0], row['seed'])
                 proof = json.loads(audit.read_text())
                 if proof['status'] != 'complete' or not proof.get('sourceUnchangedAfter') or proof['provenance'] != self.provenance:
                     raise ValueError('Missing/changed source audit')
@@ -309,13 +310,17 @@ class Experiment:
                     raise ValueError('Wrong benchmark source in raw record')
                 if profile is not None and digest(profile) != expected_profile_hash:
                     raise ValueError('Profile drift after game')
-                row['rawSha256'] = digest(raw)
-                row['auditSha256'] = digest(audit)
+                pending['rawSha256'] = digest(raw)
+                pending['auditSha256'] = digest(audit)
                 self.check_code()
         except Exception as e:
-            row['status'], row['reason'] = 'failed', str(e)
+            pending['status'], pending['reason'] = 'failed', str(e)
         finally:
-            self.save()
+            # Publish a completed row only after raw outcome, audit and hashes
+            # are valid. Other workers save/account under this same lock.
+            with self.lock:
+                row.update(pending)
+                self.save()
 
     def evaluate(self, candidate, rows, profile):
         expected = candidate['profileSha256']

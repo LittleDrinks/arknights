@@ -12,6 +12,8 @@ import sys
 import tempfile
 import time
 import unittest
+import threading
+from unittest.mock import patch
 
 from core import CEM, CURVES, TRAIN_SEEDS, accounting, fitness, make_plan, select, validate_parameters, validate_record
 from run import Experiment, HERE, REPO, Supervisor, atomic_json, clean_env, group_members, parse_args, proc_memory_bytes
@@ -34,6 +36,63 @@ class Contracts(unittest.TestCase):
                                 env=clean_env(), capture_output=True, text=True, check=True)
         cls.provenance = json.loads(result.stdout)
         cls.schema = cls.provenance['schema']
+
+    def test_completed_game_is_published_only_after_outcome_validation(self):
+        # Pause raw validation while another worker saves the shared manifest.
+        # No process or game starts; this exercises the production game() seam.
+        import run as runtime
+        with tempfile.TemporaryDirectory(dir=HERE, prefix='.contract-') as tmp:
+            out = Path(tmp)
+            ex = Experiment(parse_args(['--mode', 'smoke', '--out', str(out)]))
+            ex.provenance = self.provenance
+            for name in ('raw', 'profiles', 'candidates'):
+                (out / name).mkdir()
+            row = ex.rows[0]
+            entered, release = threading.Event(), threading.Event()
+            errors = []
+            real_validate = validate_record
+
+            def launch(command, env, log, timeout, simulation=True):
+                raw = out / 'raw' / (row['id'] + '.json')
+                atomic_json(raw, [terminal(row['seed'])])
+                atomic_json(raw.with_suffix('.audit.json'), dict(status='complete', sourceUnchangedAfter=True,
+                    provenance=self.provenance, trainedModel=False, profileFileSha256=None))
+                value = json.loads(raw.read_text())
+                value[0]['experiment']['sourceBenchmarkSha256'] = self.provenance['sources']['botbench']
+                atomic_json(raw, value)
+                return dict(status='complete', reason=None, exitCode=0, cleanup=True)
+
+            def validate(value, seed):
+                entered.set()
+                if not release.wait(3):
+                    raise TimeoutError('Regression fixture was not released')
+                return real_validate(value, seed)
+
+            def work():
+                try:
+                    ex.game(row, vanilla=True)
+                except BaseException as error:
+                    errors.append(error)
+
+            with patch.object(ex.supervisor, 'launch', side_effect=launch), patch.object(runtime, 'validate_record', side_effect=validate):
+                thread = threading.Thread(target=work)
+                thread.start()
+                try:
+                    self.assertTrue(entered.wait(3))
+                    self.assertEqual(row['status'], 'running')
+                    self.assertNotIn('outcome', row)
+                    ex.save()  # Used to raise KeyError('outcome') here.
+                    saved = json.loads((out / 'manifest.json').read_text())
+                    self.assertEqual(saved['accounting']['total']['statuses'], {'running': 1, 'unrun': 1})
+                finally:
+                    release.set()
+                    thread.join(3)
+            self.assertFalse(thread.is_alive())
+            self.assertEqual(errors, [])
+            self.assertEqual(row['status'], 'complete', row)
+            self.assertIn('outcome', row)
+            self.assertIn('rawSha256', row)
+            self.assertIn('auditSha256', row)
 
     def test_numeric_update_has_independent_closed_form(self):
         cem = CEM(self.schema, alpha=.7)
