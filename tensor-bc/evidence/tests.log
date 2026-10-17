@@ -1,0 +1,11 @@
+test_01_independent_numerics (__main__.contracts.<locals>.Contracts.test_01_independent_numerics) ... ok
+test_02_ownership_fallback_restore (__main__.contracts.<locals>.Contracts.test_02_ownership_fallback_restore) ... ok
+test_03_whole_file_admission (__main__.contracts.<locals>.Contracts.test_03_whole_file_admission) ... ok
+test_04_cli_metadata_loader_and_nooverwrite (__main__.contracts.<locals>.Contracts.test_04_cli_metadata_loader_and_nooverwrite) ... ok
+test_05_source_drift_and_exception_cleanup (__main__.contracts.<locals>.Contracts.test_05_source_drift_and_exception_cleanup) ... ok
+test_06_local_timing (__main__.contracts.<locals>.Contracts.test_06_local_timing) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 1.143s
+
+OK
