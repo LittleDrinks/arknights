@@ -1,4 +1,5 @@
-import { serialize } from 'node:v8';
+import { serialize, deserialize } from 'node:v8';
+import { isDeepStrictEqual } from 'node:util';
 
 // Audited against the pinned player/{economy,placement,prep,items}.js. Codes alone
 // are insufficient: item handlers can return the same errors AFTER dispatching effects.
@@ -49,6 +50,22 @@ export function rejectionState(m) {
 const functionIds = new WeakMap();
 let functionSequence = 0;
 
+// Coarse field paths only: no values, Map keys, item IDs or teammate offers.
+// This diagnostic does not participate in the unchanged-state decision.
+function changedPaths(before, after) {
+  const a = deserialize(before), b = deserialize(after), paths = [];
+  const fields = (x, y, prefix) => {
+    for (const k of new Set([...Object.keys(x || {}), ...Object.keys(y || {})])) {
+      if (Object.hasOwn(x || {}, k) !== Object.hasOwn(y || {}, k) ||
+          !isDeepStrictEqual(x?.[k], y?.[k])) paths.push(`${prefix}.${k}`);
+    }
+  };
+  for (let i = 0; i < Math.max(a.players.length, b.players.length); i++) fields(a.players[i], b.players[i], `players[${i}]`);
+  for (const key of ['match', 'rng', 'scheduler']) fields(a[key], b[key], key);
+  for (const key of ['pool', 'itemPool']) if (!isDeepStrictEqual(a[key], b[key])) paths.push(key);
+  return paths;
+}
+
 export function checkedProposal(ps, method, invoke, { arrange = false } = {}) {
   const m = ps.m, before = rejectionState(m), dispatch = m.dispatchItem;
   let effectDispatched = false;
@@ -56,9 +73,10 @@ export function checkedProposal(ps, method, invoke, { arrange = false } = {}) {
   let result;
   try { result = invoke(); } finally { m.dispatchItem = dispatch; }
   if (result?.ok) return { result };
-  const unchanged = before.equals(rejectionState(m));
+  const after = rejectionState(m), unchanged = before.equals(after);
   const known = arrange ? method === 'move' && ['BAD_TILE', 'BOARD_FULL'].includes(result?.error) :
     Object.hasOwn(validation, method) && [...validation[method], 'WRONG_PHASE', 'ELIMINATED'].includes(result?.error);
   return { result, diagnostic: known && unchanged && !effectDispatched,
+    ...(!unchanged ? { pathdiff: changedPaths(before, after) } : {}),
     reason: effectDispatched ? 'effect-dispatched' : !unchanged ? 'state-changed' : known ? 'pure-validation' : 'unknown-rejection' };
 }

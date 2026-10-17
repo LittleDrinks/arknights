@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Linux bounded validation: whole process group <=30s, sampled aggregate RSS <1GiB, files <=20MB."""
+"""Linux bounded validation: whole process group <=20s, sampled aggregate RSS <768MiB, files <=20MB."""
 import argparse
 import json
 import os
@@ -28,23 +28,28 @@ def group_rss(pgid):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--seconds', type=float, default=30)
-    parser.add_argument('--only', choices=['engine', 'learner', 'rejections'])
+    parser.add_argument('--seconds', type=float, default=20)
+    parser.add_argument('--only', choices=['engine', 'learner', 'rejections', 'preflight'])
+    parser.add_argument('--pattern', help='Node test name pattern (skip unrelated simulation)')
     args = parser.parse_args()
-    if not 0 < args.seconds <= 30:
-        parser.error('seconds must be in (0,30]')
+    if not 0 < args.seconds <= 20:
+        parser.error('seconds must be in (0,20]')
     out = Path(tempfile.mkdtemp(prefix='coop-check-'))
     env = {**os.environ, 'COOP_CHECK_OUT': str(out), 'PYTHONDONTWRITEBYTECODE': '1',
            'COOP_POOL': 'mixed', 'COOP_SPLIT': 'train', 'COOP_POOL_SEED': '1',
            'COOP_TEAM': 'original-v1,buy2-v1,saver-v1', 'OMP_NUM_THREADS': '1', 'MKL_NUM_THREADS': '1',
            'NODE_OPTIONS': '--max-old-space-size=192', 'MALLOC_ARENA_MAX': '2'}
     commands = []
-    if args.only == 'rejections': commands.append(['node', '--test', 'coop/rejections.test.mjs'])
+    if args.only == 'preflight': commands.append(['node', '--test', 'coop/preflight.test.mjs'])
+    elif args.only == 'rejections': commands.append(['node', '--test', 'coop/rejections.test.mjs'])
     else:
         if args.only != 'learner':
-            commands.append(['node', '--test', '--test-concurrency=1', 'coop/env.test.mjs',
+            commands.append(['node', '--test', '--test-concurrency=1', 'coop/env.test.mjs', 'coop/preflight.test.mjs',
                              *([] if args.only else ['coop/rejections.test.mjs'])])
         if args.only != 'engine': commands.append([sys.executable, '-B', 'coop/smoke.py'])
+    if args.pattern:
+        if any(cmd[0] != 'node' for cmd in commands): parser.error('--pattern requires Node-only checks')
+        for cmd in commands: cmd.insert(2, '--test-name-pattern=' + args.pattern)
     start, peak, size, failure = time.monotonic(), 0, 0, None
     try:
         for i, cmd in enumerate(commands):
@@ -56,7 +61,7 @@ def main():
                         peak = max(peak, group_rss(p.pid))
                         size = sum(f.stat().st_size for f in out.rglob('*') if f.is_file())
                         if time.monotonic() - start > args.seconds: raise RuntimeError('wall/simulation budget exceeded')
-                        if peak > 0.90 * 1024 ** 3: raise RuntimeError('RSS safety margin exceeded (1 GiB ceiling)')
+                        if peak > 700 * 1024 ** 2: raise RuntimeError('RSS safety margin exceeded (768 MiB ceiling)')
                         if size > 20_000_000: raise RuntimeError('artifact budget exceeded')
                         if p.poll() is not None: break
                         time.sleep(0.05)

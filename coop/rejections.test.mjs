@@ -6,11 +6,18 @@ import { poolConfig } from './pool.mjs';
 import { rejectionState, checkedProposal } from './rejections.mjs';
 import { control } from '../rl/controller.mjs';
 import { capacityFilteredBot } from './controller.mjs';
+import { loadMovePreflight } from './preflight.mjs';
+
+async function createBase() {
+  const base = await ShopEnv.create();
+  base.movePreflight = await loadMovePreflight();
+  return base;
+}
 
 const fixedWeak = () => poolConfig({ COOP_POOL: 'weak', COOP_TEAM: 'buy2-v1,saver-v1,buy2-v1' });
 
 test('original validation rejection remains audited and the real game continues', async () => {
-  const base = await ShopEnv.create();
+  const base = await createBase();
   const e = new CoopEnv(base, poolConfig({ COOP_POOL: 'normal' }));
   try {
     const s = e.reset({ seed: 11, difficulty: 'ABYSS', budget: 2 });
@@ -28,8 +35,8 @@ test('original validation rejection remains audited and the real game continues'
   } finally { e.close(); }
 });
 
-test('upstream arrange BAD_TILE retains controllerErrors without aborting policy step', async () => {
-  const base = await ShopEnv.create();
+test('arrange BAD_TILE is filtered before recorder and engine dispatch', async () => {
+  const base = await createBase();
   let rejected;
   const e = new CoopEnv({ ...base, bot: { ...base.bot, arrange(m, ps) {
     const piece = ps.hand.find(p => p?.kind === 'chess');
@@ -38,18 +45,20 @@ test('upstream arrange BAD_TILE retains controllerErrors without aborting policy
   try {
     const s = e.reset({ seed: 11, difficulty: 'ABYSS', budget: 4 });
     const next = e.step(s.candidates.findIndex(a => a.type === 'buy' && !a.id.includes('item')));
-    assert.equal(rejected.error, 'BAD_TILE');
-    assert.equal(next.controllerErrors, 1);
+    assert.equal(rejected.error, 'COOP_BAD_TILE_FILTER');
+    assert.equal(next.controllerErrors, 0);
     assert.equal(next.actionErrors, 0);
-    assert.equal(e.controllerDiagnosticErrors, 1);
-    assert.equal(e.rejectedActions.at(-1).result.error, 'BAD_TILE');
+    assert.equal(e.controllerDiagnosticErrors, 0);
+    assert.equal(e.controllerBlockedMoves, 1);
+    assert.equal(e.controllerBlockedMoveReasons[0].reason, 'destination-out-of-field');
+    assert.equal(e.rejectedActions.length, 0);
     assert(!e.history.actions.some(a => a.type === 'move'));
     assert.deepEqual(next.schema, s.schema);
   } finally { e.close(); }
 });
 
 test('only known unchanged validation qualifies; effects and hidden mutations stay fatal', async () => {
-  const base = await ShopEnv.create();
+  const base = await createBase();
   const e = new CoopEnv(base, poolConfig({ COOP_POOL: 'normal' }));
   try {
     e.reset({ seed: 11, difficulty: 'ABYSS' });
@@ -61,10 +70,12 @@ test('only known unchanged validation qualifies; effects and hidden mutations st
     for (const method of ['buy', 'sell', 'move', 'equip', 'pickReward', 'useArt', 'destroy']) {
       const r = p[method](-1);
       assert.equal(r.error, 'BAD_TARGET');
-      assert.equal(e.partnerAudit[p.playerId].rejections.at(-1).diagnostic, true);
+      const record = e.partnerAudit[p.playerId].rejections.at(-1);
+      assert.equal(record.diagnostic, true, JSON.stringify({ method, reason: record.reason, pathdiff: record.pathdiff }));
     }
     const reject = invoke => e.callPlayer(p, 'buy', [-1], invoke, true);
-    assert.equal(reject(() => ({ error: 'NEW_ERROR' })).reason, 'unknown-rejection');
+    const unknown = reject(() => ({ error: 'NEW_ERROR' }));
+    assert.equal(unknown.reason, 'unknown-rejection', JSON.stringify(unknown));
     const mutations = [
       () => p.funds++, () => { p.counters.hiddenProbe = 1; },
       () => { e.ps.pendingFunds++; }, () => e.m.rngShop(),
@@ -76,6 +87,8 @@ test('only known unchanged validation qualifies; effects and hidden mutations st
       const record = reject(() => { mutate(); return { error: 'BAD_TARGET' }; });
       assert.equal(record.diagnostic, false);
       assert.equal(record.reason, 'state-changed');
+      assert(record.pathdiff.length > 0);
+      assert(record.pathdiff.every(p => /^(players\[\d+\]\.\w+|match\.\w+|rng\.\w+|scheduler\.\w+|pool|itemPool)$/.test(p)));
     }
     assert.throws(() => e.assertHealthy(), /Invalid coop rollout/);
     const dispatch = e.m.dispatchItem;
@@ -93,7 +106,7 @@ test('only known unchanged validation qualifies; effects and hidden mutations st
 });
 
 test('weak actions, primary candidates, unknown controller failures and exceptions abort', async () => {
-  const base = await ShopEnv.create();
+  const base = await createBase();
   const e = new CoopEnv(base, fixedWeak());
   const normalBot = e.bot;
   try {
@@ -117,7 +130,7 @@ test('weak actions, primary candidates, unknown controller failures and exceptio
     assert.equal(e.rejectedActions.at(-1).diagnostic, false);
 
     e.reset({ seed: 11, difficulty: 'ABYSS' });
-    e.bot = capacityFilteredBot({ arrange: (m, ps) => ps.move(-1, { area: 'board', row: 10, col: 5 }, 'RIGHT') }, () => {}, e.arranging);
+    e.bot = capacityFilteredBot({ arrange: (m, ps) => ps.move(-1, { area: 'board', row: 10, col: 5 }, 'RIGHT') }, () => {}, e.arranging, e.movePreflight);
     control(e);
     assert.equal(e.controllerErrors, 1);
     assert.equal(e.controllerDiagnosticErrors, 0);
@@ -134,7 +147,7 @@ test('weak actions, primary candidates, unknown controller failures and exceptio
 });
 
 test('diagnostics stay private until a real terminal and rejected calls are never successful actions', async () => {
-  const base = await ShopEnv.create();
+  const base = await createBase();
   const e = new CoopEnv(base, poolConfig({ COOP_POOL: 'mixed', COOP_TEAM: 'original-v1,buy2-v1,saver-v1' }));
   try {
     let s = e.reset({ seed: 11, difficulty: 'ABYSS', budget: 1 });
@@ -145,7 +158,7 @@ test('diagnostics stay private until a real terminal and rejected calls are neve
     assert.equal(audit.actions, actions);
     assert.equal(audit.hash.copy().digest('hex'), hash);
     while (!s.done) {
-      for (const key of ['partnerAudit', 'partnerActionErrors', 'rejectedActions', 'controllerDiagnosticErrors']) assert(!(key in s));
+      for (const key of ['partnerAudit', 'partnerActionErrors', 'rejectedActions', 'controllerDiagnosticErrors', 'controllerBlockedMoveReasons', 'filteredMoves']) assert(!(key in s));
       assert(!('diagnostics' in s.episode));
       s = e.step(s.candidates.findIndex(a => a.type === 'ready'));
     }
@@ -161,7 +174,7 @@ test('diagnostics stay private until a real terminal and rejected calls are neve
 });
 
 test('terminal diagnostics travel in episode metadata without changing schema', async () => {
-  const base = await ShopEnv.create();
+  const base = await createBase();
   const e = new CoopEnv(base, poolConfig({ COOP_POOL: 'heldout', COOP_SPLIT: 'eval' }));
   try {
     let s = e.reset({ seed: 11, difficulty: 'ABYSS', budget: 1 });
@@ -181,7 +194,7 @@ test('terminal diagnostics travel in episode metadata without changing schema', 
 });
 
 test('a primary arrange BAD_TILE with hidden mutation cannot be exempted', async () => {
-  const base = await ShopEnv.create();
+  const base = await createBase();
   class PollutedMatch extends base.Match {
     constructor(options) {
       super(options);
@@ -199,5 +212,6 @@ test('a primary arrange BAD_TILE with hidden mutation cannot be exempted', async
     assert.equal(e.controllerDiagnosticErrors, 0);
     assert.equal(e.ps.counters.hiddenPollution, 1); // No rollback concealing the failure.
     assert.equal(e.rejectedActions[0].reason, 'state-changed');
+    assert(e.rejectedActions[0].pathdiff.includes('players[0].counters'));
   } finally { e.close(); }
 });

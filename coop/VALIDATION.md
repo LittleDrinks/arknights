@@ -1,5 +1,37 @@
 # 验证记录（2026-10-18）
 
+## v3 move preflight：exp/coop-filter
+
+基线 `d70c84b`，工作树 `experiment-coop-filter`；只修改 `coop/`。原规则 pin `6ab2468279e926d107788f63d7fe219b85f67b4a`，父环境的 HEAD/clean 检查保留。无 SSH、依赖安装、subagent 或大 batch。本次未重现主 server 的完整 normal 768 / mixed 3840 steps 前缀，不能宣称那两批已通过。
+
+审查 `server/match/player/placement.js`：chess BAD_TILE 在 160（目标）/171（反向 swap）；token 在 242/248（目标与 ownerAfter）/255（反向 swap）/266（手牌 token 占用格）；board→hand 在 311（换入 chess 的原格）。chess→自身 summon 会回收它，不能错误套用反向落点检查。`deployMap` 会写缓存及 `_legalityStale`；token 回手存在删除/恢复及 count 路径，不能因错误码放行状态变化。本次仅提前过滤上述确定 BAD_TILE，不豁免 HAND_FULL、effects 或其他真实状态变化。
+
+`preflight.mjs` 调用当前 player 原 `_legal`，使用 Object.create(ps) 派生 receiver 承接缓存写入，使用同一 pinned 游戏路径的 board helpers；不做 snapshotclone / move 模拟 / 棋盘写入。固定 arrange 记录 blocked reason；original move 记录 filtered。实际拒绝计数、成功轨迹和 guard 规则保留。新增 pathdiff 是粗粒度字段路径，不含值、Map key 或队友私有动作参数；不进入 features，partner fatal 的安全路径可在错误响应看到。
+
+验证结果：
+
+- `--only preflight --seconds 3`：最终 **3/3 通过**。16 个独立构造 placement fixture 对比原 `ps.move`：目标/反向 swap、hand swap、召唤物 range/occupancy、ownerAfter 双方向、自身 summon 例外、缓存 stale 等。过滤分支原引擎均 BAD_TILE，board/hand/temp 不变；预检全状态及 live cache 不变。正例原引擎成功。另有两个独立真实 reset、seed 11、相同 buy 前缀，验证 (10,6) LEFT / (11,6) DOWN 的原引擎拒绝与过滤；这不是服务器 R4/R11 的完整复现。生产 factory、original filtered 计数、未知目标实际拒绝计数以及被吞掉的 preflight 异常 fatal 均覆盖。
+- 拒绝 suite 首次完整运行 **6/7 通过**：mixed/heldout 真实终局与可见性、weak/学习候选错误、primary 隐藏污染 fatal 通过；`only known unchanged` 在 BAD_TARGET 上间歇报 state-changed。单跑该项通过，随后前三项串联曾在 NEW_ERROR 的空操作上也报 state-changed；添加诊断断言后的相同前三项串联 **3/3 通过**。未修改 guard 判定来消除它，尚不能断言间歇现象已解决；review/server 应保留 reason/pathdiff（包括空 pathdiff）。
+- 另一次排除终局的筛选运行未在 3 秒完成，被监控终止，无结果，**不计通过**。未继续完整重跑。
+- 原容量过滤/方法恢复、冻结池身份检查通过。schema 未改，终局 `episode.diagnostics` 仍携带诊断。
+- `git diff --check` 通过。未运行完整 engine 四终局 suite、learner smoke、训练或 v3 同 seed 大 batch；留给主 server 在 review 后运行。
+
+全部监控调用（包括两次 fixture 初始化失败和一次超时）累计 **17.363 秒**，采样进程组 RSS 峰值 **401.8 MiB**，低于 20 秒 / 768 MiB。监控器阈值 700 MiB、Node heap 192 MiB、50ms 采样；这不是内核硬 RSS 限制。
+
+| `/tmp/coop-check-` 后缀 | 秒 | 结果 |
+|---|---:|---|
+| `m231z3_u` | 0.823 | fixture 缺 onEnd；真实 reset 对照通过 |
+| `t2k1d8cd` | 0.924 | fixture 缺 difficulty；真实 reset 对照通过 |
+| `8igpi8wk` | 0.929 | 初版 preflight 2/2 |
+| `sa8h6fsl` | 7.842 | 完整拒绝 suite 6/7，间歇 state-changed |
+| `0xbbjnhl` | 0.822 | guard 项单跑通过 |
+| `8uh59g7n` | 0.972 | 前三项串联 2/3，空操作 state-changed |
+| `oa5vb5p9` | 1.029 | 前三项串联 3/3 |
+| `5ydms_kg` | 0.779 | 最终 preflight 3/3 |
+| `axk8zfw3` | 3.038 | 3 秒监控终止，无结果 |
+| `lsh_gl7t` | 0.206 | 容量/身份检查通过 |
+
+
 ## 本次拒绝分类修复：exp/coop-robust
 
 工作树 `experiment-coop-fix`，基线 `bf33344`。只修改 `coop/`；未修改游戏、`rl/`、`parallel-rl/`、schema 或 checkpoint。以下服务器现象来自主会提供的已保留证据，本次未通过 SSH 重跑：normal/mixed 首次 4 actor ABYSS 均首 batch 失败、totalSteps=0；normal 原版队友拒绝被计入 actionErrors；mixed primary arrange 在 R6 提议 uid10 → (10,5) RIGHT，BAD_TILE 被计入 controllerErrors。原 bot 11556 轨迹本已有 8 次 BAD_TILE，拒绝后游戏能继续。**本次不宣称没有拒绝，也不宣称服务器失败种子已经通过。**

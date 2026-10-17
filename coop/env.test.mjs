@@ -5,6 +5,7 @@ import { ShopEnv } from '../rl/env.mjs';
 import { encode } from '../rl/features.mjs';
 import { MANIFEST, validateManifest, poolConfig, selectTeam } from './pool.mjs';
 import { capacityFilteredBot } from './controller.mjs';
+import { loadMovePreflight } from './preflight.mjs';
 
 test('capacity filter rejects planner overflow before engine dispatch and restores methods', () => {
   let blocked = 0, dispatched = 0;
@@ -45,7 +46,7 @@ test('strict frozen identities, disjoint heldout and reproducible selection', ()
 
 test('real coop terminals, pool behavior, seat ownership, per-round actions, replay, visible schema', async () => {
   const base = await ShopEnv.create();
-  const deps = { Match: base.Match, VirtualScheduler: base.VirtualScheduler, data: base.data, bot: base.bot };
+  const deps = { Match: base.Match, VirtualScheduler: base.VirtualScheduler, data: base.data, bot: base.bot, movePreflight: await loadMovePreflight() };
   const run = (pool, fixed) => {
     const config = poolConfig({ COOP_POOL: pool, COOP_SPLIT: 'eval', ...(fixed ? { COOP_TEAM: fixed } : {}) });
     const e = new CoopEnv(deps, config);
