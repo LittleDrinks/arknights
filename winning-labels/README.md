@@ -30,6 +30,8 @@ timeout 20s node --max-old-space-size=512 --test --test-concurrency=1 winning-la
 
 可用 `--raw`、`--reference`、`--game` 指定这些文件/目录的其他位置；这不是通用其他 seed/模式转换器。非空 DIY/stand-in 私有数据覆盖明确拒绝，避免误用基础 GameData。`--audit` 与 `--out` 不能并用。输出路径及其真实父目录必须在本目录，既存目录/文件/符号链接不覆盖；输入只读。校验失败时不创建标签目录。磁盘写入失败可能留下部分新目录，审阅时必须确认 `audit.json` 存在并核对其中所有文件哈希。
 
+独立审查后额外固定了已复现 capture 的解压内容 SHA-256 和完整 terminal 的规范 JSON SHA-256；允许无损重压缩，拒绝改写任何历史或审计字段的新输入。显式要求该固定轨迹 reward=1、已知 controller、controller/diagnostic/partner error 与过滤计数均为零，核对两份 partnerAudit，并对完整终局作完整性校验。这是针对这一份已独立验证输入的白名单转换，不声称能够验证任意新轨迹的 action hash 或成功来源；新增轨迹须先独立核验再扩展。
+
 预算：每次处理检查 20 秒、峰值 RSS ≤768 MiB；上述 `timeout` 提供硬超时，V8 堆限制 512 MiB。输出总实际字节数 ≤5,000,000（gzip 文件的压缩大小）。压缩输入上限 5 MB，raw 解压上限 64 MiB，reference 解压上限 16 MiB；不打印大数组。
 
 ## 来源与重建边界

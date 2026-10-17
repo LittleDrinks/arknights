@@ -73,6 +73,21 @@ test('full raw: primary68 exact, survivor-only BC contract, fail-closed referenc
     const raw = readJsonl(DEFAULT_RAW).rows;
     const valid = validateRaw(raw); assert.equal(valid.events.length, 1066);
     const terminal = raw.at(-1), last = raw.at(-2);
+    // Review regression: equal nonzero controller counters are not a clean fixed capture.
+    terminal.controllerErrors = terminal.controllerDiagnosticErrors = 1;
+    assert.throws(() => validateRaw(raw), /fixed capture controllerErrors/);
+    terminal.controllerErrors = terminal.controllerDiagnosticErrors = 0;
+    terminal.reward = -1; assert.throws(() => validateRaw(raw), /fixed capture reward/); terminal.reward = 1;
+    const controller = terminal.controller; terminal.controller = 'wrong';
+    assert.throws(() => validateRaw(raw), /fixed capture controller/); terminal.controller = controller;
+    const partnerAudit = terminal.partnerAudit['partner-1'];
+    const actionHash = partnerAudit.actionSHA256; partnerAudit.actionSHA256 = '0'.repeat(64);
+    assert.throws(() => validateRaw(raw), /partner audit aliases/);
+    terminal.episode.diagnostics.partnerAudit['partner-1'].actionSHA256 = partnerAudit.actionSHA256;
+    raw[0].provenance.episode.diagnostics.partnerAudit['partner-1'].actionSHA256 = partnerAudit.actionSHA256;
+    assert.throws(() => validateRaw(raw), /fixed complete terminal integrity/);
+    partnerAudit.actionSHA256 = terminal.episode.diagnostics.partnerAudit['partner-1'].actionSHA256 = actionHash;
+    raw[0].provenance.episode.diagnostics.partnerAudit['partner-1'].actionSHA256 = actionHash;
     terminal.summary.errors = 1; assert.throws(() => validateRaw(raw)); terminal.summary.errors = 0;
     last.exception = 'late failure after survivor ready'; assert.throws(() => validateRaw(raw), /exception at seq/); delete last.exception;
     assert.throws(() => validateRaw(raw.slice(0, -1)), /terminal/);

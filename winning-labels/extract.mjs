@@ -15,6 +15,10 @@ export const BASE = 'ce9c4c6f624b1093872b3192db95a122aafaf0e0';
 export const DEFAULT_RAW = path.resolve(ROOT, '../experiments/coop-training-win-50003.jsonl.gz');
 export const DEFAULT_REFERENCE = path.resolve(ROOT, '../experiments/coop-training-win-primary-labels-reference.jsonl.gz');
 export const DEFAULT_GAME = path.resolve(ROOT, '../Stronghold-Protocol');
+// A converter for this independently reproduced capture, not a generic expert-data collector.
+// Pin decompressed content so lossless recompression is allowed without admitting edited history.
+export const CAPTURE_PAYLOAD_SHA256 = '15219c15523bf0c08f5fd53e9a00f7deb7b7e03a711d3275f73bca8c722c9c28';
+export const TERMINAL_SHA256 = '6a4b3961d4b03222453b3c2a8c082bec14425b7eeb8b37434b488c0b8daec05d';
 export const sha = bytes => createHash('sha256').update(bytes).digest('hex');
 const ids = ['learner', 'partner-1', 'partner-2', 'partner-3'];
 const git = (dir, ...args) => execFileSync('git', ['-C', dir, ...args], { encoding: 'utf8', timeout: 5000 }).trim();
@@ -87,7 +91,13 @@ export function validateRaw(rows) {
   for (const key of ['engineErrors', 'actionErrors']) assert.equal(terminal[key], 0, `terminal ${key}`);
   assert.equal(terminal.summary.errors, 0);
   assert.equal(header.engineErrors, 0); assert.equal(header.schedulerErrors, 0);
-  assert.equal(terminal.controllerErrors, terminal.controllerDiagnosticErrors);
+  for (const key of ['controllerErrors', 'controllerDiagnosticErrors', 'partnerActionErrors',
+    'controllerBlockedMoves', 'partnerBlockedSales']) assert.equal(terminal[key], 0, `fixed capture ${key}`);
+  assert.equal(terminal.reward, 1, 'fixed capture reward');
+  assert.equal(terminal.controller,
+    'coop/move-preflight-v3+upstream-drafts+no-sale-arrange+regular-equipment+free-rewards/v1',
+    'fixed capture controller');
+  exact(terminal.partnerAudit, terminal.episode.diagnostics.partnerAudit, 'partner audit aliases');
   exact(originalIds(header.summary), terminal.summary, 'header summary aliases vs raw terminal');
   exact(header.provenance.episode, terminal.episode, 'episode provenance');
   assert.equal(header.victory, terminal.victory); assert.equal(header.roundsPassed, terminal.rounds);
@@ -144,12 +154,16 @@ export function validateRaw(rows) {
     assert.equal(player.roundsPassed, positive ? 14 : 10);
     assert.equal(player.eliminatedRound, positive ? null : 11);
   }
+  // Seal the complete known terminal, including partner action hashes/round counters and every
+  // raw diagnostic. This does not infer audit consistency for an unverified new seed/capture.
+  assert.equal(sha(JSON.stringify(terminal)), TERMINAL_SHA256, 'fixed complete terminal integrity');
   return { header, terminal, events };
 }
 
 export async function extract({ raw = DEFAULT_RAW, reference = DEFAULT_REFERENCE, game = DEFAULT_GAME } = {}) {
   const started = performance.now(), guard = guardSince(started);
   const input = readJsonl(raw), ref = readJsonl(reference, 16 * 1024 * 1024);
+  assert.equal(input.source.payloadSHA256, CAPTURE_PAYLOAD_SHA256, 'fixed complete capture integrity');
   guard();
   const { header, terminal, events } = validateRaw(input.rows);
   assert.equal(ref.rows.length, 68, 'exact-reference must have all 68 primary samples');

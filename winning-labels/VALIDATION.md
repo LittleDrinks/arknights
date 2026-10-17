@@ -42,3 +42,9 @@ reference 53cccec88914f077e55e6aaee0679084695c8190c840962ec92455f7954387f2
 ```
 
 未执行：真实队友 teacher 环境对照、任何 Match/Battle、训练、评估或新轨迹泛化。队友历史的可观察口径和与 actual primary 的区别见 [README.md](README.md)。这些验证不是“专家泛化”或冻结模型胜率证明。
+
+## 独立审查后的终局准入修复
+
+17225e4 的独立审查复算确认 primary68 全字段一致、207 survivor 样本及历史一致，但发现终局拒绝路径遗漏：相等非零 controller counters、错误 reward/controller、同改 partnerAudit 两份别名时未完整拒绝。已只在本目录修复；依据原 coop/env.mjs recorder、已精确复现的固定 raw 文件和完整终局作为信任起点。显式校验该 capture 的零错误/过滤计数、reward=1、已知 controller、partnerAudit 别名，再固定完整 terminal 规范 JSON 与解压 raw 内容 SHA。只针对该已核验输入，不泛化接受任意新轨迹，不从终局生成特征。
+
+新增故障回归覆盖上述四类，8/8 契约测试通过，3.79秒。修复期间两次测试失败为测试代码问题（变量重名、测试未同步第三份 provenance 别名）；修正后重跑通过，未改准入条件迎合故障。新提取产物单独写 verified-v2/，不覆盖旧 evidence/；samples/labels/dispositions 内容不变，新 metadata 记录修复后实现 SHA。旧 evidence 保留其原始 provenance。仍未训练/模拟。
