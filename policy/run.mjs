@@ -16,6 +16,28 @@ for(let i=2;i<process.argv.length;i++){
 }
 if(!own.game||!own.out)throw new Error('Usage: node policy/run.mjs --game GAME --out FILE [--profile JSON] [--entry BENCH_WRAPPER] --configs ... --seeds ... --jobs ...');
 if(forward.includes('--json')||forward.includes('--compare'))throw new Error('Use --out; compare is not a run');
+// Restrict the experiment interface to unambiguous benchmark plans. The upstream
+// parser accepts repeated/fractional flags, which must not silently change N.
+const flags={};
+for(let i=0;i<forward.length;i++){
+  const key=forward[i];
+  if(!['--configs','--seeds','--seed','--jobs','--rehearsal','--band','--quiet'].includes(key))throw new Error('Unknown benchmark flag: '+key);
+  if(Object.hasOwn(flags,key))throw new Error('Repeated benchmark flag: '+key);
+  if(key==='--quiet'){flags[key]=true;continue;}
+  const value=forward[++i];
+  if(value==null||value.startsWith('--'))throw new Error('Missing benchmark value: '+key);
+  flags[key]=value;
+}
+for(const [key,min,max] of [['--seeds',1,1000000],['--seed',1,Number.MAX_SAFE_INTEGER],['--jobs',1,16],['--rehearsal',0,1000]]){
+  if(!Object.hasOwn(flags,key))continue;
+  const n=Number(flags[key]);
+  if(!/^\d+$/.test(flags[key])||!Number.isSafeInteger(n)||n<min||n>max)throw new Error('Invalid integer: '+key);
+}
+const configs=String(flags['--configs']??'solo:FUNNY,solo:HARD,coop4:FUNNY,coop4:HARD').split(',');
+if(configs.some(c=>! /^(solo|coop[1-4]):(FUNNY|NORMAL|HARD|ABYSS)$/.test(c))||new Set(configs).size!==configs.length)throw new Error('Invalid or repeated config');
+const count=Number(flags['--seeds']??10),first=Number(flags['--seed']??1);
+if(!Number.isSafeInteger(first+count-1))throw new Error('Seed range exceeds safe integers');
+const planned=new Set(configs.flatMap(config=>Array.from({length:count},(_,i)=>config+'|'+(first+i))));
 const game=fs.realpathSync(own.game),out=path.resolve(own.out);
 const rulesProvenance=verifyRules(game);
 if(fs.existsSync(out))throw new Error('Output exists; use a new arm/run directory');
@@ -38,22 +60,17 @@ const manifestPath=out+'.manifest.json';
 const save=()=>fs.writeFileSync(manifestPath,JSON.stringify(manifest,null,2)+'\n');save();
 const env={...process.env,ARK_GAME_ROOT:game};
 delete env.ARK_POLICY_PROFILE;if(profile)env.ARK_POLICY_PROFILE=profile;
-const log=fs.openSync(out+'.log','w'),start=performance.now();
-let result;
-try{result=spawnSync(command[0],command.slice(1),{cwd:game,env,stdio:['ignore',log,log]});}
-finally{fs.closeSync(log);}
-manifest.batchWallSeconds=(performance.now()-start)/1000;manifest.finishedAt=new Date().toISOString();
-manifest.exitCode=result.status;manifest.signal=result.signal;manifest.spawnError=result.error?String(result.error):null;
-manifest.botFileUnchanged=sha256(fs.readFileSync(path.join(game,PINS.botJs.relPath)))===PINS.botJs.sha256;
-manifest.status=result.status===0&&manifest.botFileUnchanged?'complete':'failed';
+const start=performance.now();
+let result={status:null,signal:null,error:null},log;
 try{
+  log=fs.openSync(out+'.log','w');
+  result=spawnSync(command[0],command.slice(1),{cwd:game,env,stdio:['ignore',log,log]});
+  fs.closeSync(log);log=undefined;
+  manifest.botFileUnchanged=sha256(fs.readFileSync(path.join(game,PINS.botJs.relPath)))===PINS.botJs.sha256;
+  manifest.status=result.status===0&&manifest.botFileUnchanged?'complete':'failed';
   if(manifest.status==='complete'){
     const rows=JSON.parse(fs.readFileSync(out,'utf8'));
     if(!Array.isArray(rows)||rows.length===0)throw new Error('No nonempty result array');
-    const value=(key,fallback)=>{const i=forward.indexOf(key);return i<0?fallback:forward[i+1];};
-    const configs=String(value('--configs','solo:FUNNY,solo:HARD,coop4:FUNNY,coop4:HARD')).split(',');
-    const count=Math.max(1,Number(value('--seeds',10))||10),first=Number(value('--seed',1))||1;
-    const planned=new Set(configs.flatMap(config=>Array.from({length:count},(_,i)=>config+'|'+(first+i))));
     const received=new Set();
     for(const row of rows){
       const key=row.config+'|'+row.seed;
@@ -69,6 +86,11 @@ try{
     manifest.rulesUnchangedAfterRun=verifyRules(game);
   }
 }catch(error){manifest.status='failed';manifest.validationError=String(error);}
-save();
+finally{
+  if(log!==undefined){try{fs.closeSync(log);}catch(error){manifest.status='failed';manifest.closeError=String(error);}}
+  manifest.batchWallSeconds=(performance.now()-start)/1000;manifest.finishedAt=new Date().toISOString();
+  manifest.exitCode=result.status;manifest.signal=result.signal;manifest.spawnError=result.error?String(result.error):null;
+  save();
+}
 console.log(JSON.stringify({profile:spec.name,status:manifest.status,games:manifest.games,wins:manifest.victories,out,manifest:manifestPath}));
 if(manifest.status!=='complete')process.exit(result.status||1);

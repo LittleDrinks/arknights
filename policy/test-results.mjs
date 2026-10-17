@@ -26,3 +26,17 @@ for(const kind of ['empty','missing','broken','partial','duplicate','engine','in
   if(kind==='engine'){assert.equal(manifest.engineErrors,2);assert.equal(manifest.victories,0);}
 }
 console.log('RESULT_FAULT_CHECKS_OK: 8 failed fixtures rejected, terminal manifests saved; no simulated-game claims from fixtures');
+for(const args of [
+  ['--seeds','1','--seeds','2'],['--seeds','1.5'],['--seeds'],
+  ['--configs','solo:ABYSS,solo:ABYSS'],['--seed','0'],['--jobs','1.2'],
+]){
+  const out=path.join(temp,'invalid-'+Math.random()+'.json');
+  const result=spawnSync(process.execPath,[fileURLToPath(new URL('./run.mjs',import.meta.url)),'--game',game,'--out',out,...args],{encoding:'utf8'});
+  assert.notEqual(result.status,0,JSON.stringify(args));
+  assert.equal(fs.existsSync(out),false);
+}
+const blocked=path.join(temp,'blocked-log.json');fs.mkdirSync(blocked+'.log');
+const result=spawnSync(process.execPath,[fileURLToPath(new URL('./run.mjs',import.meta.url)),'--game',game,'--out',blocked,'--seeds','1'],{encoding:'utf8'});
+const manifest=JSON.parse(fs.readFileSync(blocked+'.manifest.json','utf8'));
+assert.notEqual(result.status,0);assert.equal(manifest.status,'failed');assert.ok(manifest.finishedAt);
+console.log('PLAN_AND_LIFECYCLE_CHECKS_OK: six ambiguous plans refused before spawn; log-open error saved as failed');
