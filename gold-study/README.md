@@ -1,6 +1,6 @@
 # Own gold：真实数据 OFF/ON 训练与 dev 评估入口
 
-基线 `2f4842a844aa17adea9360b4f85c6285e6a97319`；只新增 `gold-study/`。复用已审 `gold-features/recapture.py`、`warm_start.py`、原 `rl/learner.py`、自然个人胜局合同，以及 `survivor-study/evaluate.py` 的原 `Protocol` / `state_contract`。不改游戏、旧模块或模块全局来切换 schema。
+基线 `fbd7c2bd0232949cb1fa8f94c02d44c4790b1233`；只新增 `gold-study/`。复用已审 `gold-features/recapture.py`、`warm_start.py`、原 `rl/learner.py`、自然个人胜局合同，以及 `survivor-study/evaluate.py` 的原 `Protocol` / `state_contract`。不改游戏、旧模块或模块全局来切换 schema。
 
 这是可执行入口，**本次没有重采真实 demo、训练真实数据或运行 Match/Battle**。服务器执行由 main 负责。hash/接口验收不自动批准 source，所有报告继续标记 `collector-source-trust-pending-main-independent-acceptance`。
 

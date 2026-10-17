@@ -360,7 +360,7 @@ class Tests(unittest.TestCase):
     def test_syntax_pins_and_schedule(self):
         for path in HERE.glob('*.py'):
             ast.parse(path.read_text(), feature_version=(3, 10))
-        self.assertEqual(source_identity(CODE)['base'], '2f4842a844aa17adea9360b4f85c6285e6a97319')
+        self.assertEqual(source_identity(CODE)['base'], 'fbd7c2bd0232949cb1fa8f94c02d44c4790b1233')
         rows = V.schedule()
         self.assertEqual(len(rows), 96)
         self.assertEqual({r['seed'] for r in rows}, set(range(1, 17)))

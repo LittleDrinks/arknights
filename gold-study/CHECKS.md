@@ -1,6 +1,6 @@
 # 本地有限验证（2026-10-18）
 
-基线 `2f4842a844aa17adea9360b4f85c6285e6a97319`。只新增 `gold-study/`。未 SSH、安装、子 agent、goal、下载大型数据、运行真实采样/Match/Battle/真实训练。
+基线 `fbd7c2bd0232949cb1fa8f94c02d44c4790b1233`。只新增 `gold-study/`。未 SSH、安装、子 agent、goal、下载大型数据、运行真实采样/Match/Battle/真实训练。
 
 Python 使用已有 `/home/q2635/venvs/logics-v3/bin/python`。命令：
 
@@ -36,3 +36,5 @@ elapsed=3.32 maxRSS_KiB=760784
 未验证：服务器实际六个自然胜局重采、全量真实训练性能/耗时、真实96局结果、胜率改善和泛化。main 必须先完成真实 paired recapture 并独立接受 source，再按 README 顺序运行。
 
 Main rebase: moved isolated module onto fbd7c2b to use the reviewed parent-width fix and race-safe monitor; refreshed exact dependency hashes. Original game/rl/coop and gold feature code unchanged. Worker source commit7814f0b preserved; final review uses integration ref.
+
+After rebase, updated the stale expected base constant in the syntax/pin test; 9 synthetic contracts pass in 2.82s, peak process RSS635652KiB. No real game or production training in this checkout.
