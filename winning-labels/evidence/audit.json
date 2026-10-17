@@ -1,0 +1,77 @@
+{
+  "ok": true,
+  "primaryExact": 68,
+  "samples": 207,
+  "independentEpisodes": 1,
+  "seats": {
+    "learner": {
+      "seat": 0,
+      "individualVictory": false,
+      "teamVictory": true,
+      "alive": false,
+      "roundsPassed": 10,
+      "eliminatedRound": 11,
+      "positive": false,
+      "samples": 0
+    },
+    "partner-1": {
+      "seat": 1,
+      "individualVictory": true,
+      "teamVictory": true,
+      "alive": true,
+      "roundsPassed": 14,
+      "eliminatedRound": null,
+      "positive": true,
+      "samples": 93
+    },
+    "partner-2": {
+      "seat": 2,
+      "individualVictory": true,
+      "teamVictory": true,
+      "alive": true,
+      "roundsPassed": 14,
+      "eliminatedRound": null,
+      "positive": true,
+      "samples": 114
+    },
+    "partner-3": {
+      "seat": 3,
+      "individualVictory": false,
+      "teamVictory": true,
+      "alive": false,
+      "roundsPassed": 10,
+      "eliminatedRound": 11,
+      "positive": false,
+      "samples": 0
+    }
+  },
+  "transitions": 1066,
+  "rejected": 0,
+  "dispositionCounts": {
+    "non-shop-method": 725,
+    "excluded-seat": 134,
+    "positive-label": 207
+  },
+  "rawSHA256": "8452bcb433452dbbf9b7aaed6a96f40630f7e5ff154bd95b7d94380374e6917a",
+  "referenceSHA256": "53cccec88914f077e55e6aaee0679084695c8190c840962ec92455f7954387f2",
+  "elapsedMs": 1108,
+  "maxRSSMiB": 471.96484375,
+  "files": {
+    "samples.jsonl.gz": {
+      "bytes": 91637,
+      "sha256": "b8812aa6cb849d4494e1b3ae50683b959e3a4b2146f9ad0e0d3c4572e7d8e6d4"
+    },
+    "labels.jsonl.gz": {
+      "bytes": 29721,
+      "sha256": "52a5447da7a88258a617ebdddf5026a3e51f02dc529c12894c651498ea0432c2"
+    },
+    "dispositions.jsonl.gz": {
+      "bytes": 9624,
+      "sha256": "f761a2412ae0b1d2f42eb6e5972b41ad3f31352729617f440499d294f23bcd56"
+    },
+    "metadata.json.gz": {
+      "bytes": 31241,
+      "sha256": "b3e1fd583506fd8fb231652b6f2f9d881e9d4e62f65d1a49b7dd0e827ae68ffb"
+    }
+  }
+}
