@@ -1,0 +1,150 @@
+{
+  "limitSeconds": 40,
+  "stopAtSeconds": 38,
+  "limitBytes": 20000000,
+  "limitRssBytes": 805306368,
+  "usedSeconds": 18.84073111300677,
+  "runs": [
+    {
+      "case": "kjerag-200-bot",
+      "seconds": 1.0616392530027952,
+      "returncode": 0,
+      "stopReason": null,
+      "peakSampledCombinedRssBytes": 198918144
+    },
+    {
+      "case": "kazimierz-200-bot",
+      "seconds": 1.0014756769996893,
+      "returncode": 0,
+      "stopReason": null,
+      "peakSampledCombinedRssBytes": 196878336
+    },
+    {
+      "case": "sargon-200-bot",
+      "seconds": 0.8987708830027259,
+      "returncode": 0,
+      "stopReason": null,
+      "peakSampledCombinedRssBytes": 195305472
+    },
+    {
+      "case": "yan-200-bot",
+      "seconds": 1.0795038070027658,
+      "returncode": 0,
+      "stopReason": null,
+      "peakSampledCombinedRssBytes": 193654784
+    },
+    {
+      "case": "kjerag-500-bot",
+      "seconds": 0.9689591900023515,
+      "returncode": 0,
+      "stopReason": null,
+      "peakSampledCombinedRssBytes": 202915840
+    },
+    {
+      "case": "kazimierz-500-bot",
+      "seconds": 0.9137804220008547,
+      "returncode": 0,
+      "stopReason": null,
+      "peakSampledCombinedRssBytes": 190025728
+    },
+    {
+      "case": "sargon-500-bot",
+      "seconds": 0.8823875529997167,
+      "returncode": 0,
+      "stopReason": null,
+      "peakSampledCombinedRssBytes": 192286720
+    },
+    {
+      "case": "yan-500-bot",
+      "seconds": 0.9300600679998752,
+      "returncode": 0,
+      "stopReason": null,
+      "peakSampledCombinedRssBytes": 189472768
+    },
+    {
+      "case": "kjerag-999-bot",
+      "seconds": 0.9722924909983703,
+      "returncode": 0,
+      "stopReason": null,
+      "peakSampledCombinedRssBytes": 198483968
+    },
+    {
+      "case": "kazimierz-999-bot",
+      "seconds": 0.817303602998436,
+      "returncode": 0,
+      "stopReason": null,
+      "peakSampledCombinedRssBytes": 180305920
+    },
+    {
+      "case": "sargon-999-bot",
+      "seconds": 0.820711978001782,
+      "returncode": 0,
+      "stopReason": null,
+      "peakSampledCombinedRssBytes": 182116352
+    },
+    {
+      "case": "yan-999-bot",
+      "seconds": 0.8152675109995471,
+      "returncode": 0,
+      "stopReason": null,
+      "peakSampledCombinedRssBytes": 187232256
+    },
+    {
+      "case": "kjerag-500-adjacent",
+      "seconds": 0.8183958890003851,
+      "returncode": 0,
+      "stopReason": null,
+      "peakSampledCombinedRssBytes": 204644352
+    },
+    {
+      "case": "kjerag-999-adjacent",
+      "seconds": 0.8880536370015761,
+      "returncode": 0,
+      "stopReason": null,
+      "peakSampledCombinedRssBytes": 197853184
+    },
+    {
+      "case": "kjerag-500-core-only",
+      "seconds": 0.9881165209990286,
+      "returncode": 0,
+      "stopReason": null,
+      "peakSampledCombinedRssBytes": 201064448
+    },
+    {
+      "case": "sargon-200-no-compass",
+      "seconds": 0.9197690270011663,
+      "returncode": 0,
+      "stopReason": null,
+      "peakSampledCombinedRssBytes": 198397952
+    },
+    {
+      "case": "sargon-200-core-only",
+      "seconds": 1.0802452829993854,
+      "returncode": 0,
+      "stopReason": null,
+      "peakSampledCombinedRssBytes": 199593984
+    },
+    {
+      "case": "sargon-200-no-items",
+      "seconds": 0.9797602359976736,
+      "returncode": 0,
+      "stopReason": null,
+      "peakSampledCombinedRssBytes": 195776512
+    },
+    {
+      "case": "yan-200-attribution",
+      "seconds": 0.9587663929996779,
+      "returncode": 0,
+      "stopReason": null,
+      "peakSampledCombinedRssBytes": 193503232
+    },
+    {
+      "case": "yan-200-attribution-full",
+      "seconds": 1.0454716909989656,
+      "returncode": 0,
+      "stopReason": null,
+      "peakSampledCombinedRssBytes": 194772992
+    }
+  ],
+  "artifactBytes": 800135
+}

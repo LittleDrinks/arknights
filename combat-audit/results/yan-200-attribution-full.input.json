@@ -1,0 +1,756 @@
+{
+  "kind": "CONSTRUCTED_R14_NOT_NATURAL",
+  "pin": "6ab2468279e926d107788f63d7fe219b85f67b4a",
+  "build": "yan",
+  "layer": 200,
+  "variant": "attribution-full",
+  "guides": [
+    "BV1kgwjzqExY"
+  ],
+  "seed": 4,
+  "bossId": "boss_2",
+  "stageId": "act1autochess_m04",
+  "bans": [
+    "deputShip",
+    "kjeragShip",
+    "lateranoShip",
+    "preciShip",
+    "soloShip",
+    "victoriaShip",
+    "visiShip"
+  ],
+  "bandId": "band_bldsk",
+  "lpAtStart": 28,
+  "deployCap": 8,
+  "equipmentSlots": 2,
+  "roster": [
+    {
+      "uid": 8,
+      "kind": "chess",
+      "chessId": "chess_char_3_21_b",
+      "row": 11,
+      "col": 4,
+      "dir": "RIGHT",
+      "items": [
+        "chess_item_6_09_e_b",
+        "chess_item_3_04_e_b"
+      ],
+      "skillIndex": 2,
+      "moduleId": "uniequip_002_archet",
+      "potential": 6,
+      "cultivate": 3,
+      "name": "空弦"
+    },
+    {
+      "uid": 1,
+      "kind": "chess",
+      "chessId": "chess_char_2_04_b",
+      "row": 11,
+      "col": 5,
+      "dir": "RIGHT",
+      "items": [],
+      "skillIndex": 1,
+      "moduleId": "uniequip_002_grabds",
+      "potential": 6,
+      "cultivate": 3,
+      "name": "小满"
+    },
+    {
+      "uid": 3,
+      "kind": "chess",
+      "chessId": "chess_char_5_12_b",
+      "row": 11,
+      "col": 6,
+      "dir": "RIGHT",
+      "items": [],
+      "skillIndex": 0,
+      "moduleId": "uniequip_002_dusk",
+      "potential": 6,
+      "cultivate": 3,
+      "name": "夕"
+    },
+    {
+      "uid": 7,
+      "kind": "chess",
+      "chessId": "chess_char_6_11_b",
+      "row": 11,
+      "col": 7,
+      "dir": "LEFT",
+      "items": [
+        "chess_item_6_09_e_b",
+        "chess_item_3_04_e_b"
+      ],
+      "skillIndex": 2,
+      "moduleId": "uniequip_002_mlyss",
+      "potential": 6,
+      "cultivate": 3,
+      "name": "缪尔赛思"
+    },
+    {
+      "uid": 2,
+      "kind": "chess",
+      "chessId": "chess_char_5_23_b",
+      "row": 11,
+      "col": 8,
+      "dir": "DOWN",
+      "items": [],
+      "skillIndex": 1,
+      "moduleId": "uniequip_002_reckpr",
+      "potential": 6,
+      "cultivate": 3,
+      "name": "录武官"
+    },
+    {
+      "uid": 6,
+      "kind": "chess",
+      "chessId": "chess_char_6_15_b",
+      "row": 10,
+      "col": 4,
+      "dir": "RIGHT",
+      "items": [
+        "chess_item_5_03_e_b",
+        "chess_item_2_04_e_b"
+      ],
+      "skillIndex": 2,
+      "moduleId": "uniequip_002_qiubai",
+      "potential": 6,
+      "cultivate": 3,
+      "name": "仇白"
+    },
+    {
+      "uid": 9,
+      "kind": "token",
+      "tokenId": "token_10030_mlyss_wtrman",
+      "row": 10,
+      "col": 6,
+      "dir": "RIGHT",
+      "ownerUid": 7
+    },
+    {
+      "uid": 5,
+      "kind": "chess",
+      "chessId": "chess_char_6_03_b",
+      "row": 10,
+      "col": 7,
+      "dir": "RIGHT",
+      "items": [],
+      "skillIndex": 2,
+      "moduleId": "uniequip_002_yu",
+      "potential": 6,
+      "cultivate": 3,
+      "name": "余"
+    },
+    {
+      "uid": 4,
+      "kind": "chess",
+      "chessId": "chess_char_5_03_b",
+      "row": 9,
+      "col": 8,
+      "dir": "UP",
+      "items": [
+        "chess_item_5_03_e_b",
+        "chess_item_2_04_e_b"
+      ],
+      "skillIndex": 2,
+      "moduleId": "uniequip_002_blaze2",
+      "potential": 6,
+      "cultivate": 3,
+      "name": "烛煌"
+    }
+  ],
+  "bonds": {
+    "yanShip": {
+      "count": 9,
+      "active": true,
+      "tier": 3,
+      "layers": 200
+    },
+    "sargonShip": {
+      "count": 0,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "victoriaShip": {
+      "count": 2,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "kjeragShip": {
+      "count": 0,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "lateranoShip": {
+      "count": 2,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "egirShip": {
+      "count": 0,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "siracusaShip": {
+      "count": 0,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "kazimierzShip": {
+      "count": 0,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "preciShip": {
+      "count": 0,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "swiftShip": {
+      "count": 0,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "skillfulShip": {
+      "count": 2,
+      "active": true,
+      "tier": 1,
+      "layers": 200
+    },
+    "arcaneShip": {
+      "count": 1,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "steadShip": {
+      "count": 1,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "deputShip": {
+      "count": 0,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "visiShip": {
+      "count": 0,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "miraShip": {
+      "count": 1,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "investShip": {
+      "count": 0,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "raidShip": {
+      "count": 1,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "indomShip": {
+      "count": 0,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "maniShip": {
+      "count": 1,
+      "active": true,
+      "tier": 1,
+      "layers": 0
+    },
+    "emptyShip": {
+      "count": 0,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "soloShip": {
+      "count": 0,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "suntShip": {
+      "count": 8,
+      "active": true,
+      "tier": 2,
+      "layers": 0
+    }
+  },
+  "loadout": {},
+  "playerEffects": [],
+  "waves": [
+    {
+      "players": [
+        "p_0"
+      ],
+      "wave": {
+        "templateId": "act1autochess_h07_02_s",
+        "spawns": [
+          {
+            "time": 10,
+            "enemyKey": "enemy_1174_duholy_2",
+            "routeIndex": 0,
+            "count": 1,
+            "interval": 0,
+            "mods": {
+              "hpMul": 3.583181,
+              "atkMul": 1.948717,
+              "speedMul": 1.15,
+              "slot": "E"
+            },
+            "actionIndex": 0,
+            "preview": {
+              "gate": "lower",
+              "start": [
+                2,
+                10
+              ],
+              "fly": false,
+              "elite": true,
+              "boss": false
+            }
+          },
+          {
+            "time": 30,
+            "enemyKey": "enemy_1430_lrrook",
+            "routeIndex": 1,
+            "count": 1,
+            "interval": 0,
+            "mods": {
+              "hpMul": 3.583181,
+              "atkMul": 1.948717,
+              "speedMul": 1.15,
+              "slot": "EF"
+            },
+            "actionIndex": 1,
+            "preview": {
+              "gate": "lower",
+              "start": [
+                2,
+                10
+              ],
+              "fly": true,
+              "elite": true,
+              "boss": false
+            }
+          },
+          {
+            "time": 90,
+            "enemyKey": "enemy_1430_lrrook",
+            "routeIndex": 2,
+            "count": 1,
+            "interval": 0,
+            "mods": {
+              "hpMul": 3.583181,
+              "atkMul": 1.948717,
+              "speedMul": 1.15,
+              "slot": "EF"
+            },
+            "actionIndex": 2,
+            "preview": {
+              "gate": "lower",
+              "start": [
+                2,
+                10
+              ],
+              "fly": true,
+              "elite": true,
+              "boss": false
+            }
+          },
+          {
+            "time": 0,
+            "enemyKey": "enemy_9017_achunt",
+            "routeIndex": 4,
+            "count": 1,
+            "interval": 0,
+            "mods": {
+              "atkMul": 1.948717,
+              "speedMul": 1.15,
+              "slot": "N"
+            },
+            "actionIndex": 4,
+            "preview": {
+              "gate": "lower",
+              "start": [
+                4,
+                10
+              ],
+              "fly": false,
+              "elite": true,
+              "boss": true
+            },
+            "tag": "boss"
+          }
+        ],
+        "routes": [
+          {
+            "motion": "WALK",
+            "start": [
+              2,
+              10
+            ],
+            "end": [
+              1,
+              3
+            ],
+            "checkpoints": []
+          },
+          {
+            "motion": "WALK",
+            "start": [
+              2,
+              10
+            ],
+            "end": [
+              1,
+              3
+            ],
+            "checkpoints": [
+              [
+                4,
+                6
+              ]
+            ],
+            "steps": [
+              {
+                "t": "move",
+                "p": [
+                  4,
+                  6
+                ]
+              },
+              {
+                "t": "wait",
+                "s": 25
+              }
+            ]
+          },
+          {
+            "motion": "WALK",
+            "start": [
+              2,
+              10
+            ],
+            "end": [
+              1,
+              3
+            ],
+            "checkpoints": [
+              [
+                4,
+                6
+              ]
+            ],
+            "steps": [
+              {
+                "t": "move",
+                "p": [
+                  4,
+                  6
+                ]
+              },
+              {
+                "t": "wait",
+                "s": 25
+              }
+            ]
+          },
+          {
+            "motion": "FLY",
+            "start": [
+              2,
+              10
+            ],
+            "end": [
+              1,
+              3
+            ],
+            "checkpoints": [
+              [
+                2,
+                9
+              ],
+              [
+                5,
+                9
+              ],
+              [
+                5,
+                7
+              ],
+              [
+                2,
+                7
+              ],
+              [
+                2,
+                5
+              ],
+              [
+                5,
+                5
+              ],
+              [
+                5,
+                3
+              ],
+              [
+                2,
+                3
+              ]
+            ]
+          },
+          {
+            "motion": "WALK",
+            "start": [
+              4,
+              10
+            ],
+            "end": [
+              2,
+              2
+            ],
+            "checkpoints": [
+              [
+                3,
+                9
+              ],
+              [
+                2,
+                3
+              ],
+              [
+                5,
+                9
+              ]
+            ],
+            "steps": [
+              {
+                "t": "patrol",
+                "p": [
+                  3,
+                  9
+                ]
+              },
+              {
+                "t": "patrol",
+                "p": [
+                  2,
+                  3
+                ]
+              },
+              {
+                "t": "patrol",
+                "p": [
+                  5,
+                  9
+                ]
+              }
+            ]
+          }
+        ],
+        "extraRoutes": [
+          {
+            "motion": "FLY",
+            "start": [
+              4,
+              10
+            ],
+            "end": [
+              2,
+              2
+            ],
+            "checkpoints": []
+          },
+          {
+            "motion": "WALK",
+            "start": [
+              5,
+              10
+            ],
+            "end": [
+              2,
+              2
+            ],
+            "checkpoints": []
+          },
+          {
+            "motion": "FLY",
+            "start": [
+              5,
+              10
+            ],
+            "end": [
+              2,
+              2
+            ],
+            "checkpoints": [
+              [
+                4,
+                9
+              ],
+              [
+                4,
+                7
+              ],
+              [
+                3,
+                6
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                2,
+                3
+              ]
+            ]
+          }
+        ],
+        "timeLimit": null,
+        "overrides": {
+          "enemy_1430_lrrook": {
+            "stats": {
+              "maxHp": 60000
+            }
+          }
+        },
+        "pick": {
+          "round": 14,
+          "type": "REFLECTION",
+          "key": "enemy_1175_dushdo_2",
+          "normal": "enemy_1165_duhond",
+          "elite": "enemy_1174_duholy_2",
+          "fly": false,
+          "firstHalf": false
+        },
+        "entries": {
+          "ground": {
+            "key": "enemy_1175_dushdo_2",
+            "type": "REFLECTION",
+            "weight": 8,
+            "firstHalf": false,
+            "fly": false,
+            "N": [
+              {
+                "key": "enemy_1165_duhond"
+              }
+            ],
+            "E": [
+              {
+                "key": "enemy_1174_duholy_2"
+              }
+            ],
+            "inactiveIn": [
+              "mode_multi_funny",
+              "mode_multi_normal",
+              "mode_single_funny",
+              "mode_single_normal"
+            ],
+            "pick": {
+              "round": 14,
+              "type": "REFLECTION",
+              "key": "enemy_1175_dushdo_2",
+              "normal": "enemy_1165_duhond",
+              "elite": "enemy_1174_duholy_2",
+              "fly": false,
+              "firstHalf": false
+            }
+          },
+          "fly": null
+        },
+        "actions": [
+          {
+            "index": 0,
+            "key": "enemy_1174_duholy_2",
+            "tplKey": "enemy_1427_lrnazg",
+            "slot": "E",
+            "time": 10,
+            "count": 1,
+            "tplCount": 2,
+            "window": 40,
+            "routeIndex": 0,
+            "valid": true,
+            "server": true
+          },
+          {
+            "index": 1,
+            "key": "enemy_1430_lrrook",
+            "tplKey": "enemy_1430_lrrook",
+            "slot": null,
+            "time": 30,
+            "count": 1,
+            "tplCount": 1,
+            "window": 30,
+            "routeIndex": 1,
+            "valid": true,
+            "server": true
+          },
+          {
+            "index": 2,
+            "key": "enemy_1430_lrrook",
+            "tplKey": "enemy_1430_lrrook",
+            "slot": null,
+            "time": 90,
+            "count": 1,
+            "tplCount": 1,
+            "window": 25,
+            "routeIndex": 2,
+            "valid": true,
+            "server": true
+          },
+          {
+            "index": 3,
+            "key": null,
+            "tplKey": "enemy_1042_frostd",
+            "slot": "EF",
+            "time": 10,
+            "count": 0,
+            "tplCount": 3,
+            "window": 45,
+            "routeIndex": 3,
+            "valid": false,
+            "server": false
+          },
+          {
+            "index": 4,
+            "key": "enemy_9017_achunt",
+            "tplKey": "enemy_9017_achunt",
+            "slot": null,
+            "time": 0,
+            "count": 1,
+            "tplCount": 1,
+            "window": 0,
+            "routeIndex": 4,
+            "valid": true,
+            "server": false
+          }
+        ]
+      }
+    }
+  ]
+}

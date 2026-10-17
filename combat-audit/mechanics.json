@@ -1,0 +1,3678 @@
+{
+  "sourceNote": "Minified data/*.json line 1; object keys below are exact JSON pointers.",
+  "chess": {
+    "chess_char_1_02_b": {
+      "name": "角峰",
+      "isGolden": true,
+      "tier": 1,
+      "bonds": [
+        "kjeragShip",
+        "steadShip"
+      ],
+      "backup": {
+        "charId": "char_199_yak",
+        "tmplId": null,
+        "skillIndex": 1,
+        "uniEquipId": "uniequip_002_yak",
+        "potRank": 0
+      },
+      "garrisonIds": [
+        "garrison_25_b"
+      ],
+      "stats": {
+        "maxHp": 3404,
+        "atk": 358,
+        "def": 648,
+        "res": 5,
+        "cost": 19,
+        "blockCnt": 4,
+        "bat": 1.2,
+        "aspd": 100,
+        "respawnTime": 60,
+        "spRecovery": 1,
+        "hpRecoveryPerSec": 0,
+        "moveSpeed": 1,
+        "tauntLevel": 0,
+        "massLevel": 0,
+        "deployLimit": 1,
+        "deckStack": 0
+      }
+    },
+    "chess_char_2_04_b": {
+      "name": "小满",
+      "isGolden": true,
+      "tier": 2,
+      "bonds": [
+        "yanShip",
+        "skillfulShip"
+      ],
+      "backup": {
+        "charId": "char_4122_grabds",
+        "tmplId": null,
+        "skillIndex": 1,
+        "uniEquipId": "uniequip_002_grabds",
+        "potRank": 0
+      },
+      "garrisonIds": [
+        "garrison_31_b"
+      ],
+      "stats": {
+        "maxHp": 1270,
+        "atk": 553,
+        "def": 95,
+        "res": 20,
+        "cost": 13,
+        "blockCnt": 1,
+        "bat": 1.9,
+        "aspd": 100,
+        "respawnTime": 66,
+        "spRecovery": 1,
+        "hpRecoveryPerSec": 0,
+        "moveSpeed": 1,
+        "tauntLevel": 0,
+        "massLevel": 0,
+        "deployLimit": 1,
+        "deckStack": 0
+      }
+    },
+    "chess_char_2_12_b": {
+      "name": "砾",
+      "isGolden": true,
+      "tier": 2,
+      "bonds": [
+        "kazimierzShip",
+        "indomShip"
+      ],
+      "backup": {
+        "charId": "char_237_gravel",
+        "tmplId": null,
+        "skillIndex": 1,
+        "uniEquipId": "uniequip_002_gravel",
+        "potRank": 0
+      },
+      "garrisonIds": [
+        "garrison_75_b",
+        "garrison_143_b"
+      ],
+      "stats": {
+        "maxHp": 1612,
+        "atk": 430,
+        "def": 363,
+        "res": 0,
+        "cost": 6,
+        "blockCnt": 1,
+        "bat": 0.93,
+        "aspd": 100,
+        "respawnTime": 16,
+        "spRecovery": 1,
+        "hpRecoveryPerSec": 0,
+        "moveSpeed": 1,
+        "tauntLevel": 0,
+        "massLevel": 0,
+        "deployLimit": 1,
+        "deckStack": 0
+      }
+    },
+    "chess_char_3_12_b": {
+      "name": "瑕光",
+      "isGolden": true,
+      "tier": 3,
+      "bonds": [
+        "kazimierzShip",
+        "raidShip"
+      ],
+      "backup": {
+        "charId": "char_608_acpion",
+        "tmplId": null,
+        "skillIndex": 2,
+        "uniEquipId": null,
+        "potRank": 0
+      },
+      "garrisonIds": [
+        "garrison_106_b"
+      ],
+      "stats": {
+        "maxHp": 3096,
+        "atk": 522,
+        "def": 581,
+        "res": 10,
+        "cost": 20,
+        "blockCnt": 3,
+        "bat": 1.2,
+        "aspd": 100,
+        "respawnTime": 66,
+        "spRecovery": 1,
+        "hpRecoveryPerSec": 0,
+        "moveSpeed": 1,
+        "tauntLevel": 0,
+        "massLevel": 0,
+        "deployLimit": 1,
+        "deckStack": 0
+      }
+    },
+    "chess_char_3_13_b": {
+      "name": "至简",
+      "isGolden": true,
+      "tier": 3,
+      "bonds": [
+        "sargonShip",
+        "skillfulShip"
+      ],
+      "backup": {
+        "charId": "char_4054_malist",
+        "tmplId": null,
+        "skillIndex": 1,
+        "uniEquipId": "uniequip_002_malist",
+        "potRank": 0
+      },
+      "garrisonIds": [
+        "garrison_13_b"
+      ],
+      "stats": {
+        "maxHp": 1375,
+        "atk": 327,
+        "def": 115,
+        "res": 20,
+        "cost": 20,
+        "blockCnt": 1,
+        "bat": 1.3,
+        "aspd": 100,
+        "respawnTime": 70,
+        "spRecovery": 1,
+        "hpRecoveryPerSec": 0,
+        "moveSpeed": 1,
+        "tauntLevel": 0,
+        "massLevel": 0,
+        "deployLimit": 1,
+        "deckStack": 0
+      }
+    },
+    "chess_char_3_14_b": {
+      "name": "初雪",
+      "isGolden": true,
+      "tier": 3,
+      "bonds": [
+        "kjeragShip",
+        "visiShip"
+      ],
+      "backup": {
+        "charId": "char_174_slbell",
+        "tmplId": null,
+        "skillIndex": 1,
+        "uniEquipId": "uniequip_002_slbell",
+        "potRank": 0
+      },
+      "garrisonIds": [
+        "garrison_28_b"
+      ],
+      "stats": {
+        "maxHp": 1615,
+        "atk": 411,
+        "def": 99,
+        "res": 33,
+        "cost": 10,
+        "blockCnt": 1,
+        "bat": 1.6,
+        "aspd": 104,
+        "respawnTime": 66,
+        "spRecovery": 1,
+        "hpRecoveryPerSec": 0,
+        "moveSpeed": 1,
+        "tauntLevel": 0,
+        "massLevel": 0,
+        "deployLimit": 1,
+        "deckStack": 0
+      }
+    },
+    "chess_char_3_21_b": {
+      "name": "空弦",
+      "isGolden": true,
+      "tier": 3,
+      "bonds": [
+        "lateranoShip",
+        "skillfulShip"
+      ],
+      "backup": {
+        "charId": "char_611_acnipe",
+        "tmplId": null,
+        "skillIndex": 2,
+        "uniEquipId": null,
+        "potRank": 0
+      },
+      "garrisonIds": [
+        "garrison_150_b"
+      ],
+      "stats": {
+        "maxHp": 1590,
+        "atk": 538,
+        "def": 180,
+        "res": 0,
+        "cost": 12,
+        "blockCnt": 1,
+        "bat": 1,
+        "aspd": 102,
+        "respawnTime": 66,
+        "spRecovery": 1,
+        "hpRecoveryPerSec": 0,
+        "moveSpeed": 1,
+        "tauntLevel": 0,
+        "massLevel": 0,
+        "deployLimit": 1,
+        "deckStack": 0
+      }
+    },
+    "chess_char_4_04_b": {
+      "name": "伊内丝",
+      "isGolden": true,
+      "tier": 4,
+      "bonds": [
+        "visiShip",
+        "raidShip"
+      ],
+      "backup": {
+        "charId": "char_607_cspec",
+        "tmplId": null,
+        "skillIndex": 1,
+        "uniEquipId": null,
+        "potRank": 0
+      },
+      "garrisonIds": [
+        "garrison_104_b"
+      ],
+      "stats": {
+        "maxHp": 2149,
+        "atk": 573,
+        "def": 268,
+        "res": 0,
+        "cost": 9,
+        "blockCnt": 1,
+        "bat": 1,
+        "aspd": 108,
+        "respawnTime": 31,
+        "spRecovery": 1,
+        "hpRecoveryPerSec": 0,
+        "moveSpeed": 1,
+        "tauntLevel": 0,
+        "massLevel": 0,
+        "deployLimit": 1,
+        "deckStack": 0
+      }
+    },
+    "chess_char_4_13_b": {
+      "name": "灵知",
+      "isGolden": true,
+      "tier": 4,
+      "bonds": [
+        "kjeragShip",
+        "skillfulShip"
+      ],
+      "backup": {
+        "charId": "char_614_acsupo",
+        "tmplId": null,
+        "skillIndex": 1,
+        "uniEquipId": null,
+        "potRank": 0
+      },
+      "garrisonIds": [
+        "garrison_111_b"
+      ],
+      "stats": {
+        "maxHp": 1989,
+        "atk": 477,
+        "def": 142,
+        "res": 25,
+        "cost": 11,
+        "blockCnt": 1,
+        "bat": 1.6,
+        "aspd": 100,
+        "respawnTime": 66,
+        "spRecovery": 1,
+        "hpRecoveryPerSec": 0,
+        "moveSpeed": 1,
+        "tauntLevel": 0,
+        "massLevel": 0,
+        "deployLimit": 1,
+        "deckStack": 0
+      }
+    },
+    "chess_char_4_14_b": {
+      "name": "莱恩哈特",
+      "isGolden": true,
+      "tier": 4,
+      "bonds": [
+        "swiftShip",
+        "preciShip"
+      ],
+      "backup": {
+        "charId": "char_373_lionhd",
+        "tmplId": null,
+        "skillIndex": 1,
+        "uniEquipId": "uniequip_002_lionhd",
+        "potRank": 0
+      },
+      "garrisonIds": [
+        "garrison_51_b"
+      ],
+      "stats": {
+        "maxHp": 1626,
+        "atk": 819,
+        "def": 115,
+        "res": 20,
+        "cost": 31,
+        "blockCnt": 1,
+        "bat": 2.9,
+        "aspd": 100,
+        "respawnTime": 66,
+        "spRecovery": 1,
+        "hpRecoveryPerSec": 0,
+        "moveSpeed": 1,
+        "tauntLevel": 0,
+        "massLevel": 0,
+        "deployLimit": 1,
+        "deckStack": 0
+      }
+    },
+    "chess_char_4_20_b": {
+      "name": "远牙",
+      "isGolden": true,
+      "tier": 4,
+      "bonds": [
+        "kazimierzShip",
+        "preciShip"
+      ],
+      "backup": {
+        "charId": "char_603_csnipe",
+        "tmplId": null,
+        "skillIndex": 1,
+        "uniEquipId": null,
+        "potRank": 0
+      },
+      "garrisonIds": [
+        "garrison_148_b"
+      ],
+      "stats": {
+        "maxHp": 1419,
+        "atk": 1233,
+        "def": 153,
+        "res": 0,
+        "cost": 20,
+        "blockCnt": 1,
+        "bat": 2.7,
+        "aspd": 105,
+        "respawnTime": 66,
+        "spRecovery": 1,
+        "hpRecoveryPerSec": 0,
+        "moveSpeed": 1,
+        "tauntLevel": 0,
+        "massLevel": 0,
+        "deployLimit": 1,
+        "deckStack": 0
+      }
+    },
+    "chess_char_4_23_b": {
+      "name": "百炼嘉维尔",
+      "isGolden": true,
+      "tier": 4,
+      "bonds": [
+        "sargonShip"
+      ],
+      "backup": {
+        "charId": "char_609_acguad",
+        "tmplId": null,
+        "skillIndex": 1,
+        "uniEquipId": null,
+        "potRank": 0
+      },
+      "garrisonIds": [
+        "garrison_128_b"
+      ],
+      "stats": {
+        "maxHp": 2811,
+        "atk": 777,
+        "def": 390,
+        "res": 0,
+        "cost": 22,
+        "blockCnt": 3,
+        "bat": 1.2,
+        "aspd": 100,
+        "respawnTime": 70,
+        "spRecovery": 1,
+        "hpRecoveryPerSec": 0,
+        "moveSpeed": 1,
+        "tauntLevel": 0,
+        "massLevel": 0,
+        "deployLimit": 1,
+        "deckStack": 0
+      }
+    },
+    "chess_char_4_24_b": {
+      "name": "卡涅利安",
+      "isGolden": true,
+      "tier": 4,
+      "bonds": [
+        "sargonShip",
+        "deputShip"
+      ],
+      "backup": {
+        "charId": "char_604_ccast",
+        "tmplId": null,
+        "skillIndex": 1,
+        "uniEquipId": null,
+        "potRank": 0
+      },
+      "garrisonIds": [
+        "garrison_49_b"
+      ],
+      "stats": {
+        "maxHp": 2178,
+        "atk": 906,
+        "def": 218,
+        "res": 15,
+        "cost": 22,
+        "blockCnt": 1,
+        "bat": 2,
+        "aspd": 100,
+        "respawnTime": 66,
+        "spRecovery": 1,
+        "hpRecoveryPerSec": 0,
+        "moveSpeed": 1,
+        "tauntLevel": 0,
+        "massLevel": 0,
+        "deployLimit": 1,
+        "deckStack": 0
+      }
+    },
+    "chess_char_5_02_b": {
+      "name": "缇缇",
+      "isGolden": true,
+      "tier": 5,
+      "bonds": [
+        "sargonShip",
+        "preciShip"
+      ],
+      "backup": {
+        "charId": "char_604_ccast",
+        "tmplId": null,
+        "skillIndex": 2,
+        "uniEquipId": null,
+        "potRank": 0
+      },
+      "garrisonIds": [
+        "garrison_125_b"
+      ],
+      "stats": {
+        "maxHp": 1439,
+        "atk": 572,
+        "def": 109,
+        "res": 20,
+        "cost": 15,
+        "blockCnt": 1,
+        "bat": 1.6,
+        "aspd": 100,
+        "respawnTime": 70,
+        "spRecovery": 1,
+        "hpRecoveryPerSec": 0,
+        "moveSpeed": 1,
+        "tauntLevel": 0,
+        "massLevel": 0,
+        "deployLimit": 1,
+        "deckStack": 0
+      }
+    },
+    "chess_char_5_03_b": {
+      "name": "烛煌",
+      "isGolden": true,
+      "tier": 5,
+      "bonds": [
+        "victoriaShip",
+        "yanShip"
+      ],
+      "backup": {
+        "charId": "char_612_accast",
+        "tmplId": null,
+        "skillIndex": 2,
+        "uniEquipId": "uniequip_002_accast",
+        "potRank": 0
+      },
+      "garrisonIds": [
+        "garrison_35_b"
+      ],
+      "stats": {
+        "maxHp": 1472,
+        "atk": 709,
+        "def": 133,
+        "res": 15,
+        "cost": 19,
+        "blockCnt": 1,
+        "bat": 1.6,
+        "aspd": 100,
+        "respawnTime": 70,
+        "spRecovery": 1,
+        "hpRecoveryPerSec": 0,
+        "moveSpeed": 1,
+        "tauntLevel": 0,
+        "massLevel": 0,
+        "deployLimit": 1,
+        "deckStack": 0
+      }
+    },
+    "chess_char_5_12_b": {
+      "name": "夕",
+      "isGolden": true,
+      "tier": 5,
+      "bonds": [
+        "yanShip",
+        "arcaneShip"
+      ],
+      "backup": {
+        "charId": "char_614_acsupo",
+        "tmplId": null,
+        "skillIndex": 2,
+        "uniEquipId": "uniequip_002_acsupo",
+        "potRank": 0
+      },
+      "garrisonIds": [
+        "garrison_119_b"
+      ],
+      "stats": {
+        "maxHp": 1787,
+        "atk": 957,
+        "def": 120,
+        "res": 20,
+        "cost": 32,
+        "blockCnt": 1,
+        "bat": 2.9,
+        "aspd": 100,
+        "respawnTime": 66,
+        "spRecovery": 1,
+        "hpRecoveryPerSec": 0,
+        "moveSpeed": 1,
+        "tauntLevel": 0,
+        "massLevel": 0,
+        "deployLimit": 1,
+        "deckStack": 0
+      }
+    },
+    "chess_char_5_14_b": {
+      "name": "凛御银灰",
+      "isGolden": true,
+      "tier": 5,
+      "bonds": [
+        "kjeragShip",
+        "investShip",
+        "swiftShip"
+      ],
+      "backup": {
+        "charId": "char_608_acpion",
+        "tmplId": null,
+        "skillIndex": 2,
+        "uniEquipId": "uniequip_002_acpion",
+        "potRank": 0
+      },
+      "garrisonIds": [
+        "garrison_126_b"
+      ],
+      "stats": {
+        "maxHp": 2174,
+        "atk": 581,
+        "def": 395,
+        "res": 15,
+        "cost": 11,
+        "blockCnt": 2,
+        "bat": 1.2,
+        "aspd": 100,
+        "respawnTime": 70,
+        "spRecovery": 1,
+        "hpRecoveryPerSec": 0,
+        "moveSpeed": 1,
+        "tauntLevel": 0,
+        "massLevel": 0,
+        "deployLimit": 1,
+        "deckStack": 0
+      }
+    },
+    "chess_char_5_19_b": {
+      "name": "玛恩纳",
+      "isGolden": true,
+      "tier": 5,
+      "bonds": [
+        "kazimierzShip"
+      ],
+      "backup": {
+        "charId": "char_617_sharp2",
+        "tmplId": null,
+        "skillIndex": 0,
+        "uniEquipId": "uniequip_002_sharp2",
+        "potRank": 0
+      },
+      "garrisonIds": [
+        "garrison_115_b"
+      ],
+      "stats": {
+        "maxHp": 3907,
+        "atk": 380,
+        "def": 476,
+        "res": 15,
+        "cost": 10,
+        "blockCnt": 3,
+        "bat": 1.2,
+        "aspd": 105,
+        "respawnTime": 70,
+        "spRecovery": 1,
+        "hpRecoveryPerSec": 0,
+        "moveSpeed": 1,
+        "tauntLevel": 0,
+        "massLevel": 0,
+        "deployLimit": 1,
+        "deckStack": 0
+      }
+    },
+    "chess_char_5_23_b": {
+      "name": "录武官",
+      "isGolden": true,
+      "tier": 5,
+      "bonds": [
+        "yanShip",
+        "miraShip"
+      ],
+      "backup": {
+        "charId": "char_4196_reckpr",
+        "tmplId": null,
+        "skillIndex": 1,
+        "uniEquipId": "uniequip_002_reckpr",
+        "potRank": 0
+      },
+      "garrisonIds": [
+        "garrison_156_b"
+      ],
+      "stats": {
+        "maxHp": 1610,
+        "atk": 507,
+        "def": 118,
+        "res": 0,
+        "cost": 17,
+        "blockCnt": 1,
+        "bat": 2.85,
+        "aspd": 104,
+        "respawnTime": 66,
+        "spRecovery": 1,
+        "hpRecoveryPerSec": 0,
+        "moveSpeed": 1,
+        "tauntLevel": 0,
+        "massLevel": 0,
+        "deployLimit": 1,
+        "deckStack": 0
+      }
+    },
+    "chess_char_6_02_b": {
+      "name": "圣聆初雪",
+      "isGolden": true,
+      "tier": 6,
+      "bonds": [
+        "kjeragShip",
+        "arcaneShip"
+      ],
+      "backup": {
+        "charId": "char_608_acpion",
+        "tmplId": null,
+        "skillIndex": 2,
+        "uniEquipId": "uniequip_002_acpion",
+        "potRank": 0
+      },
+      "garrisonIds": [
+        "garrison_05_b"
+      ],
+      "stats": {
+        "maxHp": 1933,
+        "atk": 905,
+        "def": 292,
+        "res": 15,
+        "cost": 22,
+        "blockCnt": 1,
+        "bat": 2,
+        "aspd": 100,
+        "respawnTime": 70,
+        "spRecovery": 1,
+        "hpRecoveryPerSec": 0,
+        "moveSpeed": 1,
+        "tauntLevel": 0,
+        "massLevel": 0,
+        "deployLimit": 1,
+        "deckStack": 0
+      }
+    },
+    "chess_char_6_03_b": {
+      "name": "余",
+      "isGolden": true,
+      "tier": 6,
+      "bonds": [
+        "yanShip",
+        "steadShip"
+      ],
+      "backup": {
+        "charId": "char_610_acfend",
+        "tmplId": null,
+        "skillIndex": 2,
+        "uniEquipId": "uniequip_002_acfend",
+        "potRank": 0
+      },
+      "garrisonIds": [
+        "garrison_37_b"
+      ],
+      "stats": {
+        "maxHp": 3700,
+        "atk": 724,
+        "def": 532,
+        "res": 10,
+        "cost": 24,
+        "blockCnt": 3,
+        "bat": 1.6,
+        "aspd": 100,
+        "respawnTime": 70,
+        "spRecovery": 1,
+        "hpRecoveryPerSec": 0,
+        "moveSpeed": 1,
+        "tauntLevel": 0,
+        "massLevel": 0,
+        "deployLimit": 1,
+        "deckStack": 0
+      }
+    },
+    "chess_char_6_05_b": {
+      "name": "异客",
+      "isGolden": true,
+      "tier": 6,
+      "bonds": [
+        "sargonShip",
+        "swiftShip",
+        "preciShip"
+      ],
+      "backup": {
+        "charId": "char_611_acnipe",
+        "tmplId": null,
+        "skillIndex": 2,
+        "uniEquipId": "uniequip_002_acnipe",
+        "potRank": 0
+      },
+      "garrisonIds": [
+        "garrison_100_b"
+      ],
+      "stats": {
+        "maxHp": 1442,
+        "atk": 771,
+        "def": 125,
+        "res": 20,
+        "cost": 31,
+        "blockCnt": 1,
+        "bat": 2.3,
+        "aspd": 105,
+        "respawnTime": 70,
+        "spRecovery": 1,
+        "hpRecoveryPerSec": 0,
+        "moveSpeed": 1,
+        "tauntLevel": 0,
+        "massLevel": 0,
+        "deployLimit": 1,
+        "deckStack": 0
+      }
+    },
+    "chess_char_6_06_b": {
+      "name": "佩佩",
+      "isGolden": true,
+      "tier": 6,
+      "bonds": [
+        "sargonShip",
+        "indomShip"
+      ],
+      "backup": {
+        "charId": "char_609_acguad",
+        "tmplId": null,
+        "skillIndex": 2,
+        "uniEquipId": "uniequip_002_acguad",
+        "potRank": 0
+      },
+      "garrisonIds": [
+        "garrison_94_b"
+      ],
+      "stats": {
+        "maxHp": 2939,
+        "atk": 1368,
+        "def": 367,
+        "res": 0,
+        "cost": 18,
+        "blockCnt": 2,
+        "bat": 1.8,
+        "aspd": 100,
+        "respawnTime": 70,
+        "spRecovery": 1,
+        "hpRecoveryPerSec": 0,
+        "moveSpeed": 1,
+        "tauntLevel": 0,
+        "massLevel": 0,
+        "deployLimit": 1,
+        "deckStack": 0
+      }
+    },
+    "chess_char_6_11_b": {
+      "name": "缪尔赛思",
+      "isGolden": true,
+      "tier": 6,
+      "bonds": [
+        "maniShip"
+      ],
+      "backup": {
+        "charId": "char_608_acpion",
+        "tmplId": null,
+        "skillIndex": 2,
+        "uniEquipId": "uniequip_002_acpion",
+        "potRank": 0
+      },
+      "garrisonIds": [
+        "garrison_76_b"
+      ],
+      "stats": {
+        "maxHp": 1893,
+        "atk": 517,
+        "def": 141,
+        "res": 0,
+        "cost": 13,
+        "blockCnt": 1,
+        "bat": 1,
+        "aspd": 100,
+        "respawnTime": 66,
+        "spRecovery": 1,
+        "hpRecoveryPerSec": 0,
+        "moveSpeed": 1,
+        "tauntLevel": 0,
+        "massLevel": 0,
+        "deployLimit": 1,
+        "deckStack": 0
+      }
+    },
+    "chess_char_6_15_b": {
+      "name": "仇白",
+      "isGolden": true,
+      "tier": 6,
+      "bonds": [
+        "yanShip",
+        "raidShip"
+      ],
+      "backup": {
+        "charId": "char_614_acsupo",
+        "tmplId": null,
+        "skillIndex": 2,
+        "uniEquipId": "uniequip_002_acsupo",
+        "potRank": 0
+      },
+      "garrisonIds": [
+        "garrison_101_b"
+      ],
+      "stats": {
+        "maxHp": 2304,
+        "atk": 753,
+        "def": 424,
+        "res": 10,
+        "cost": 18,
+        "blockCnt": 2,
+        "bat": 1.3,
+        "aspd": 107,
+        "respawnTime": 70,
+        "spRecovery": 1,
+        "hpRecoveryPerSec": 0,
+        "moveSpeed": 1,
+        "tauntLevel": 0,
+        "massLevel": 0,
+        "deployLimit": 1,
+        "deckStack": 0
+      }
+    },
+    "chess_char_6_17_b": {
+      "name": "耀骑士临光",
+      "isGolden": true,
+      "tier": 6,
+      "bonds": [
+        "kazimierzShip",
+        "raidShip"
+      ],
+      "backup": {
+        "charId": "char_608_acpion",
+        "tmplId": null,
+        "skillIndex": 2,
+        "uniEquipId": "uniequip_002_acpion",
+        "potRank": 0
+      },
+      "garrisonIds": [
+        "garrison_145_b",
+        "garrison_144_b",
+        "garrison_159_b",
+        "garrison_160_b"
+      ],
+      "stats": {
+        "maxHp": 3593,
+        "atk": 1143,
+        "def": 279,
+        "res": 0,
+        "cost": 17,
+        "blockCnt": 1,
+        "bat": 1.5,
+        "aspd": 100,
+        "respawnTime": 66,
+        "spRecovery": 1,
+        "hpRecoveryPerSec": 0,
+        "moveSpeed": 1,
+        "tauntLevel": 0,
+        "massLevel": 0,
+        "deployLimit": 1,
+        "deckStack": 0
+      }
+    },
+    "chess_char_6_19_b": {
+      "name": "锏",
+      "isGolden": true,
+      "tier": 6,
+      "bonds": [
+        "kjeragShip",
+        "kazimierzShip",
+        "swiftShip"
+      ],
+      "backup": {
+        "charId": "char_615_acspec",
+        "tmplId": null,
+        "skillIndex": 2,
+        "uniEquipId": "uniequip_002_acspec",
+        "potRank": 0
+      },
+      "garrisonIds": [
+        "garrison_155_b",
+        "garrison_65_b"
+      ],
+      "stats": {
+        "maxHp": 2767,
+        "atk": 661,
+        "def": 367,
+        "res": 0,
+        "cost": 21,
+        "blockCnt": 2,
+        "bat": 1.3,
+        "aspd": 100,
+        "respawnTime": 70,
+        "spRecovery": 1,
+        "hpRecoveryPerSec": 0,
+        "moveSpeed": 1,
+        "tauntLevel": 0,
+        "massLevel": 0,
+        "deployLimit": 1,
+        "deckStack": 0
+      }
+    }
+  },
+  "items": {
+    "chess_item_2_04_e_b": {
+      "id": "chess_item_2_04_e_b",
+      "baseId": "chess_item_2_04_e_a",
+      "goldenId": "chess_item_2_04_e_b",
+      "isGolden": true,
+      "trapId": "trap_1050_acarm050",
+      "iconId": "trap_1050_acarm050",
+      "identifier": 335,
+      "name": "萨尔贡浓茶",
+      "itemType": "EQUIP",
+      "tier": 2,
+      "shopSortId": 4,
+      "price": 5,
+      "hideInShop": false,
+      "shopExcluded": false,
+      "shopExcludedBy": null,
+      "mergeable": false,
+      "upgradeNum": 0,
+      "upgradeChessId": null,
+      "duration": 0,
+      "giveBondId": "sargonShip",
+      "givePowerId": null,
+      "canGiveBond": false,
+      "requiresBondId": null,
+      "effectId": "eff_acgarm050",
+      "effectName": "萨尔贡浓茶",
+      "desc": "技力自然回复速度+0.25/秒",
+      "descRaw": "技力自然回复速度<@ba.vup>+0.25</>/秒",
+      "buffs": [
+        {
+          "key": "env_gbuff_new_with_verify",
+          "countType": "NONE",
+          "bb": {
+            "sp_recovery_per_sec": 0.25
+          },
+          "bbStr": {
+            "key": "act1autochess_equip_acarm050_global_buff"
+          }
+        }
+      ],
+      "params": {
+        "sp_recovery_per_sec": 0.25,
+        "key": "act1autochess_equip_acarm050_global_buff"
+      },
+      "category": "STAT",
+      "kind": "passive",
+      "family": null,
+      "implFormula": "spRecoveryPerSec += sp_recovery_per_sec (flat, on top of base 1 SP/s for auto-recovery skills).",
+      "note": null,
+      "rangeGrid": [
+        [
+          0,
+          0
+        ]
+      ],
+      "flavor": "一种曾在萨尔贡的荒漠中救人性命的浓茶。\n“别畏惧苦涩，它能让你保持清醒，清醒地活下去。”"
+    },
+    "chess_item_3_04_e_b": {
+      "id": "chess_item_3_04_e_b",
+      "baseId": "chess_item_3_04_e_a",
+      "goldenId": "chess_item_3_04_e_b",
+      "isGolden": true,
+      "trapId": "trap_1040_acarm040",
+      "iconId": "trap_1040_acarm040",
+      "identifier": 325,
+      "name": "炎国短刀",
+      "itemType": "EQUIP",
+      "tier": 3,
+      "shopSortId": 4,
+      "price": 5,
+      "hideInShop": false,
+      "shopExcluded": false,
+      "shopExcludedBy": null,
+      "mergeable": false,
+      "upgradeNum": 0,
+      "upgradeChessId": null,
+      "duration": 0,
+      "giveBondId": "yanShip",
+      "givePowerId": null,
+      "canGiveBond": false,
+      "requiresBondId": null,
+      "effectId": "eff_acgarm040",
+      "effectName": "炎国短刀",
+      "desc": "每开启一次技能，获得8%的攻击力加成（最多叠加10次）",
+      "descRaw": "每开启一次技能，获得<@ba.vup>8%</>的攻击力加成（最多叠加10次）",
+      "buffs": [
+        {
+          "key": "env_gbuff_new_with_verify",
+          "countType": "COUNTING",
+          "bb": {
+            "prob": 1,
+            "atk": 0.08,
+            "atk_buff_cnt": 10
+          },
+          "bbStr": {
+            "key": "act1vautochess_equip_acarm024_global_buff"
+          }
+        }
+      ],
+      "params": {
+        "prob": 1,
+        "atk": 0.08,
+        "atk_buff_cnt": 10,
+        "key": "act1vautochess_equip_acarm024_global_buff"
+      },
+      "category": "ON_HIT",
+      "kind": "passive_counter",
+      "family": null,
+      "implFormula": "Each time the carrier activates a skill: stacks = min(stacks+1, atk_buff_cnt); ATK% += atk * stacks. Stacks reset each battle.",
+      "note": null,
+      "rangeGrid": [
+        [
+          0,
+          0
+        ]
+      ],
+      "flavor": "一把曾在炎国的江湖上铲除不义的短刀。\n“拔刀之前，先想清楚是否值得。拔出刀后，就不可再犹豫。”"
+    },
+    "chess_item_5_02_e_b": {
+      "id": "chess_item_5_02_e_b",
+      "baseId": "chess_item_5_02_e_a",
+      "goldenId": "chess_item_5_02_e_b",
+      "isGolden": true,
+      "trapId": "trap_1062_acarm062",
+      "iconId": "trap_1062_acarm062",
+      "identifier": 347,
+      "name": "谢拉格不融冰",
+      "itemType": "EQUIP",
+      "tier": 5,
+      "shopSortId": 2,
+      "price": 5,
+      "hideInShop": false,
+      "shopExcluded": false,
+      "shopExcludedBy": null,
+      "mergeable": false,
+      "upgradeNum": 0,
+      "upgradeChessId": null,
+      "duration": 0,
+      "giveBondId": "kjeragShip",
+      "givePowerId": null,
+      "canGiveBond": false,
+      "requiresBondId": null,
+      "effectId": "eff_acgarm062",
+      "effectName": "谢拉格不融冰",
+      "desc": "攻击时有20%概率对目标施加1.5秒的寒冷",
+      "descRaw": "攻击时有20%概率对目标施加1.5秒的<$ba.cold>寒冷</>",
+      "buffs": [
+        {
+          "key": "env_gbuff_new_with_verify",
+          "countType": "NONE",
+          "bb": {
+            "prob": 0.2,
+            "cold": 1.5
+          },
+          "bbStr": {
+            "key": "act1vautochess_equip_acarm003_global_buff"
+          }
+        }
+      ],
+      "params": {
+        "prob": 0.2,
+        "cold": 1.5,
+        "key": "act1vautochess_equip_acarm003_global_buff"
+      },
+      "category": "ON_HIT",
+      "kind": "passive",
+      "family": null,
+      "implFormula": "On attack: prob chance to apply 寒冷(Cold: ASPD -30; cold again while cold -> Frozen) for `cold` s.",
+      "note": null,
+      "rangeGrid": [
+        [
+          0,
+          0
+        ]
+      ],
+      "flavor": "\"一块曾在谢拉格的山峰上见证日月升落的不融冰。\n“让自己冷静下来，如同冰川，不可被撼动，却能摧毁一切。”\""
+    },
+    "chess_item_5_03_e_b": {
+      "id": "chess_item_5_03_e_b",
+      "baseId": "chess_item_5_03_e_a",
+      "goldenId": "chess_item_5_03_e_b",
+      "isGolden": true,
+      "trapId": "trap_1067_acarm067",
+      "iconId": "trap_1067_acarm067",
+      "identifier": 352,
+      "name": "双模机械臂",
+      "itemType": "EQUIP",
+      "tier": 5,
+      "shopSortId": 3,
+      "price": 5,
+      "hideInShop": false,
+      "shopExcluded": false,
+      "shopExcludedBy": null,
+      "mergeable": false,
+      "upgradeNum": 0,
+      "upgradeChessId": null,
+      "duration": 0,
+      "giveBondId": null,
+      "givePowerId": null,
+      "canGiveBond": false,
+      "requiresBondId": null,
+      "effectId": "eff_acgarm067",
+      "effectName": "双模机械臂",
+      "desc": "攻击力+50%，自身造成物理和法术伤害时，伤害类型转化为弱点伤害",
+      "descRaw": "攻击力<@ba.vup>+50%</>，自身造成物理和法术伤害时，伤害类型转化为<$ba.weaknessatk>弱点伤害</>",
+      "buffs": [
+        {
+          "key": "env_gbuff_new_with_verify",
+          "countType": "NONE",
+          "bb": {},
+          "bbStr": {
+            "key": "act1autochess_equip_acarm067_global_buff"
+          }
+        },
+        {
+          "key": "env_gbuff_new_with_verify",
+          "countType": "NONE",
+          "bb": {
+            "atk": 0.5
+          },
+          "bbStr": {
+            "key": "attr_common_global_buff"
+          }
+        }
+      ],
+      "params": {
+        "key": "act1autochess_equip_acarm067_global_buff",
+        "atk": 0.5
+      },
+      "category": "ON_HIT",
+      "kind": "passive",
+      "family": null,
+      "implFormula": "ATK% += atk; carrier's physical and arts damage becomes 弱点伤害(weakness damage): each hit is dealt as whichever of physical/arts yields MORE damage against that target's DEF/RES.",
+      "note": null,
+      "rangeGrid": [
+        [
+          0,
+          0
+        ]
+      ],
+      "flavor": "“是的，这台设备能帮上你不小的忙，但要获得胜利，还是得靠你自己。”"
+    },
+    "chess_item_6_06_e_b": {
+      "id": "chess_item_6_06_e_b",
+      "baseId": "chess_item_6_06_e_a",
+      "goldenId": "chess_item_6_06_e_b",
+      "isGolden": true,
+      "trapId": "trap_1102_acarm102",
+      "iconId": "trap_1102_acarm102",
+      "identifier": 366,
+      "name": "耶拉冈德之泪",
+      "itemType": "EQUIP",
+      "tier": 6,
+      "shopSortId": 6,
+      "price": 5,
+      "hideInShop": false,
+      "shopExcluded": false,
+      "shopExcludedBy": null,
+      "mergeable": false,
+      "upgradeNum": 0,
+      "upgradeChessId": null,
+      "duration": 0,
+      "giveBondId": null,
+      "givePowerId": null,
+      "canGiveBond": false,
+      "requiresBondId": "kjeragShip",
+      "effectId": "eff_acgarm102",
+      "effectName": "耶拉冈德之泪",
+      "desc": "法术抗性+50；若携带者为【谢拉格】盟约干员，该干员攻击范围内被寒冷或冻结的敌人每秒受到一次自身攻击力30%的法术伤害\n若该【谢拉格】盟约干员同时装备“谢拉格不融冰”，则使自身攻击范围内寒冷或冻结的敌人每秒受到的法术伤害提升至100%攻击力",
+      "descRaw": "法术抗性<@ba.vup>+50</>；若携带者为【谢拉格】盟约干员，该干员攻击范围内被<$ba.cold>寒冷</>或<$ba.frozen>冻结</>的敌人每秒受到一次自身攻击力<@ba.vup>30%</>的法术伤害\n<@ba.acrem>若该【谢拉格】盟约干员同时装备“谢拉格不融冰”，则使自身攻击范围内<$ba.cold>寒冷</>或<$ba.frozen>冻结</>的敌人每秒受到的法术伤害提升至<@ba.vup>100%</>攻击力</>",
+      "buffs": [
+        {
+          "key": "char_dynamic_ability_new",
+          "countType": "NONE",
+          "bb": {
+            "atk_scale": 0.3,
+            "interval": 1,
+            "atk_scale_ex": 1
+          },
+          "bbStr": {
+            "key": "act2autochess_equip_acarm102_ability",
+            "equip_chess_id": "chess_item_5_02_e"
+          }
+        },
+        {
+          "key": "env_gbuff_new_with_verify",
+          "countType": "NONE",
+          "bb": {
+            "magic_resistance": 50
+          },
+          "bbStr": {
+            "key": "attr_common_global_buff"
+          }
+        }
+      ],
+      "params": {
+        "atk_scale": 0.3,
+        "interval": 1,
+        "atk_scale_ex": 1,
+        "key": "act2autochess_equip_acarm102_ability",
+        "equip_chess_id": "chess_item_5_02_e",
+        "magic_resistance": 50
+      },
+      "category": "BOND_SIGNATURE",
+      "kind": "passive",
+      "family": null,
+      "implFormula": "RES += magic_resistance. If carrier has bond Kjerag: every `interval` (1 s) each Cold or Frozen enemy inside the carrier's attack range takes atk_scale * ATK arts damage; atk_scale_ex (100%) if carrier also holds 谢拉格不融冰.",
+      "note": null,
+      "rangeGrid": [
+        [
+          0,
+          0
+        ]
+      ],
+      "flavor": "“谢拉格人相信冰川最深处的宝石是耶拉冈德的眼泪。”"
+    },
+    "chess_item_6_07_e_b": {
+      "id": "chess_item_6_07_e_b",
+      "baseId": "chess_item_6_07_e_a",
+      "goldenId": "chess_item_6_07_e_b",
+      "isGolden": true,
+      "trapId": "trap_1103_acarm103",
+      "iconId": "trap_1103_acarm103",
+      "identifier": 367,
+      "name": "黄沙罗盘",
+      "itemType": "EQUIP",
+      "tier": 6,
+      "shopSortId": 7,
+      "price": 5,
+      "hideInShop": false,
+      "shopExcluded": false,
+      "shopExcludedBy": null,
+      "mergeable": false,
+      "upgradeNum": 0,
+      "upgradeChessId": null,
+      "duration": 0,
+      "giveBondId": null,
+      "givePowerId": null,
+      "canGiveBond": false,
+      "requiresBondId": "sargonShip",
+      "effectId": "eff_acgarm103",
+      "effectName": "黄沙罗盘",
+      "desc": "初始技力+50；若携带者为【萨尔贡】盟约干员，该干员首次技能结束时立刻回复30点技力\n若该【萨尔贡】盟约干员同时装备“萨尔贡浓茶”，每次开启技能时为全部【萨尔贡】干员回复3点技力",
+      "descRaw": "初始技力<@ba.vup>+50</>；若携带者为【萨尔贡】盟约干员，该干员首次技能结束时立刻回复<@ba.vup>30</>点技力\n<@ba.acrem>若该【萨尔贡】盟约干员同时装备“萨尔贡浓茶”，每次开启技能时为全部【萨尔贡】干员回复<@ba.vup>3</>点技力</>",
+      "buffs": [
+        {
+          "key": "env_gbuff_new_with_verify",
+          "countType": "NONE",
+          "bb": {
+            "sp": 30,
+            "addition_sp": 3,
+            "init_sp": 50
+          },
+          "bbStr": {
+            "key": "act1autochess_equip_acarm103_global_buff",
+            "equip_chess_id": "chess_item_2_04_e"
+          }
+        }
+      ],
+      "params": {
+        "sp": 30,
+        "addition_sp": 3,
+        "init_sp": 50,
+        "key": "act1autochess_equip_acarm103_global_buff",
+        "equip_chess_id": "chess_item_2_04_e"
+      },
+      "category": "BOND_SIGNATURE",
+      "kind": "passive",
+      "family": null,
+      "implFormula": "Initial SP += init_sp (30/50). If carrier has bond Sargon: when its FIRST skill ends, SP += sp (30). If also holding 萨尔贡浓茶: each time the carrier activates a skill, all Sargon operators on field gain addition_sp (3) SP.",
+      "note": null,
+      "rangeGrid": [
+        [
+          0,
+          0
+        ]
+      ],
+      "flavor": "“传说萨尔贡人将会在黄沙尽头找到时间回流的刻印。”"
+    },
+    "chess_item_6_09_e_b": {
+      "id": "chess_item_6_09_e_b",
+      "baseId": "chess_item_6_09_e_a",
+      "goldenId": "chess_item_6_09_e_b",
+      "isGolden": true,
+      "trapId": "trap_1073_acarm073",
+      "iconId": "trap_1073_acarm073",
+      "identifier": 358,
+      "name": "变形同构体",
+      "itemType": "EQUIP",
+      "tier": 6,
+      "shopSortId": 9,
+      "price": 5,
+      "hideInShop": false,
+      "shopExcluded": false,
+      "shopExcludedBy": null,
+      "mergeable": false,
+      "upgradeNum": 0,
+      "upgradeChessId": null,
+      "duration": 0,
+      "giveBondId": null,
+      "givePowerId": null,
+      "canGiveBond": true,
+      "requiresBondId": null,
+      "effectId": "eff_acgarm073",
+      "effectName": "变形同构体",
+      "desc": "携带者获得额外盟约（由另一件携带装备而定）\n具体对应关系可在模拟中查看本装备天赋栏",
+      "descRaw": "携带者获得额外盟约（由另一件携带装备而定）\n<@ba.acrem>具体对应关系可在模拟中查看本装备天赋栏</>",
+      "buffs": [],
+      "params": {},
+      "category": "BOND_GRANT",
+      "kind": "passive",
+      "family": null,
+      "implFormula": "Carrier additionally counts as a member of bond B where B = giveBondId of the OTHER item equipped on the same operator (see bondGrantTable). No effect if the other item has giveBondId=null. Never merges.",
+      "note": null,
+      "rangeGrid": [
+        [
+          0,
+          0
+        ]
+      ],
+      "flavor": "“变形者集群，我们早已见识到了你都能做到些什么……”"
+    }
+  },
+  "bonds": {
+    "yanShip": {
+      "bondId": "yanShip",
+      "name": "炎",
+      "identifier": 1,
+      "isCore": true,
+      "bondType": "SEASON",
+      "bondOrder": 2,
+      "powerIdList": [
+        "yan",
+        "sui",
+        "lungmen",
+        "lee",
+        "lgd"
+      ],
+      "iconId": "icon_yanShip",
+      "activeCount": 3,
+      "thresholds": [
+        3,
+        6,
+        9
+      ],
+      "maxCount": null,
+      "thresholdTemplate": "count_threshold_upward",
+      "countMode": "BOARD",
+      "countsHand": false,
+      "countsGoldenOnly": false,
+      "activeType": "BATTLE",
+      "isActiveInDeck": false,
+      "noStack": false,
+      "weight": 10,
+      "maxInactiveBondCount": -1,
+      "layerMilestones": [],
+      "desc": "【炎】干员攻击力提升（受层数影响）\n<在场6名不同【炎】干员>战斗开始时召唤可自主行动的“炎佑”，其攻击力生命值分别为开战时【炎】干员攻击力生命值总和的30%，“炎佑”同时攻击3个目标，可使用“祛恶之焰”，攻击时附带攻击力一定比例的灼燃损伤且周围敌人受到一定比例的元素脆弱\n<在场9名不同【炎】干员>改为召唤2只“炎佑”，攻击力提升至1.5倍，受到的伤害-90%",
+      "descRaw": "【炎】干员<@ba.vup>攻击力</>提升<@autochess.gray>（受层数影响）</>\n<在场<@autochess.dgreen>6</>名不同【炎】干员>战斗开始时召唤可自主行动的<@ba.vup>“炎佑”</>，其攻击力生命值分别为开战时【炎】干员攻击力生命值总和的30%，“炎佑”同时攻击3个目标，可使用<@ba.vup>“祛恶之焰”</>，攻击时附带攻击力一定比例的灼燃损伤且周围敌人受到一定比例的元素脆弱\n<在场<@autochess.dgreen>9</>名不同【炎】干员>改为召唤2只<@ba.vup>“炎佑”</>，攻击力提升至<@ba.vup>1.5</>倍，受到的伤害<@ba.vup>-90%</>",
+      "effectId": "bondeffect_yan",
+      "effectName": "炎",
+      "effectDesc": "【炎】干员攻击力+{0:0%}（受层数影响）\n<在场6名不同【炎】干员>战斗开始时收集【炎】干员部分属性召唤“炎佑”（其攻击力和生命值为【炎】干员攻击力和生命值总和的30%）；“炎佑”同时攻击3个目标，攻击附带20%攻击力的灼燃损伤，周围敌人受到20%的元素脆弱，周期性使用“祛恶之焰”\n<在场9名不同【炎】干员>改为召唤2只“炎佑”；“炎佑”攻击力提升至1.5倍，受到的伤害-90%",
+      "effectDescRaw": "【炎】干员攻击力<@ba.vup>+{0:0%}</><@ba.acrem>（受层数影响）</>\n<在场<@ba.vup>6</>名不同【炎】干员>战斗开始时收集【炎】干员部分属性召唤“炎佑”（其攻击力和生命值为【炎】干员攻击力和生命值总和的30%）；“炎佑”同时攻击3个目标，攻击附带20%<@ba.vup>攻击力</>的<@ba.vup>灼燃损伤</>，周围敌人受到20%的<@ba.vup>元素脆弱</>，周期性使用“祛恶之焰”\n<在场<@ba.vup>9</>名不同【炎】干员>改为召唤2只“炎佑”；“炎佑”攻击力提升至1.5倍，受到的伤害-90%",
+      "effectDescParams": [
+        {
+          "index": 0,
+          "format": "0%",
+          "base": "base_atk",
+          "perStack": "atk_per_stack"
+        }
+      ],
+      "bb": {
+        "base_atk": 0.23,
+        "atk_per_stack": 0.009,
+        "power_bond_char_cnt": 6,
+        "ex_bond_char_cnt": 9,
+        "damage_resistance": 0.9,
+        "atk": 1.5
+      },
+      "bbStr": {
+        "key": "act1autochess_bond_eff_yan"
+      },
+      "buffs": [
+        {
+          "key": "env_gbuff_new",
+          "bb": {
+            "base_atk": 0.23,
+            "atk_per_stack": 0.009,
+            "power_bond_char_cnt": 6,
+            "ex_bond_char_cnt": 9,
+            "damage_resistance": 0.9,
+            "atk": 1.5
+          },
+          "bbStr": {
+            "key": "act1autochess_bond_eff_yan"
+          }
+        }
+      ],
+      "baseParams": [
+        "base_atk"
+      ],
+      "perStackParams": [
+        "atk_per_stack"
+      ],
+      "members": [
+        "chess_char_1_03_a",
+        "chess_char_2_04_a",
+        "chess_char_3_03_a",
+        "chess_char_3_04_a",
+        "chess_char_4_15_a",
+        "chess_char_4_17_a",
+        "chess_char_5_03_a",
+        "chess_char_5_12_a",
+        "chess_char_5_23_a",
+        "chess_char_6_03_a",
+        "chess_char_6_15_a"
+      ],
+      "visibleMembers": [
+        "chess_char_1_03_a",
+        "chess_char_2_04_a",
+        "chess_char_3_03_a",
+        "chess_char_3_04_a",
+        "chess_char_4_17_a",
+        "chess_char_5_03_a",
+        "chess_char_5_12_a",
+        "chess_char_5_23_a",
+        "chess_char_6_03_a",
+        "chess_char_6_15_a"
+      ],
+      "spec": {
+        "tiers": [
+          {
+            "need": "3 distinct 炎 on board",
+            "effect": "炎 members (+调和 members) ATK x(1 + 0.23 + 0.009*L)."
+          },
+          {
+            "need": "6 distinct",
+            "effect": "At battle start spawn 1 \"炎佑\" (enemy_9012_acloon template, allied flying ranged unit, not blockable, moves on its own). ATK = 0.30 x sum(ATK of 炎 operators on board at battle start), maxHP = 0.30 x sum(maxHP of those operators). Template: DEF 200, RES 0, BAT 2.5 s, ASPD 100, attack range radius 2.0 tiles, magic damage, hits up to 3 targets; every hit adds 灼燃损伤 (burn elemental damage) = 20% of its ATK and applies 元素脆弱 (elemental damage taken x1.2) to enemies within 0.8 tiles of the target. Skill \"祛恶之焰\": cooldown 15 s (first cast 15 s after spawn), channels a flame on one enemy in range dealing 60% ATK magic damage per second to it and to enemies within 1.0 tile, for up to 20 s."
+          },
+          {
+            "need": "9 distinct",
+            "effect": "Spawn 2 炎佑 instead; each has ATK x1.5 and takes 90% less damage (damage_resistance 0.9)."
+          }
+        ],
+        "formulas": {
+          "atkMultiplier": "1 + 0.23 + 0.009*L"
+        },
+        "caps": "none",
+        "layerGain": "Economy-driven: 惊蛰 获得时 +shop level (no activation needed); 小满 休整期结束 +1 per operator gained this round; 夕 +2 炎/奥术 per operator gained; 录武官 获得时 +6 炎 +3 奇迹; 星熊 获得时 +8 own bonds; 烛煌 获得时 +5 炎/维多利亚; 机变 \"诗怀雅的盟誓\" +10. Strategy 杜遥夜: first 2 manual refreshes each round prefer a 炎 operator.",
+        "howToPlay": "Buy many operators each round (every gain feeds 小满/夕), rush 6 炎 for the 炎佑 spike; 琳琅诗怀雅 / 诗怀雅 give early gold. 9 炎 is a late-game luxury.",
+        "assumed": [
+          "炎佑 base stats are replaced (not added) by the 30% sums",
+          "祛恶之焰 hit_duration=20 read as 20 one-second ticks",
+          "spawn point: centre of the player's board / near the objective",
+          "targets = 3 nearest enemies in range"
+        ]
+      }
+    },
+    "kjeragShip": {
+      "bondId": "kjeragShip",
+      "name": "谢拉格",
+      "identifier": 4,
+      "isCore": true,
+      "bondType": "SEASON",
+      "bondOrder": 2,
+      "powerIdList": [
+        "kjerag",
+        "karlan"
+      ],
+      "iconId": "icon_kjeragShip",
+      "activeCount": 3,
+      "thresholds": [
+        3,
+        6
+      ],
+      "maxCount": null,
+      "thresholdTemplate": "count_threshold_upward",
+      "countMode": "BOARD",
+      "countsHand": false,
+      "countsGoldenOnly": false,
+      "activeType": "BATTLE",
+      "isActiveInDeck": false,
+      "noStack": false,
+      "weight": 10,
+      "maxInactiveBondCount": -1,
+      "layerMilestones": [],
+      "desc": "【谢拉格】干员造成的伤害提升，对寒冷、冻结敌人获得额外提升（受层数影响）\n<在场6名不同【谢拉格】干员>战场上每25秒过一阵寒风使场上的敌人寒冷一定时间（受层数影响）",
+      "descRaw": "【谢拉格】干员造成的<@ba.vup>伤害提升</>，对<@ba.vup>寒冷、冻结</>敌人获得额外提升<@autochess.gray>（受层数影响）</>\n<在场<@autochess.dgreen>6</>名不同【谢拉格】干员>战场上每25秒过一阵寒风使场上的敌人寒冷一定时间<@autochess.gray>（受层数影响）</>",
+      "effectId": "bondeffect_kjerag",
+      "effectName": "谢拉格",
+      "effectDesc": "【谢拉格】干员伤害提升至125%，对寒冷和冻结敌人额外提升至{0:0%}（受层数影响）\n<在场6名不同【谢拉格】干员>战场上每25秒吹过一阵寒风使敌人寒冷{1:0}秒（受层数影响）",
+      "effectDescRaw": "【谢拉格】干员伤害提升至<@ba.vup>125%</>，对寒冷和冻结敌人额外提升至<@ba.vup>{0:0%}</><@ba.acrem>（受层数影响）</>\n<在场<@ba.vup>6</>名不同【谢拉格】干员>战场上每25秒吹过一阵寒风使敌人寒冷<@ba.vup>{1:0}</>秒<@ba.acrem>（受层数影响）</>",
+      "effectDescParams": [
+        {
+          "index": 0,
+          "format": "0%",
+          "base": "base_ex_damage_scale",
+          "perStack": "ex_damage_scale_per_stack"
+        },
+        {
+          "index": 1,
+          "format": "0",
+          "base": "bond_eff_kjerag[storm].base_time",
+          "perStack": "bond_eff_kjerag[storm].time_per_stack"
+        }
+      ],
+      "bb": {
+        "base_damage_scale": 1.25,
+        "base_ex_damage_scale": 1.35,
+        "ex_damage_scale_per_stack": 0.01,
+        "power_bond_char_cnt": 6,
+        "bond_eff_kjerag[storm].interval": 25,
+        "bond_eff_kjerag[storm].base_time": 20,
+        "bond_eff_kjerag[storm].time_per_stack": 0.1
+      },
+      "bbStr": {
+        "key": "act1autochess_bond_eff_kjerag"
+      },
+      "buffs": [
+        {
+          "key": "env_gbuff_new",
+          "bb": {
+            "base_damage_scale": 1.25,
+            "base_ex_damage_scale": 1.35,
+            "ex_damage_scale_per_stack": 0.01,
+            "power_bond_char_cnt": 6,
+            "bond_eff_kjerag[storm].interval": 25,
+            "bond_eff_kjerag[storm].base_time": 20,
+            "bond_eff_kjerag[storm].time_per_stack": 0.1
+          },
+          "bbStr": {
+            "key": "act1autochess_bond_eff_kjerag"
+          }
+        }
+      ],
+      "baseParams": [
+        "base_ex_damage_scale",
+        "bond_eff_kjerag[storm].base_time"
+      ],
+      "perStackParams": [
+        "ex_damage_scale_per_stack",
+        "bond_eff_kjerag[storm].time_per_stack"
+      ],
+      "members": [
+        "chess_char_1_02_a",
+        "chess_char_2_03_a",
+        "chess_char_2_05_a",
+        "chess_char_3_11_a",
+        "chess_char_3_14_a",
+        "chess_char_3_20_a",
+        "chess_char_4_03_a",
+        "chess_char_4_13_a",
+        "chess_char_4_22_a",
+        "chess_char_5_14_a",
+        "chess_char_6_02_a",
+        "chess_char_6_19_a"
+      ],
+      "visibleMembers": [
+        "chess_char_1_02_a",
+        "chess_char_2_05_a",
+        "chess_char_3_11_a",
+        "chess_char_3_14_a",
+        "chess_char_3_20_a",
+        "chess_char_4_13_a",
+        "chess_char_4_22_a",
+        "chess_char_5_14_a",
+        "chess_char_6_02_a",
+        "chess_char_6_19_a"
+      ],
+      "spec": {
+        "tiers": [
+          {
+            "need": "3 distinct",
+            "effect": "谢拉格 members deal damage x1.25; against enemies that are 寒冷 (cold) or 冻结 (frozen) x(1.35 + 0.01*L) instead."
+          },
+          {
+            "need": "6 distinct",
+            "effect": "Every 25 s a cold wind applies 寒冷 to every enemy on the field for (20 + 0.1*L) s."
+          }
+        ],
+        "formulas": {
+          "damageMultiplier": "1.25",
+          "damageMultiplierVsColdOrFrozen": "1.35 + 0.01*L",
+          "windIntervalSec": "25",
+          "windColdDurationSec": "20 + 0.1*L"
+        },
+        "caps": "none",
+        "layerGain": "In battle, freeze-driven: 初雪 and 银灰 - each enemy in range that becomes frozen: 50% chance +1; 凛御银灰 gives the 谢拉格 operator in front of it a 60% version (<=200/battle); 锏 部署时 +8 own active bonds (<=24/battle). 获得时: 角峰 +2, 崖心 +3 (hidden), 雪猎 +5, 灵知 +5, 锏 +8. 机变 \"银灰的盟誓\" +8. Strategy 休露丝: first 谢拉格 bought each round costs 1.",
+        "howToPlay": "Standard AK rule: applying 寒冷 to an already-cold enemy freezes it. The 6-member wind + cold-on-hit sources (谢拉格不融冰 12% 1.5 s cold) create constant freezes, so layers can reach hundreds per battle.",
+        "notes": [
+          "巴哈姆特: avoid lighting 3 奥术 alongside max-layer 谢拉格 (圣聆初雪 gets damage-capped)."
+        ],
+        "assumed": [
+          "first wind at t = 25 s",
+          "wind re-applying cold on a cold enemy triggers freeze like any cold source"
+        ]
+      }
+    },
+    "kazimierzShip": {
+      "bondId": "kazimierzShip",
+      "name": "卡西米尔",
+      "identifier": 8,
+      "isCore": true,
+      "bondType": "SEASON",
+      "bondOrder": 2,
+      "powerIdList": [
+        "kazimierz",
+        "pinus"
+      ],
+      "iconId": "icon_kazimierzShip",
+      "activeCount": 3,
+      "thresholds": [
+        3,
+        6
+      ],
+      "maxCount": null,
+      "thresholdTemplate": "count_threshold_upward",
+      "countMode": "BOARD",
+      "countsHand": false,
+      "countsGoldenOnly": false,
+      "activeType": "BATTLE",
+      "isActiveInDeck": false,
+      "noStack": false,
+      "weight": 10,
+      "maxInactiveBondCount": -1,
+      "layerMilestones": [],
+      "desc": "每次有干员部署时，【卡西米尔】干员攻击力+20%持续至战斗结束（上限受层数影响）\n<在场6名不同【卡西米尔】干员>【卡西米尔】干员阻挡敌人时每2秒对周围敌人造成120%攻击力真实伤害和0.1秒晕眩，未阻挡敌人时攻击附带30%攻击力的真实伤害",
+      "descRaw": "每次有干员部署时，【卡西米尔】干员攻击力<@ba.vup>+20%</>持续至战斗结束<@autochess.gray>（上限受层数影响）</>\n<在场<@autochess.dgreen>6</>名不同【卡西米尔】干员>【卡西米尔】干员阻挡敌人时每<@ba.vup>2</>秒对周围敌人造成<@ba.vup>120%</>攻击力真实伤害和<@ba.vup>0.1</>秒晕眩，未阻挡敌人时攻击附带<@ba.vup>30%</>攻击力的真实伤害",
+      "effectId": "bondeffect_kazimierz",
+      "effectName": "卡西米尔",
+      "effectDesc": "每次有干员部署时【卡西米尔】干员攻击力+20%（至多+{0:0%}）（受层数影响）\n<在场6名不同【卡西米尔】干员>【卡西米尔】干员阻挡敌人时每2秒对周围敌人造成120%攻击力真实伤害和0.1秒晕眩，未阻挡敌人时攻击附带30%攻击力的真实伤害",
+      "effectDescRaw": "每次有干员部署时【卡西米尔】干员攻击力+20%（至多<@ba.vup>+{0:0%}</>）<@ba.acrem>（受层数影响）</>\n<在场<@ba.vup>6</>名不同【卡西米尔】干员>【卡西米尔】干员阻挡敌人时每2秒对周围敌人造成<@ba.vup>120%</>攻击力真实伤害和<@ba.vup>0.1</>秒晕眩，未阻挡敌人时攻击附带<@ba.vup>30%</>攻击力的真实伤害",
+      "effectDescParams": [
+        {
+          "index": 0,
+          "format": "0%",
+          "base": "base_max_atk_when_born",
+          "perStack": "max_atk_when_born_per_stack"
+        }
+      ],
+      "bb": {
+        "atk_when_born": 0.2,
+        "base_max_atk_when_born": 0.5,
+        "max_atk_when_born_per_stack": 0.01,
+        "damage_interval": 2,
+        "damage_atk_scale": 1.2,
+        "stun": 0.1,
+        "range_radius": 0.8,
+        "power_bond_char_cnt": 6,
+        "pure_atk_scale": 0.3
+      },
+      "bbStr": {
+        "key": "act2autochess_bond_eff_kazimierz"
+      },
+      "buffs": [
+        {
+          "key": "env_gbuff_new",
+          "bb": {
+            "atk_when_born": 0.2,
+            "base_max_atk_when_born": 0.5,
+            "max_atk_when_born_per_stack": 0.01,
+            "damage_interval": 2,
+            "damage_atk_scale": 1.2,
+            "stun": 0.1,
+            "range_radius": 0.8,
+            "power_bond_char_cnt": 6,
+            "pure_atk_scale": 0.3
+          },
+          "bbStr": {
+            "key": "act2autochess_bond_eff_kazimierz"
+          }
+        }
+      ],
+      "baseParams": [
+        "base_max_atk_when_born"
+      ],
+      "perStackParams": [
+        "max_atk_when_born_per_stack"
+      ],
+      "members": [
+        "chess_char_1_19_a",
+        "chess_char_2_12_a",
+        "chess_char_2_18_a",
+        "chess_char_3_12_a",
+        "chess_char_3_17_a",
+        "chess_char_4_19_a",
+        "chess_char_4_20_a",
+        "chess_char_5_19_a",
+        "chess_char_6_17_a",
+        "chess_char_6_19_a"
+      ],
+      "visibleMembers": [
+        "chess_char_1_19_a",
+        "chess_char_2_12_a",
+        "chess_char_2_18_a",
+        "chess_char_3_12_a",
+        "chess_char_3_17_a",
+        "chess_char_4_19_a",
+        "chess_char_4_20_a",
+        "chess_char_5_19_a",
+        "chess_char_6_17_a",
+        "chess_char_6_19_a"
+      ],
+      "spec": {
+        "tiers": [
+          {
+            "need": "3 distinct",
+            "effect": "Every time any friendly operator is deployed (incl. redeploys) each 卡西米尔 member gains ATK +20% until battle end, capped at +(50 + 1*L)%."
+          },
+          {
+            "need": "6 distinct",
+            "effect": "While blocking >= 1 enemy: every 2 s deals 120% ATK true damage to all enemies within radius 0.8 tiles and stuns them 0.1 s. While not blocking: each normal damage instance adds 30% ATK sourceless true damage."
+          }
+        ],
+        "formulas": {
+          "atkPerDeploy": "0.20",
+          "atkCap": "0.50 + 0.01*L"
+        },
+        "caps": "ATK bonus cap 50%+1%/layer",
+        "layerGain": "Deploy-driven in battle: 砾 部署时 +1; 瑕光 部署时 +4 own active bonds (<=12/battle); 远牙 grants the right-most operator in its row \"部署时 +4 卡西米尔/精准 (<=24/battle)\"; 锏 部署时 +8 (<=24); 获得时: 野鬃 +2, 灰毫 +3 to highest-layer bond; 机变 \"玛恩纳的盟誓\" +12. Strategy 玛恩纳: +1 gold next round per 卡西米尔 bought (<=3).",
+        "howToPlay": "Maximise deploy events: low redeploy time (助力 -30%, 骑士戒律), operators that die/retreat and come back (砾 + 不屈). 巴哈姆特: do not light 坚守 (damage sharing keeps 砾 alive).",
+        "assumed": [
+          "initial auto-deployments at battle start also count as deploys",
+          "buff applies to members deployed later too (stored globally, capped)"
+        ]
+      }
+    },
+    "sargonShip": {
+      "bondId": "sargonShip",
+      "name": "萨尔贡",
+      "identifier": 2,
+      "isCore": true,
+      "bondType": "SEASON",
+      "bondOrder": 2,
+      "powerIdList": [
+        "sargon"
+      ],
+      "iconId": "icon_sargonShip",
+      "activeCount": 3,
+      "thresholds": [
+        3,
+        6
+      ],
+      "maxCount": null,
+      "thresholdTemplate": "count_threshold_upward",
+      "countMode": "BOARD",
+      "countsHand": false,
+      "countsGoldenOnly": false,
+      "activeType": "BATTLE",
+      "isActiveInDeck": false,
+      "noStack": false,
+      "weight": 10,
+      "maxInactiveBondCount": -1,
+      "layerMilestones": [],
+      "desc": "【萨尔贡】干员开启技能时，所有【萨尔贡】干员攻击速度提升（有上限），持续一定时间（受层数影响，每层持续时间独立计算）\n<在场6名不同【萨尔贡】干员>开启技能还会为所有【萨尔贡】干员提供等持续时间的攻击力（有上限）\n选择策略【娜仁图亚】时，<在场6名不同【萨尔贡】干员>的效果会有所改变",
+      "descRaw": "【萨尔贡】干员开启技能时，所有【萨尔贡】干员<@ba.vup>攻击速度</>提升（有上限），持续一定时间<@autochess.gray>（受层数影响，每层持续时间独立计算）</>\n<在场<@autochess.dgreen>6</>名不同【萨尔贡】干员>开启技能还会为所有【萨尔贡】干员提供等持续时间的<@ba.vup>攻击力</>（有上限）\n<@ba.acrem>选择策略【娜仁图亚】时，<在场6名不同【萨尔贡】干员>的效果会有所改变</>",
+      "effectId": "bondeffect_sargon",
+      "effectName": "萨尔贡",
+      "effectDesc": "【萨尔贡】干员开启技能时，所有【萨尔贡】干员攻击速度+12（至多+300），持续{0:0}秒（受层数影响）\n<在场6名不同【萨尔贡】干员>开启技能还会使所有【萨尔贡】干员攻击力+12%（至多+300%）\n选择策略【娜仁图亚】时，<在场6名不同【萨尔贡】干员>的效果会有所改变",
+      "effectDescRaw": "【萨尔贡】干员开启技能时，所有【萨尔贡】干员攻击速度+12（至多<@ba.vup>+300</>），持续<@ba.vup>{0:0}</>秒<@ba.acrem>（受层数影响）</>\n<在场<@ba.vup>6</>名不同【萨尔贡】干员>开启技能还会使所有【萨尔贡】干员攻击力+12%（至多<@ba.vup>+300%</>）\n<@ba.acrem>选择策略【娜仁图亚】时，<在场6名不同【萨尔贡】干员>的效果会有所改变</>",
+      "effectDescParams": [
+        {
+          "index": 0,
+          "format": "0",
+          "base": "base_time",
+          "perStack": "time_per_stack"
+        }
+      ],
+      "bb": {
+        "base_time": 5,
+        "time_per_stack": 0.22,
+        "max_buff_stack_cnt": 25,
+        "base_attack_speed": 12,
+        "power_bond_char_cnt": 6,
+        "base_atk": 0.12,
+        "base_power_time": 60,
+        "power_time_per_stack": 0,
+        "filter_item_level": 5
+      },
+      "bbStr": {
+        "key": "act1autochess_bond_eff_sargon",
+        "invalid_in_band": "band_narant",
+        "valid_in_band": "band_narant"
+      },
+      "buffs": [
+        {
+          "key": "env_gbuff_new",
+          "bb": {
+            "base_time": 5,
+            "time_per_stack": 0.22,
+            "max_buff_stack_cnt": 25,
+            "base_attack_speed": 12,
+            "power_bond_char_cnt": 6,
+            "base_atk": 0.12
+          },
+          "bbStr": {
+            "key": "act1autochess_bond_eff_sargon",
+            "invalid_in_band": "band_narant"
+          }
+        },
+        {
+          "key": "env_gbuff_new",
+          "bb": {
+            "base_time": 5,
+            "time_per_stack": 0.22,
+            "max_buff_stack_cnt": 25,
+            "base_attack_speed": 12,
+            "power_bond_char_cnt": 6,
+            "base_power_time": 60,
+            "power_time_per_stack": 0,
+            "filter_item_level": 5
+          },
+          "bbStr": {
+            "key": "act2autochess_bond_eff_sargon[share]",
+            "valid_in_band": "band_narant"
+          }
+        }
+      ],
+      "baseParams": [
+        "base_time"
+      ],
+      "perStackParams": [
+        "time_per_stack"
+      ],
+      "members": [
+        "chess_char_1_12_a",
+        "chess_char_2_06_a",
+        "chess_char_2_08_a",
+        "chess_char_3_06_a",
+        "chess_char_3_13_a",
+        "chess_char_4_05_a",
+        "chess_char_4_23_a",
+        "chess_char_4_24_a",
+        "chess_char_5_02_a",
+        "chess_char_5_18_a",
+        "chess_char_6_05_a",
+        "chess_char_6_06_a"
+      ],
+      "visibleMembers": [
+        "chess_char_1_12_a",
+        "chess_char_2_06_a",
+        "chess_char_2_08_a",
+        "chess_char_3_06_a",
+        "chess_char_3_13_a",
+        "chess_char_4_23_a",
+        "chess_char_4_24_a",
+        "chess_char_5_02_a",
+        "chess_char_6_05_a",
+        "chess_char_6_06_a"
+      ],
+      "spec": {
+        "tiers": [
+          {
+            "need": "3 distinct",
+            "effect": "Whenever any 萨尔贡 member activates its skill, every 萨尔贡 member on the field gains one stack: ASPD +12 for (5 + 0.22*L) s. Each stack has its own timer; at most 25 concurrent stacks (=> +300 ASPD cap)."
+          },
+          {
+            "need": "6 distinct",
+            "effect": "Each stack additionally gives ATK +12% (25 stacks => +300% cap), same duration."
+          },
+          {
+            "need": "6 distinct AND strategy 娜仁图亚 (band_narant)",
+            "effect": "Replaces the 6-member effect: when a 萨尔贡 member activates its skill, operators on its 8 surrounding tiles also enjoy the effects of the equipment (tier <= V, filter_item_level 5) it carries, for 60 s (base_power_time 60, power_time_per_stack 0)."
+          }
+        ],
+        "formulas": {
+          "stackDurationSec": "5 + 0.22*L",
+          "aspdPerStack": "12",
+          "atkPerStack(6)": "0.12",
+          "maxStacks": "25"
+        },
+        "caps": "25 stacks: +300 ASPD, +300% ATK",
+        "layerGain": "In battle on skill activation: 菲莱 +6 每次开技能, 百炼嘉维尔 +9 每次开技能, 莎草 +5 首次开技能, 缇缇 +1 萨尔贡/精准 per sleep/stun in range (<=24/battle); 艾丝黛尔 获得时 +2; 机变 \"缇缇的盟誓\" +10. Strategy 佩佩: after shop level 2/4/6 one special refresh preferring 萨尔贡.",
+        "howToPlay": "Fast-cycling skills (萨尔贡浓茶 / 黄沙罗盘 items) keep many stacks alive; L mainly extends duration, so stacks overlap more.",
+        "notes": [
+          "PRTS: the in-level UI shows twice the real duration (display bug); real duration is 5+0.22L."
+        ],
+        "assumed": [
+          "When a 26th stack would be added, it replaces the stack with the shortest remaining time",
+          "stack granted to all 萨尔贡 members including the caster"
+        ]
+      }
+    },
+    "siracusaShip": {
+      "bondId": "siracusaShip",
+      "name": "叙拉古",
+      "identifier": 7,
+      "isCore": true,
+      "bondType": "SEASON",
+      "bondOrder": 2,
+      "powerIdList": [
+        "siracusa",
+        "chiave"
+      ],
+      "iconId": "icon_siracusaShip",
+      "activeCount": 3,
+      "thresholds": [
+        3,
+        6
+      ],
+      "maxCount": null,
+      "thresholdTemplate": "count_threshold_upward",
+      "countMode": "BOARD",
+      "countsHand": false,
+      "countsGoldenOnly": false,
+      "activeType": "BATTLE",
+      "isActiveInDeck": false,
+      "noStack": false,
+      "weight": 10,
+      "maxInactiveBondCount": -1,
+      "layerMilestones": [],
+      "desc": "【叙拉古】干员部署后攻击速度提升，持续一定时间（受层数影响）\n<在场6名不同【叙拉古】干员>【叙拉古】干员部署后进入等时长的隐匿状态，【叙拉古】干员隐匿状态下和脱离隐匿10秒内对敌人攻击时有3%的概率造成一定真实伤害（受层数影响）并恐惧3秒",
+      "descRaw": "【叙拉古】干员部署后<@ba.vup>攻击速度</>提升，持续一定时间<@autochess.gray>（受层数影响）</>\n<在场<@autochess.dgreen>6</>名不同【叙拉古】干员>【叙拉古】干员部署后进入等时长的隐匿状态，【叙拉古】干员隐匿状态下和脱离隐匿<@ba.vup>10</>秒内对敌人攻击时有<@ba.vup>3%</>的概率造成一定真实伤害<@autochess.gray>（受层数影响）</>并<@ba.vup>恐惧</>3秒",
+      "effectId": "bondeffect_siracusa",
+      "effectName": "叙拉古",
+      "effectDesc": "【叙拉古】干员部署后攻击速度+{0:0}，持续{1:0}秒（受层数影响）\n<在场6名不同【叙拉古】干员>【叙拉古】干员部署后还会进入等时长的隐匿状态，【叙拉古】干员在隐匿状态和脱离隐匿10秒内对敌人攻击时有3%概率造成{2:0}（受层数影响）点真实伤害并恐惧目标3秒",
+      "effectDescRaw": "【叙拉古】干员部署后攻击速度<@ba.vup>+{0:0}</>，持续<@ba.vup>{1:0}</>秒<@ba.acrem>（受层数影响）</>\n<在场<@ba.vup>6</>名不同【叙拉古】干员>【叙拉古】干员部署后还会进入等时长的隐匿状态，【叙拉古】干员在隐匿状态和脱离隐匿10秒内对敌人攻击时有3%概率造成<@ba.vup>{2:0}</><@ba.acrem>（受层数影响）</>点真实伤害并<@ba.vup>恐惧</>目标3秒",
+      "effectDescParams": [
+        {
+          "index": 0,
+          "format": "0",
+          "base": "base_attack_speed",
+          "perStack": "attack_speed_per_stack"
+        },
+        {
+          "index": 1,
+          "format": "0",
+          "base": "base_duration",
+          "perStack": "duration_per_stack"
+        },
+        {
+          "index": 2,
+          "format": "0",
+          "base": "base_damage",
+          "perStack": "damage_per_stack"
+        }
+      ],
+      "bb": {
+        "base_duration": 32,
+        "duration_per_stack": 0.4,
+        "base_attack_speed": 25,
+        "attack_speed_per_stack": 0.8,
+        "power_bond_char_cnt": 6,
+        "ex_bond_char_cnt": 6,
+        "end_duration": 10,
+        "prob": 0.03,
+        "base_damage": 5000,
+        "damage_per_stack": 50,
+        "fear": 3
+      },
+      "bbStr": {
+        "key": "act2autochess_bond_eff_siracusa"
+      },
+      "buffs": [
+        {
+          "key": "env_gbuff_new",
+          "bb": {
+            "base_duration": 32,
+            "duration_per_stack": 0.4,
+            "base_attack_speed": 25,
+            "attack_speed_per_stack": 0.8,
+            "power_bond_char_cnt": 6,
+            "ex_bond_char_cnt": 6,
+            "end_duration": 10,
+            "prob": 0.03,
+            "base_damage": 5000,
+            "damage_per_stack": 50,
+            "fear": 3
+          },
+          "bbStr": {
+            "key": "act2autochess_bond_eff_siracusa"
+          }
+        }
+      ],
+      "baseParams": [
+        "base_attack_speed",
+        "base_duration",
+        "base_damage"
+      ],
+      "perStackParams": [
+        "attack_speed_per_stack",
+        "duration_per_stack",
+        "damage_per_stack"
+      ],
+      "members": [
+        "chess_char_1_07_a",
+        "chess_char_1_08_a",
+        "chess_char_2_16_a",
+        "chess_char_3_15_a",
+        "chess_char_3_18_a",
+        "chess_char_3_19_a",
+        "chess_char_4_10_a",
+        "chess_char_4_16_a",
+        "chess_char_5_10_a",
+        "chess_char_5_20_a",
+        "chess_char_6_18_a"
+      ],
+      "visibleMembers": [
+        "chess_char_1_07_a",
+        "chess_char_1_08_a",
+        "chess_char_2_16_a",
+        "chess_char_3_18_a",
+        "chess_char_3_19_a",
+        "chess_char_4_10_a",
+        "chess_char_4_16_a",
+        "chess_char_5_10_a",
+        "chess_char_5_20_a",
+        "chess_char_6_18_a"
+      ],
+      "spec": {
+        "tiers": [
+          {
+            "need": "3 distinct",
+            "effect": "After every deployment (incl. redeploy) a 叙拉古 member gains ASPD +(25 + 0.8*L) for (32 + 0.4*L) s."
+          },
+          {
+            "need": "6 distinct",
+            "effect": "After deployment also 隐匿 (camouflage) for the same duration. While camouflaged and for 10 s after it ends, each normal damage instance (普通伤害 = attack type NORMAL: attacks, skill hits, drone attacks; not 溅射 / 持续 / 附加 — `bonds/core.js siracusaRolls`) it deals may add (5000 + 50*L) true damage (source = the operator) and 恐惧 (fear) 3 s. Nominal 3% chance, implemented as pseudo-random: all 叙拉古 members share one counter; attempt n since last proc succeeds with p = 0.00139*n (guaranteed at n = 720); counter resets on proc."
+          }
+        ],
+        "formulas": {
+          "aspd": "25 + 0.8*L",
+          "durationSec": "32 + 0.4*L",
+          "procDamage": "5000 + 50*L",
+          "prdStep": "0.00139"
+        },
+        "caps": "none",
+        "layerGain": "Shop refresh-driven: 拉普兰德 first manual refresh each round +4 (works from bench); 安洁莉娜 休整期结束 +4 per refresh this round (<=12/round); 阿罗玛 +2 叙拉古/奥术 per refresh (<=6); 伺夜 first 3 kills +2 叙拉古 +1 奇迹; 荒芜拉普兰德 each kill +2 (elite: every 叙拉古 gets this, <=100/battle); 忍冬 获得时 +6 own bonds (x2/x3 with 投资人); 机变 \"德克萨斯的盟誓\" +10. Strategy 贾维: every 6 manual refreshes get a free 叙拉古 (<=2/round).",
+        "howToPlay": "Refresh a lot in prep (free refresh sources: 普罗旺斯, 德克萨斯, 缄默德克萨斯, 巫恋) to feed 拉普兰德/安洁莉娜; pair with 投资人 for 忍冬.",
+        "notes": [
+          "PRTS: the 10 s post-stealth window restarts if the operator's status effects or immunities change."
+        ],
+        "assumed": [
+          "隐匿 = standard AK camouflage (not targeted by ranged enemies unless blocking)"
+        ]
+      }
+    },
+    "skillfulShip": {
+      "bondId": "skillfulShip",
+      "name": "灵巧",
+      "identifier": 11,
+      "isCore": false,
+      "bondType": "REGULAR",
+      "bondOrder": 2,
+      "powerIdList": [],
+      "iconId": "icon_skillfulShip",
+      "activeCount": 2,
+      "thresholds": [
+        2
+      ],
+      "maxCount": null,
+      "thresholdTemplate": "count_threshold_upward",
+      "countMode": "BOARD",
+      "countsHand": false,
+      "countsGoldenOnly": false,
+      "activeType": "BATTLE",
+      "isActiveInDeck": false,
+      "noStack": false,
+      "weight": 10,
+      "maxInactiveBondCount": -1,
+      "layerMilestones": [
+        {
+          "layer": 40,
+          "mode": "reach",
+          "effect": "env_gbuff_new"
+        }
+      ],
+      "desc": "【灵巧】干员及周围4格干员攻击速度提升（受层数影响）\n<达到40层>生效范围变为【灵巧】干员周围8格",
+      "descRaw": "【灵巧】干员及周围4格干员<@ba.vup>攻击速度</>提升<@autochess.gray>（受层数影响）</>\n<达到<@autochess.dgreen>40</>层>生效范围变为【灵巧】干员周围8格",
+      "effectId": "bondeffect_skillful",
+      "effectName": "灵巧",
+      "effectDesc": "【灵巧】干员及周围4格的干员攻击速度+{0:0}（受层数影响）\n <达到40层>生效范围变为【灵巧】干员周围8格",
+      "effectDescRaw": "【灵巧】干员及周围4格的干员攻击速度<@ba.vup>+{0:0}</><@ba.acrem>（受层数影响）</>\n <达到<@ba.vup>40</>层>生效范围变为【灵巧】干员周围8格",
+      "effectDescParams": [
+        {
+          "index": 0,
+          "format": "0",
+          "base": "base_attack_speed",
+          "perStack": "attack_speed_per_stack"
+        }
+      ],
+      "bb": {
+        "base_attack_speed": 10,
+        "attack_speed_per_stack": 1,
+        "power_bond_stack_cnt": 40
+      },
+      "bbStr": {
+        "key": "act1autochess_bond_eff_skillful"
+      },
+      "buffs": [
+        {
+          "key": "env_gbuff_new",
+          "bb": {
+            "base_attack_speed": 10,
+            "attack_speed_per_stack": 1,
+            "power_bond_stack_cnt": 40
+          },
+          "bbStr": {
+            "key": "act1autochess_bond_eff_skillful"
+          }
+        }
+      ],
+      "baseParams": [
+        "base_attack_speed"
+      ],
+      "perStackParams": [
+        "attack_speed_per_stack"
+      ],
+      "members": [
+        "chess_char_1_14_a",
+        "chess_char_2_04_a",
+        "chess_char_2_13_a",
+        "chess_char_3_02_a",
+        "chess_char_3_13_a",
+        "chess_char_3_21_a",
+        "chess_char_4_11_a",
+        "chess_char_4_13_a",
+        "chess_char_4_21_a",
+        "chess_char_5_06_a",
+        "chess_char_5_16_a",
+        "chess_char_6_16_a"
+      ],
+      "visibleMembers": [
+        "chess_char_1_14_a",
+        "chess_char_2_04_a",
+        "chess_char_2_13_a",
+        "chess_char_3_02_a",
+        "chess_char_3_13_a",
+        "chess_char_3_21_a",
+        "chess_char_4_11_a",
+        "chess_char_4_13_a",
+        "chess_char_4_21_a",
+        "chess_char_5_06_a",
+        "chess_char_6_16_a"
+      ],
+      "spec": {
+        "tiers": [
+          {
+            "need": "2 distinct",
+            "effect": "灵巧 members and operators on their 4 orthogonally adjacent tiles: ASPD +(10 + 1*L)."
+          },
+          {
+            "need": "L >= 40",
+            "effect": "Area becomes the 8 surrounding tiles."
+          }
+        ],
+        "formulas": {
+          "aspd": "10 + L"
+        },
+        "layerGain": "溯光星源 休整期结束 +2 灵巧/奥术 per 3 gold spent this round ; 断崖 +3 self & behind; 空弦 +3 self & front; 蒂比 +2; 获得时 灵知 +5. (act1 灵巧 also had a 20-layer shop reward; removed in act2.)",
+        "assumed": [
+          "a unit covered by several 灵巧 auras gets the bonus once"
+        ]
+      }
+    },
+    "arcaneShip": {
+      "bondId": "arcaneShip",
+      "name": "奥术",
+      "identifier": 12,
+      "isCore": false,
+      "bondType": "REGULAR",
+      "bondOrder": 2,
+      "powerIdList": [],
+      "iconId": "icon_arcaneShip",
+      "activeCount": 2,
+      "thresholds": [
+        2,
+        3
+      ],
+      "maxCount": null,
+      "thresholdTemplate": "count_threshold_upward",
+      "countMode": "BOARD",
+      "countsHand": false,
+      "countsGoldenOnly": false,
+      "activeType": "BATTLE",
+      "isActiveInDeck": false,
+      "noStack": false,
+      "weight": 10,
+      "maxInactiveBondCount": -1,
+      "layerMilestones": [],
+      "desc": "【奥术】干员造成法术伤害时使目标受到的法术伤害提升（受层数影响），持续3秒\n<在场3名不同【奥术】干员>【奥术】干员对生命值低于50%的敌人施加的伤害提升比例提升（受层数影响）",
+      "descRaw": "【奥术】干员造成法术伤害时使目标受到的法术伤害提升<@autochess.gray>（受层数影响）</>，持续3秒\n<在场<@autochess.dgreen>3</>名不同【奥术】干员>【奥术】干员对生命值低于<@ba.vup>50%</>的敌人施加的伤害提升比例提升<@autochess.gray>（受层数影响）</>",
+      "effectId": "bondeffect_arcane",
+      "effectName": "奥术",
+      "effectDesc": "【奥术】干员造成法术伤害时使目标受到的法术伤害提升{0:0%}（受层数影响），持续3秒\n<在场3名不同【奥术】干员>【奥术】干员对生命值低于50%的敌人施加的伤害提升比例为{1:0%}（受层数影响）",
+      "effectDescRaw": "【奥术】干员造成法术伤害时使目标受到的法术伤害提升<@ba.vup>{0:0%}</><@ba.acrem>（受层数影响）</>，持续3秒\n<在场<@ba.vup>3</>名不同【奥术】干员>【奥术】干员对生命值低于50%的敌人施加的伤害提升比例为<@ba.vup>{1:0%}</><@ba.acrem>（受层数影响）</>",
+      "effectDescParams": [
+        {
+          "index": 0,
+          "format": "0%",
+          "base": "base_damage_scale_show",
+          "perStack": "damage_scale_per_stack"
+        },
+        {
+          "index": 1,
+          "format": "0%",
+          "base": "base_damage_scale_show_ex",
+          "perStack": "damage_scale_per_stack_show_ex"
+        }
+      ],
+      "bb": {
+        "weak_duration": 3,
+        "base_damage_scale": 1.2,
+        "damage_scale_per_stack": 0.01,
+        "power_bond_char_cnt": 3,
+        "power_weak_scale": 1.4,
+        "hp_ratio": 0.5,
+        "base_damage_scale_show": 0.2,
+        "base_damage_scale_show_ex": 0.68,
+        "damage_scale_per_stack_show_ex": 0.014
+      },
+      "bbStr": {
+        "key": "act2autochess_bond_eff_arcane"
+      },
+      "buffs": [
+        {
+          "key": "env_gbuff_new",
+          "bb": {
+            "weak_duration": 3,
+            "base_damage_scale": 1.2,
+            "damage_scale_per_stack": 0.01,
+            "power_bond_char_cnt": 3,
+            "power_weak_scale": 1.4,
+            "hp_ratio": 0.5,
+            "base_damage_scale_show": 0.2,
+            "base_damage_scale_show_ex": 0.68,
+            "damage_scale_per_stack_show_ex": 0.014
+          },
+          "bbStr": {
+            "key": "act2autochess_bond_eff_arcane"
+          }
+        }
+      ],
+      "baseParams": [
+        "base_damage_scale_show",
+        "base_damage_scale_show_ex"
+      ],
+      "perStackParams": [
+        "damage_scale_per_stack",
+        "damage_scale_per_stack_show_ex"
+      ],
+      "members": [
+        "chess_char_1_17_a",
+        "chess_char_2_10_a",
+        "chess_char_2_15_a",
+        "chess_char_3_09_a",
+        "chess_char_4_02_a",
+        "chess_char_4_10_a",
+        "chess_char_5_07_a",
+        "chess_char_5_12_a",
+        "chess_char_6_02_a",
+        "chess_char_6_16_a"
+      ],
+      "visibleMembers": [
+        "chess_char_1_17_a",
+        "chess_char_2_10_a",
+        "chess_char_3_09_a",
+        "chess_char_4_02_a",
+        "chess_char_4_10_a",
+        "chess_char_5_07_a",
+        "chess_char_5_12_a",
+        "chess_char_6_02_a",
+        "chess_char_6_16_a"
+      ],
+      "spec": {
+        "tiers": [
+          {
+            "need": "2 distinct",
+            "effect": "When an 奥术 member deals magic damage, the target takes magic damage x(1.20 + 0.01*L) (i.e. +(20+L)%) for 3 s. ONE instance per target whatever applies it: the strongest value wins, a weaker one resumes if it outlasts it; reapplying refreshes (corrected 2026-10-01: PRTS 作战机制 同名buff默认只表现出一个; 巴哈姆特 12316 the two players of a pair field compete for it)."
+          },
+          {
+            "need": "3 distinct",
+            "effect": "Against enemies below 50% HP the multiplier is 1.4 x (1.20 + 0.01*L) = 1.68 + 0.014*L (i.e. +(68+1.4L)%)."
+          }
+        ],
+        "formulas": {
+          "magicTakenMul": "1.20 + 0.01*L",
+          "magicTakenMulLowHp(3)": "1.4*(1.20 + 0.01*L)",
+          "hpThreshold": "0.5",
+          "durationSec": "3"
+        },
+        "layerGain": "夕 +2 per operator gained; 阿罗玛 +2 per refresh (<=6); 溯光星源 +2 per 3 gold spent; 海霓 first kill +3; 获得时: 深靛 +2, 协律 +4 (hidden). 机变 \"莫斯提马的盟誓\" +10.",
+        "assumed": [
+          "one instance per target, the strongest (the engine's default same-name rule; the two players of a pair field compete for it) — until v2.5 the remake kept one per player and they multiplied"
+        ]
+      }
+    },
+    "preciShip": {
+      "bondId": "preciShip",
+      "name": "精准",
+      "identifier": 9,
+      "isCore": false,
+      "bondType": "REGULAR",
+      "bondOrder": 2,
+      "powerIdList": [],
+      "iconId": "icon_preciShip",
+      "activeCount": 2,
+      "thresholds": [
+        2,
+        3
+      ],
+      "maxCount": null,
+      "thresholdTemplate": "count_threshold_upward",
+      "countMode": "BOARD",
+      "countsHand": false,
+      "countsGoldenOnly": false,
+      "activeType": "BATTLE",
+      "isActiveInDeck": false,
+      "noStack": false,
+      "weight": 10,
+      "maxInactiveBondCount": -1,
+      "layerMilestones": [],
+      "desc": "【精准】干员攻击力提升（受层数影响）\n<在场3名不同【精准】干员>生效范围变为【精准】干员和所有远程干员，且攻击无视一定的防御力和法术抗性",
+      "descRaw": "【精准】干员<@ba.vup>攻击力</>提升<@autochess.gray>（受层数影响）</>\n<在场<@autochess.dgreen>3</>名不同【精准】干员>生效范围变为【精准】干员和所有远程干员，且攻击无视一定的<@ba.vup>防御力</>和<@ba.vup>法术抗性</>",
+      "effectId": "bondeffect_preci",
+      "effectName": "精准",
+      "effectDesc": "【精准】干员攻击力+{0:0%}（受层数影响）\n<在场3名不同【精准】干员>生效范围变为所有【精准】干员和远程干员，且攻击无视30%防御力和法术抗性",
+      "effectDescRaw": "【精准】干员攻击力<@ba.vup>+{0:0%}</><@ba.acrem>（受层数影响）</>\n<在场<@ba.vup>3</>名不同【精准】干员>生效范围变为所有【精准】干员和远程干员，且攻击无视<@ba.vup>30%</>防御力和法术抗性",
+      "effectDescParams": [
+        {
+          "index": 0,
+          "format": "0%",
+          "base": "base_atk",
+          "perStack": "atk_per_stack"
+        }
+      ],
+      "bb": {
+        "base_atk": 0.1,
+        "atk_per_stack": 0.012,
+        "power_def_penetrate": 0.3,
+        "power_magic_resist_penetrate": 0.3,
+        "power_bond_char_cnt": 3
+      },
+      "bbStr": {
+        "key": "act1autochess_bond_eff_preci"
+      },
+      "buffs": [
+        {
+          "key": "env_gbuff_new",
+          "bb": {
+            "base_atk": 0.1,
+            "atk_per_stack": 0.012,
+            "power_def_penetrate": 0.3,
+            "power_magic_resist_penetrate": 0.3,
+            "power_bond_char_cnt": 3
+          },
+          "bbStr": {
+            "key": "act1autochess_bond_eff_preci"
+          }
+        }
+      ],
+      "baseParams": [
+        "base_atk"
+      ],
+      "perStackParams": [
+        "atk_per_stack"
+      ],
+      "members": [
+        "chess_char_1_09_a",
+        "chess_char_1_17_a",
+        "chess_char_2_01_a",
+        "chess_char_3_11_a",
+        "chess_char_4_06_a",
+        "chess_char_4_14_a",
+        "chess_char_4_20_a",
+        "chess_char_5_02_a",
+        "chess_char_6_01_a",
+        "chess_char_6_05_a",
+        "chess_char_6_08_a",
+        "chess_char_6_12_a"
+      ],
+      "visibleMembers": [
+        "chess_char_1_09_a",
+        "chess_char_1_17_a",
+        "chess_char_2_01_a",
+        "chess_char_3_11_a",
+        "chess_char_4_06_a",
+        "chess_char_4_14_a",
+        "chess_char_4_20_a",
+        "chess_char_5_02_a",
+        "chess_char_6_01_a",
+        "chess_char_6_05_a",
+        "chess_char_6_08_a",
+        "chess_char_6_12_a"
+      ],
+      "spec": {
+        "tiers": [
+          {
+            "need": "2 distinct",
+            "effect": "精准 members ATK x(1 + 0.10 + 0.012*L)."
+          },
+          {
+            "need": "3 distinct",
+            "effect": "Scope becomes 精准 members + every RANGED operator; affected units also ignore 30% of target DEF and 30% of target RES."
+          }
+        ],
+        "formulas": {
+          "atkMultiplier": "1.10 + 0.012*L",
+          "defPenetrateRatio(3)": "0.3",
+          "resPenetrateRatio(3)": "0.3"
+        },
+        "layerGain": "Kill/skill/deploy in battle: 寒芒克洛丝 gives front operator \"开技能 +1 精准 (<=10/battle)\"; 远牙 grant (+4/deploy); 缇缇 +1 per sleep/stun; 蕾缪安, 送葬人; 莱恩哈特 休整期结束 +5 own active bonds; 获得时: 深靛 +2, 雪猎 +5. 机变 \"缇缇的盟誓\" +10.",
+        "assumed": [
+          "penetration = ratio ignore (like 无视 x% 防御)"
+        ]
+      }
+    },
+    "swiftShip": {
+      "bondId": "swiftShip",
+      "name": "迅捷",
+      "identifier": 10,
+      "isCore": false,
+      "bondType": "REGULAR",
+      "bondOrder": 2,
+      "powerIdList": [],
+      "iconId": "icon_swiftShip",
+      "activeCount": 2,
+      "thresholds": [
+        2
+      ],
+      "maxCount": null,
+      "thresholdTemplate": "count_threshold_upward",
+      "countMode": "BOARD",
+      "countsHand": false,
+      "countsGoldenOnly": false,
+      "activeType": "BATTLE",
+      "isActiveInDeck": false,
+      "noStack": false,
+      "weight": 10,
+      "maxInactiveBondCount": -1,
+      "layerMilestones": [
+        {
+          "layer": 40,
+          "mode": "reach",
+          "effect": "env_gbuff_new"
+        }
+      ],
+      "desc": "【迅捷】干员技能结束时有概率（受层数影响）立刻回复12点技力\n<达到40层>所有干员技能结束时有等概率额外回复15点技力",
+      "descRaw": "【迅捷】干员技能结束时有概率<@autochess.gray>（受层数影响）</>立刻回复<@ba.vup>12点</>技力\n<达到<@autochess.dgreen>40</>层>所有干员技能结束时有等概率额外回复<@ba.vup>15点</>技力",
+      "effectId": "bondeffect_swift",
+      "effectName": "迅捷",
+      "effectDesc": "【迅捷】干员技能结束时有{0:0%}概率（受层数影响）立刻回复12点技力\n<达到40层>所有干员技能结束时有等概率额外回复15点技力",
+      "effectDescRaw": "【迅捷】干员技能结束时有<@ba.vup>{0:0%}</>概率<@ba.acrem>（受层数影响）</>立刻回复<@ba.vup>12</>点技力\n<达到<@ba.vup>40</>层>所有干员技能结束时有等概率额外回复<@ba.vup>15</>点技力",
+      "effectDescParams": [
+        {
+          "index": 0,
+          "format": "0%",
+          "base": "base_prob",
+          "perStack": "prob_per_stack"
+        }
+      ],
+      "bb": {
+        "base_prob": 0.2,
+        "prob_per_stack": 0.0035,
+        "power_bond_stack_cnt": 40,
+        "normal_sp": 12,
+        "power_sp": 15
+      },
+      "bbStr": {
+        "key": "act1autochess_bond_eff_swift"
+      },
+      "buffs": [
+        {
+          "key": "env_gbuff_new",
+          "bb": {
+            "base_prob": 0.2,
+            "prob_per_stack": 0.0035,
+            "power_bond_stack_cnt": 40,
+            "normal_sp": 12,
+            "power_sp": 15
+          },
+          "bbStr": {
+            "key": "act1autochess_bond_eff_swift"
+          }
+        }
+      ],
+      "baseParams": [
+        "base_prob"
+      ],
+      "perStackParams": [
+        "prob_per_stack"
+      ],
+      "members": [
+        "chess_char_1_01_a",
+        "chess_char_1_16_a",
+        "chess_char_1_19_a",
+        "chess_char_2_13_a",
+        "chess_char_2_19_a",
+        "chess_char_3_10_a",
+        "chess_char_3_18_a",
+        "chess_char_4_14_a",
+        "chess_char_5_14_a",
+        "chess_char_5_15_a",
+        "chess_char_5_22_a",
+        "chess_char_6_05_a",
+        "chess_char_6_10_a",
+        "chess_char_6_19_a"
+      ],
+      "visibleMembers": [
+        "chess_char_1_01_a",
+        "chess_char_1_19_a",
+        "chess_char_2_13_a",
+        "chess_char_2_19_a",
+        "chess_char_3_10_a",
+        "chess_char_3_18_a",
+        "chess_char_4_14_a",
+        "chess_char_5_14_a",
+        "chess_char_5_15_a",
+        "chess_char_5_22_a",
+        "chess_char_6_05_a",
+        "chess_char_6_19_a"
+      ],
+      "spec": {
+        "tiers": [
+          {
+            "need": "2 distinct",
+            "effect": "When a 迅捷 member's skill ends: with p = min(1, 0.20 + 0.0035*L) immediately +12 SP."
+          },
+          {
+            "need": "L >= 40",
+            "effect": "Every operator whose skill ends: with the same p, additionally +15 SP."
+          }
+        ],
+        "formulas": {
+          "p": "min(1, 0.20 + 0.0035*L)",
+          "reaches100%AtL": "229"
+        },
+        "layerGain": "妮芙 休整期结束 +2 per operator on the bench; 蒂比 进入休整期 +2 own active bonds; 莱恩哈特 +5; 引星棘刺 +4 self & front; 获得时: 锡人/野鬃 +2, 忍冬 +6, 锏 +8. 机变 \"银灰的盟誓\" +8.",
+        "assumed": [
+          "迅捷 members roll both the 12 SP and the 15 SP independently"
+        ]
+      }
+    },
+    "raidShip": {
+      "bondId": "raidShip",
+      "name": "突袭",
+      "identifier": 18,
+      "isCore": false,
+      "bondType": "REGULAR",
+      "bondOrder": 2,
+      "powerIdList": [],
+      "iconId": "icon_raidShip",
+      "activeCount": 2,
+      "thresholds": [
+        2
+      ],
+      "maxCount": null,
+      "thresholdTemplate": "count_threshold_upward",
+      "countMode": "BOARD",
+      "countsHand": false,
+      "countsGoldenOnly": false,
+      "activeType": "BATTLE",
+      "isActiveInDeck": false,
+      "noStack": false,
+      "weight": 10,
+      "maxInactiveBondCount": -1,
+      "layerMilestones": [
+        {
+          "layer": 50,
+          "mode": "reach",
+          "effect": "env_gbuff_new"
+        }
+      ],
+      "desc": "【突袭】干员10秒内未进行攻击或技能就绪时，若范围内没有敌人，则保留技力立即再部署至一名地面敌人周围，期间攻击力和生命值提升（受层数影响）\n<达到50层>所有干员攻击速度+50",
+      "descRaw": "【突袭】干员<@ba.vup>10</>秒内未进行攻击或技能就绪时，若范围内没有敌人，则保留技力立即<@ba.vup>再部署至一名地面敌人周围</>，期间<@ba.vup>攻击力</>和<@ba.vup>生命值</>提升<@autochess.gray>（受层数影响）</>\n<达到<@autochess.dgreen>50</>层>所有干员攻击速度<@ba.vup>+50</>",
+      "effectId": "bondeffect_raid",
+      "effectName": "突袭",
+      "effectDesc": "【突袭】干员10秒内未进行攻击或技能就绪时，若范围内没有敌人，则保留技力立即再部署至一名地面敌人周围，期间攻击力和生命值+{0:0%}（受层数影响）\n <达到50层>所有干员攻击速度+50",
+      "effectDescRaw": "【突袭】干员10秒内未进行攻击或技能就绪时，若范围内没有敌人，则保留技力立即再部署至一名地面敌人周围，期间攻击力和生命值<@ba.vup>+{0:0%}</><@ba.acrem>（受层数影响）</>\n <达到<@ba.vup>50</>层>所有干员攻击速度<@ba.vup>+50</>",
+      "effectDescParams": [
+        {
+          "index": 0,
+          "format": "0%",
+          "base": "base_atk",
+          "perStack": "atk_per_stack"
+        }
+      ],
+      "bb": {
+        "base_attack_speed": 0,
+        "attack_speed_per_stack": 0,
+        "base_atk": 0.25,
+        "atk_per_stack": 0.01,
+        "base_max_hp": 0.25,
+        "max_hp_per_stack": 0.01,
+        "power_bond_stack_cnt": 50,
+        "power_attack_speed": 50,
+        "no_attack_duration": 10
+      },
+      "bbStr": {
+        "key": "act1autochess_bond_eff_raid"
+      },
+      "buffs": [
+        {
+          "key": "env_gbuff_new",
+          "bb": {
+            "base_attack_speed": 0,
+            "attack_speed_per_stack": 0,
+            "base_atk": 0.25,
+            "atk_per_stack": 0.01,
+            "base_max_hp": 0.25,
+            "max_hp_per_stack": 0.01,
+            "power_bond_stack_cnt": 50,
+            "power_attack_speed": 50,
+            "no_attack_duration": 10
+          },
+          "bbStr": {
+            "key": "act1autochess_bond_eff_raid"
+          }
+        }
+      ],
+      "baseParams": [
+        "base_atk"
+      ],
+      "perStackParams": [
+        "atk_per_stack"
+      ],
+      "members": [
+        "chess_char_1_18_a",
+        "chess_char_2_09_a",
+        "chess_char_3_05_a",
+        "chess_char_3_12_a",
+        "chess_char_4_04_a",
+        "chess_char_4_16_a",
+        "chess_char_5_07_a",
+        "chess_char_6_15_a",
+        "chess_char_6_17_a"
+      ],
+      "visibleMembers": [
+        "chess_char_1_18_a",
+        "chess_char_2_09_a",
+        "chess_char_3_05_a",
+        "chess_char_3_12_a",
+        "chess_char_4_04_a",
+        "chess_char_4_16_a",
+        "chess_char_5_07_a",
+        "chess_char_6_15_a",
+        "chess_char_6_17_a"
+      ],
+      "spec": {
+        "tiers": [
+          {
+            "need": "2 distinct",
+            "effect": "If a 突袭 member has not attacked for 10 s, or its skill is ready, and no enemy is in its range: it is immediately redeployed (keeping SP) onto a tile next to a ground enemy; while in that redeployed state its ATK and maxHP x(1 + 0.25 + 0.01*L)."
+          },
+          {
+            "need": "L >= 50",
+            "effect": "ALL operators ASPD +50."
+          }
+        ],
+        "formulas": {
+          "atkHpMultiplier": "1.25 + 0.01*L",
+          "idleSec": "10",
+          "aspdAll(L>=50)": "50"
+        },
+        "layerGain": "史尔特尔 部署时 +8 (<=50/battle); 休谟斯 each 2 kills +1; 瑕光 +4/deploy; 斯卡蒂; 伊内丝 +5; 机变 \"斯卡蒂的盟誓\" +8, \"德克萨斯的盟誓\" +10.",
+        "assumed": [
+          "target enemy = the ground enemy closest to the player's objective (its own field's; another field's only while its own has none) that the member can reach; landing tile = the nearest free deployable tile within 2 tiles of it from which the member's attack range covers it. No such tile for any of the 8 most advanced -> no jump; the poll looks again every 0.25 s (GitHub issue #51 - up to 0.1.1 the idle trigger landed out of reach and hopped every 10 s; DESIGN §22.2)",
+          "the buff lasts until the operator leaves the field"
+        ]
+      }
+    },
+    "suntShip": {
+      "bondId": "suntShip",
+      "name": "绝技",
+      "identifier": 23,
+      "isCore": false,
+      "bondType": "REGULAR",
+      "bondOrder": 2,
+      "powerIdList": [],
+      "iconId": "icon_suntShip",
+      "activeCount": 2,
+      "thresholds": [
+        2,
+        5
+      ],
+      "maxCount": null,
+      "thresholdTemplate": "count_threshold_upward_golden",
+      "countMode": "BOARD_ALL_CHESS",
+      "countsHand": false,
+      "countsGoldenOnly": true,
+      "activeType": "BATTLE",
+      "isActiveInDeck": false,
+      "noStack": true,
+      "weight": 0,
+      "maxInactiveBondCount": -1,
+      "layerMilestones": [],
+      "desc": "<在场2名精锐状态的干员>精锐状态的干员攻击力+30%\n<在场5名精锐状态的干员>精锐状态的干员技力消耗-30%\n（所有干员的精锐状态均可激活本盟约）",
+      "descRaw": "<在场<@autochess.dgreen>2</>名精锐状态的干员>精锐状态的干员攻击力<@ba.vup>+30%</>\n<在场<@autochess.dgreen>5</>名精锐状态的干员>精锐状态的干员技力消耗<@ba.vup>-30%</>\n<@ba.acrem>（所有干员的精锐状态均可激活本盟约）</>",
+      "effectId": "bondeffect_sunt",
+      "effectName": "绝技",
+      "effectDesc": "<在场2名精锐状态的干员>精锐状态的干员攻击力+30%\n<在场5名精锐状态的干员>精锐状态的干员技力消耗-30%\n（所有干员的精锐状态均可激活本盟约）",
+      "effectDescRaw": "<在场<@ba.vup>2</>名精锐状态的干员>精锐状态的干员攻击力<@ba.vup>+30%</>\n<在场<@ba.vup>5</>名精锐状态的干员>精锐状态的干员技力消耗<@ba.vup>-30%</>\n<@ba.acrem>（所有干员的精锐状态均可激活本盟约）</>",
+      "effectDescParams": [],
+      "bb": {
+        "power_char_cnt": 2,
+        "ex_char_cnt": 5,
+        "power_atk": 0.3,
+        "sp_ratio": 0.7
+      },
+      "bbStr": {
+        "key": "act2autochess_bond_eff_sunt"
+      },
+      "buffs": [
+        {
+          "key": "env_gbuff_new",
+          "bb": {
+            "power_char_cnt": 2,
+            "ex_char_cnt": 5,
+            "power_atk": 0.3,
+            "sp_ratio": 0.7
+          },
+          "bbStr": {
+            "key": "act2autochess_bond_eff_sunt"
+          }
+        }
+      ],
+      "baseParams": [],
+      "perStackParams": [],
+      "members": [],
+      "visibleMembers": [],
+      "spec": {
+        "tiers": [
+          {
+            "need": "2 elite (精锐) operators on board (any operators, duplicates count)",
+            "effect": "All elite operators ATK +30%."
+          },
+          {
+            "need": "5 elite operators on board",
+            "effect": "At battle start every elite operator and its summons have skill SP cost x0.7 (rounded down, may become 0)."
+          }
+        ],
+        "formulas": {
+          "atkMul": "1.3",
+          "spCostMul": "floor(sp*0.7)"
+        },
+        "notes": [
+          "isHiddenCharList=true, chessIdList empty: no member operators; elites are not \"members\" of 绝技 (PRTS).",
+          "noStack=true"
+        ]
+      }
+    },
+    "maniShip": {
+      "bondId": "maniShip",
+      "name": "调和",
+      "identifier": 20,
+      "isCore": false,
+      "bondType": "REGULAR",
+      "bondOrder": 1,
+      "powerIdList": [],
+      "iconId": "icon_maniShip",
+      "activeCount": 1,
+      "thresholds": [
+        1
+      ],
+      "maxCount": null,
+      "thresholdTemplate": "count_threshold_upward",
+      "countMode": "BOARD",
+      "countsHand": false,
+      "countsGoldenOnly": false,
+      "activeType": "MANI",
+      "isActiveInDeck": false,
+      "noStack": true,
+      "weight": 0,
+      "maxInactiveBondCount": -1,
+      "layerMilestones": [],
+      "desc": "激活时使场上核心盟约的激活人数+1，【调和】干员享受已激活的核心盟约的效果",
+      "descRaw": "激活时使场上核心盟约的<@ba.vup>激活人数+1</>，【调和】干员享受已激活的核心盟约的效果",
+      "effectId": "bondeffect_mani",
+      "effectName": "调和",
+      "effectDesc": "激活时可以使场上核心盟约的激活人数+1，【调和】干员享受已激活的核心盟约的效果",
+      "effectDescRaw": "激活时可以使场上核心盟约的<@ba.vup>激活人数+1</>，【调和】干员<@ba.vup>享受</>已激活的核心盟约的效果",
+      "effectDescParams": [],
+      "bb": {
+        "count": 1
+      },
+      "bbStr": {},
+      "buffs": [
+        {
+          "key": "other_bond_add_trigger_cnt",
+          "bb": {
+            "count": 1
+          },
+          "bbStr": {}
+        }
+      ],
+      "baseParams": [],
+      "perStackParams": [],
+      "members": [
+        "chess_char_1_15_a",
+        "chess_char_6_11_a"
+      ],
+      "visibleMembers": [
+        "chess_char_6_11_a"
+      ],
+      "spec": {
+        "tiers": [
+          {
+            "need": "1 调和 on board",
+            "effect": "Every core bond's member count +1; 调和 operators receive the effects of all active core bonds."
+          }
+        ],
+        "members": "缪尔赛思 (T6) and 盟约·辅助干员 (T1, hidden; given in round 1 by strategy Pith \"优等生\").",
+        "assumed": [
+          "+1 only for core bonds with >=1 real member",
+          "one +1 total no matter how many 调和 operators"
+        ]
+      }
+    }
+  },
+  "garrisons": {
+    "garrison_05_b": {
+      "garrisonId": "garrison_05_b",
+      "desc": "【谢拉格】【奥术】每叠加3层，本干员攻击力+2%",
+      "descRaw": "【谢拉格】【奥术】每叠加3层，本干员攻击力<@ba.vup>+2%</>",
+      "eventType": "IN_BATTLE",
+      "eventTypeDesc": "作战能力",
+      "eventTypeIcon": "icon_battle",
+      "effectType": "GAIN_BUFF",
+      "effectKey": "act1autochess_gar_eff_attrByBond",
+      "battleRuneKey": "env_gbuff_new_with_verify",
+      "charLevel": 0,
+      "bb": {
+        "divide_num": 3,
+        "atk": 0.02
+      },
+      "bbStr": {
+        "key": "act1autochess_gar_eff_attrByBond",
+        "bond_id": "kjeragShip,arcaneShip"
+      },
+      "owners": [
+        "chess_char_6_02_b"
+      ]
+    },
+    "garrison_100_b": {
+      "garrisonId": "garrison_100_b",
+      "desc": "【萨尔贡】【迅捷】【精准】每叠加3层，本干员攻击力+4%",
+      "descRaw": "【萨尔贡】【迅捷】【精准】每叠加3层，本干员攻击力<@ba.vup>+4%</>",
+      "eventType": "IN_BATTLE",
+      "eventTypeDesc": "作战能力",
+      "eventTypeIcon": "icon_battle",
+      "effectType": "GAIN_BUFF",
+      "effectKey": "act1autochess_gar_eff_attrByBond",
+      "battleRuneKey": "env_gbuff_new_with_verify",
+      "charLevel": 0,
+      "bb": {
+        "divide_num": 3,
+        "atk": 0.04
+      },
+      "bbStr": {
+        "key": "act1autochess_gar_eff_attrByBond",
+        "bond_id": "sargonShip,swiftShip,preciShip"
+      },
+      "owners": [
+        "chess_char_6_05_b"
+      ]
+    },
+    "garrison_101_b": {
+      "garrisonId": "garrison_101_b",
+      "desc": "【炎】【突袭】每叠加3层，本干员攻击束缚和停顿状态的敌人造成的伤害提升2%",
+      "descRaw": "【炎】【突袭】每叠加3层，本干员攻击束缚和停顿状态的敌人造成的伤害提升<@ba.vup>2%</>",
+      "eventType": "IN_BATTLE",
+      "eventTypeDesc": "作战能力",
+      "eventTypeIcon": "icon_battle",
+      "effectType": "GAIN_BUFF",
+      "effectKey": "act2autochess_gar_eff_ab_damageScaleByBond",
+      "battleRuneKey": "env_gbuff_new_with_verify",
+      "charLevel": 0,
+      "bb": {
+        "divide_num": 3,
+        "check_ab_flag": 13,
+        "check_sluggish": 1,
+        "damage_scale_per_stack": 0.02
+      },
+      "bbStr": {
+        "key": "act2autochess_gar_eff_ab_damageScaleByBond",
+        "bond_id": "yanShip,raidShip"
+      },
+      "owners": [
+        "chess_char_6_15_b"
+      ]
+    },
+    "garrison_104_b": {
+      "garrisonId": "garrison_104_b",
+      "desc": "<休整期结束时>使自身已激活的盟约层数+10",
+      "descRaw": "<休整期结束时>使自身已激活的盟约层数<@ba.vup>+10</>",
+      "eventType": "SERVER_PREP_FIN",
+      "eventTypeDesc": "持续叠加",
+      "eventTypeIcon": "icon_bond",
+      "effectType": "SERVER_ADD_BOND_CHESS_ALL",
+      "effectKey": "SERVER_ADD_BOND_CHESS_ALL",
+      "battleRuneKey": null,
+      "charLevel": 0,
+      "bb": {
+        "count": 10
+      },
+      "bbStr": {
+        "conditionkey": "character_target_inboard"
+      },
+      "owners": [
+        "chess_char_4_04_b"
+      ]
+    },
+    "garrison_106_b": {
+      "garrisonId": "garrison_106_b",
+      "desc": "<部署时>使自身已激活的盟约层数+8（每场作战至多24层）",
+      "descRaw": "<部署时>使自身已激活的盟约层数<@ba.vup>+8</>（每场作战至多24层）",
+      "eventType": "IN_BATTLE",
+      "eventTypeDesc": "持续叠加",
+      "eventTypeIcon": "icon_bond",
+      "effectType": "ADD_BOND",
+      "effectKey": "act2autochess_gar_event_onstart",
+      "battleRuneKey": "env_gbuff_new_with_verify",
+      "charLevel": 0,
+      "bb": {
+        "bond_add_count": 8,
+        "max_add_count_per_battle": 24
+      },
+      "bbStr": {
+        "key": "act2autochess_gar_event_onstart",
+        "bond_type": "bond_self",
+        "bond_add_type": "by_count",
+        "garrison_key": "garrison_106_b"
+      },
+      "owners": [
+        "chess_char_3_12_b"
+      ]
+    },
+    "garrison_111_b": {
+      "garrisonId": "garrison_111_b",
+      "desc": "<获得时>自身所属盟约层数+10（无需激活盟约）",
+      "descRaw": "<获得时>自身所属盟约层数<@ba.vup>+10</>（无需激活盟约）",
+      "eventType": "SERVER_GAIN",
+      "eventTypeDesc": "单次叠加",
+      "eventTypeIcon": "icon_bond",
+      "effectType": "SERVER_ADD_BOND_CHESS_ALL",
+      "effectKey": "SERVER_ADD_BOND_CHESS_ALL",
+      "battleRuneKey": null,
+      "charLevel": 0,
+      "bb": {
+        "count": 10
+      },
+      "bbStr": {},
+      "owners": [
+        "chess_char_3_11_b",
+        "chess_char_4_13_b"
+      ]
+    },
+    "garrison_115_b": {
+      "garrisonId": "garrison_115_b",
+      "desc": "【卡西米尔】每叠加5层，本干员部署后100秒内基础攻击力+20、基础生命值+100",
+      "descRaw": "【卡西米尔】每叠加5层，本干员部署后100秒内<@ba.vup>基础攻击力</>+20、<@ba.vup>基础生命值</>+100",
+      "eventType": "IN_BATTLE",
+      "eventTypeDesc": "作战能力",
+      "eventTypeIcon": "icon_battle",
+      "effectType": "GAIN_BUFF",
+      "effectKey": "act2autochess_gar_eff_attrByBond_add_onstart",
+      "battleRuneKey": "env_gbuff_new_with_verify",
+      "charLevel": 0,
+      "bb": {
+        "divide_num": 5,
+        "atk": 20,
+        "max_hp": 100,
+        "duration": 100
+      },
+      "bbStr": {
+        "key": "act2autochess_gar_eff_attrByBond_add_onstart",
+        "bond_id": "kazimierzShip"
+      },
+      "owners": [
+        "chess_char_5_19_b"
+      ]
+    },
+    "garrison_119_b": {
+      "garrisonId": "garrison_119_b",
+      "desc": "<休整期结束时>当前休整期每获得过一名干员，使已激活的【炎】【奥术】层数+4",
+      "descRaw": "<休整期结束时>当前休整期每获得过一名干员，使已激活的【炎】【奥术】层数<@ba.vup>+4</>",
+      "eventType": "SERVER_PREP_FIN",
+      "eventTypeDesc": "持续叠加",
+      "eventTypeIcon": "icon_bond",
+      "effectType": "SERVER_ADD_BOND_METHOD",
+      "effectKey": "SERVER_ADD_BOND_METHOD",
+      "battleRuneKey": null,
+      "charLevel": 0,
+      "bb": {
+        "multi": 4
+      },
+      "bbStr": {
+        "add_method": "round_gain_char",
+        "bond": "yanShip,arcaneShip",
+        "conditionkey": "character_target_inboard"
+      },
+      "owners": [
+        "chess_char_5_12_b"
+      ]
+    },
+    "garrison_125_b": {
+      "garrisonId": "garrison_125_b",
+      "desc": "<战斗中>每当范围内有敌人或干员进入沉睡或晕眩时，使已激活的【萨尔贡】【精准】层数+2（每场战斗至多48层）",
+      "descRaw": "<战斗中>每当范围内有敌人或干员进入<@ba.vup>沉睡</>或<@ba.vup>晕眩</>时，使已激活的【萨尔贡】【精准】层数<@ba.vup>+2</>（每场战斗至多48层）",
+      "eventType": "IN_BATTLE",
+      "eventTypeDesc": "持续叠加",
+      "eventTypeIcon": "icon_bond",
+      "effectType": "ADD_BOND",
+      "effectKey": "act2autochess_gar_event_allyenemy_sleepstun_inrange",
+      "battleRuneKey": "char_dynamic_ability_new",
+      "charLevel": 0,
+      "bb": {
+        "bond_add_count": 2,
+        "max_add_count_per_battle": 48
+      },
+      "bbStr": {
+        "key": "act2autochess_gar_event_allyenemy_sleepstun_inrange",
+        "bond_type": "bond_by_id",
+        "bond_id": "sargonShip,preciShip",
+        "bond_add_type": "by_count",
+        "garrison_key": "garrison_125_b"
+      },
+      "owners": [
+        "chess_char_5_02_b"
+      ]
+    },
+    "garrison_126_b": {
+      "garrisonId": "garrison_126_b",
+      "desc": "<战斗开始时>使身前一格【谢拉格】干员获得特质“范围内1名敌人进入冻结时，有60%概率使已激活的【谢拉格】层数+2”",
+      "descRaw": "<战斗开始时>使身前一格【谢拉格】干员获得特质“范围内1名敌人进入冻结时，有60%概率使已激活的【谢拉格】层数<@ba.vup>+2</>”",
+      "eventType": "IN_BATTLE",
+      "eventTypeDesc": "持续叠加",
+      "eventTypeIcon": "icon_bond",
+      "effectType": "ADD_BOND",
+      "effectKey": "ADD_BOND",
+      "battleRuneKey": "give_garrison_to_front",
+      "charLevel": 0,
+      "bb": {},
+      "bbStr": {
+        "check_bond_id": "kjeragShip",
+        "give_garrison_id": "garrison_29_b"
+      },
+      "owners": [
+        "chess_char_5_14_b"
+      ]
+    },
+    "garrison_128_b": {
+      "garrisonId": "garrison_128_b",
+      "desc": "<战斗中>开启技能时，使已激活的【萨尔贡】层数+18",
+      "descRaw": "<战斗中>开启技能时，使已激活的【萨尔贡】层数<@ba.vup>+18</>",
+      "eventType": "IN_BATTLE",
+      "eventTypeDesc": "持续叠加",
+      "eventTypeIcon": "icon_bond",
+      "effectType": "ADD_BOND",
+      "effectKey": "act1autochess_gar_event_useskill",
+      "battleRuneKey": "env_gbuff_new_with_verify",
+      "charLevel": 0,
+      "bb": {
+        "bond_add_count": 18
+      },
+      "bbStr": {
+        "key": "act1autochess_gar_event_useskill",
+        "bond_type": "bond_by_id",
+        "bond_id": "sargonShip",
+        "bond_add_type": "by_count"
+      },
+      "owners": [
+        "chess_char_4_23_b",
+        "chess_char_5_18_b"
+      ]
+    },
+    "garrison_13_b": {
+      "garrisonId": "garrison_13_b",
+      "desc": "购买价格为1",
+      "descRaw": "购买价格为<@ba.vup>1</>",
+      "eventType": "SERVER_PRICE",
+      "eventTypeDesc": "整备能力",
+      "eventTypeIcon": "icon_gold",
+      "effectType": "SERVER_CHESS_PRICE",
+      "effectKey": "SERVER_CHESS_PRICE",
+      "battleRuneKey": null,
+      "charLevel": 0,
+      "bb": {
+        "price": 2
+      },
+      "bbStr": {},
+      "owners": [
+        "chess_char_3_13_b"
+      ]
+    },
+    "garrison_143_b": {
+      "garrisonId": "garrison_143_b",
+      "desc": "<部署时>使已激活的【卡西米尔】层数+2",
+      "descRaw": "<部署时>使已激活的【卡西米尔】层数<@ba.vup>+2</>",
+      "eventType": "IN_BATTLE",
+      "eventTypeDesc": "持续叠加",
+      "eventTypeIcon": "icon_bond",
+      "effectType": "ADD_BOND",
+      "effectKey": "act2autochess_gar_event_onstart",
+      "battleRuneKey": "env_gbuff_new_with_verify",
+      "charLevel": 0,
+      "bb": {
+        "bond_add_count": 2
+      },
+      "bbStr": {
+        "key": "act2autochess_gar_event_onstart",
+        "bond_type": "bond_by_id",
+        "bond_id": "kazimierzShip",
+        "bond_add_type": "by_count"
+      },
+      "owners": [
+        "chess_char_2_12_b"
+      ]
+    },
+    "garrison_144_b": {
+      "garrisonId": "garrison_144_b",
+      "desc": "【卡西米尔】每叠加3层，本干员再部署时间-3%，攻击速度+1",
+      "descRaw": "【卡西米尔】每叠加3层，本干员再部署时间<@ba.vup>-3%</>，攻击速度<@ba.vup>+1</>",
+      "eventType": "IN_BATTLE",
+      "eventTypeDesc": "作战能力",
+      "eventTypeIcon": "icon_battle",
+      "effectType": "GAIN_BUFF",
+      "effectKey": "act1autochess_gar_eff_respawnTimeByBond",
+      "battleRuneKey": "env_gbuff_new_with_verify",
+      "charLevel": 0,
+      "bb": {
+        "divide_num": 3,
+        "respawn_time": -0.03
+      },
+      "bbStr": {
+        "key": "act1autochess_gar_eff_respawnTimeByBond",
+        "bond_id": "kazimierzShip"
+      },
+      "owners": [
+        "chess_char_6_17_b"
+      ]
+    },
+    "garrison_145_b": {
+      "garrisonId": "garrison_145_b",
+      "desc": "<战斗开始时>使自身和身前一格干员获得特质“【卡西米尔】每叠加3层，本干员再部署时间-3%，攻击速度+1”",
+      "descRaw": "<战斗开始时>使<@ba.vup>自身</>和<@ba.vup>身前一格</>干员获得特质“【卡西米尔】每叠加3层，本干员再部署时间<@ba.vup>-3%</>，攻击速度<@ba.vup>+1</>”",
+      "eventType": "IN_BATTLE",
+      "eventTypeDesc": "持续叠加",
+      "eventTypeIcon": "icon_bond",
+      "effectType": "ADD_BOND",
+      "effectKey": "ADD_BOND",
+      "battleRuneKey": "give_garrison_to_front",
+      "charLevel": 0,
+      "bb": {},
+      "bbStr": {
+        "give_garrison_id": "garrison_144_b"
+      },
+      "owners": [
+        "chess_char_6_17_b"
+      ]
+    },
+    "garrison_148_b": {
+      "garrisonId": "garrison_148_b",
+      "desc": "<战斗开始时>使同一行最右边一名干员获得特质“<部署时>使已激活的【卡西米尔】【精准】层数+8（每场作战至多48层）”",
+      "descRaw": "<战斗开始时>使同一行最右边一名干员获得特质“<部署时>使已激活的【卡西米尔】【精准】层数<@ba.vup>+8</>（每场作战至多48层）”",
+      "eventType": "IN_BATTLE",
+      "eventTypeDesc": "持续叠加",
+      "eventTypeIcon": "icon_bond",
+      "effectType": "ADD_BOND",
+      "effectKey": "ADD_BOND",
+      "battleRuneKey": "give_garrison_to_most_right",
+      "charLevel": 0,
+      "bb": {},
+      "bbStr": {
+        "give_garrison_id": "garrison_108_b"
+      },
+      "owners": [
+        "chess_char_4_20_b"
+      ]
+    },
+    "garrison_150_b": {
+      "garrisonId": "garrison_150_b",
+      "desc": "<进入休整期时>使自身及身前一格干员的已激活盟约分别各层数+6",
+      "descRaw": "<进入休整期时>使自身及身前一格干员的已激活盟约分别各层数<@ba.vup>+6</>",
+      "eventType": "SERVER_PREP_START",
+      "eventTypeDesc": "持续叠加",
+      "eventTypeIcon": "icon_bond",
+      "effectType": "SERVER_ADD_BOND_POSITION",
+      "effectKey": "SERVER_ADD_BOND_POSITION",
+      "battleRuneKey": null,
+      "charLevel": 0,
+      "bb": {
+        "count": 6
+      },
+      "bbStr": {
+        "dir": "front",
+        "conditionkey": "character_target_inboard"
+      },
+      "owners": [
+        "chess_char_3_21_b"
+      ]
+    },
+    "garrison_155_b": {
+      "garrisonId": "garrison_155_b",
+      "desc": "<获得时>自身所属的盟约层数+16\n<部署时>使自身已激活的盟约层数+16（至多48层）",
+      "descRaw": "<获得时>自身所属的盟约层数<@ba.vup>+16</>\n<部署时>使自身已激活的盟约层数<@ba.vup>+16</>（至多48层）",
+      "eventType": "IN_BATTLE",
+      "eventTypeDesc": "持续叠加",
+      "eventTypeIcon": "icon_bond",
+      "effectType": "ADD_BOND",
+      "effectKey": "act2autochess_gar_event_onstart",
+      "battleRuneKey": "env_gbuff_new_with_verify",
+      "charLevel": 0,
+      "bb": {
+        "bond_add_count": 16,
+        "max_add_count_per_battle": 48
+      },
+      "bbStr": {
+        "key": "act2autochess_gar_event_onstart",
+        "bond_type": "bond_self",
+        "bond_add_type": "by_count",
+        "garrison_key": "garrison_155_b"
+      },
+      "owners": [
+        "chess_char_6_19_b"
+      ]
+    },
+    "garrison_156_b": {
+      "garrisonId": "garrison_156_b",
+      "desc": "<获得时>【炎】层数+12、【奇迹】层数+6（无需激活盟约）",
+      "descRaw": "<获得时>【炎】层数<@ba.vup>+12</>、【奇迹】层数<@ba.vup>+6</>（无需激活盟约）",
+      "eventType": "SERVER_GAIN",
+      "eventTypeDesc": "单次叠加",
+      "eventTypeIcon": "icon_bond",
+      "effectType": "SERVER_ADD_MULTIPLE_BOND",
+      "effectKey": "SERVER_ADD_MULTIPLE_BOND",
+      "battleRuneKey": null,
+      "charLevel": 0,
+      "bb": {},
+      "bbStr": {
+        "bond": "yanShip,miraShip",
+        "count": "12,6"
+      },
+      "owners": [
+        "chess_char_4_15_b",
+        "chess_char_5_23_b"
+      ]
+    },
+    "garrison_159_b": {
+      "garrisonId": "garrison_159_b",
+      "desc": "【145】【卡西米尔】每叠加3层，本干员攻击速度+1",
+      "descRaw": "【145】【卡西米尔】每叠加3层，本干员攻击速度<@ba.vup>+1</>",
+      "eventType": "IN_BATTLE",
+      "eventTypeDesc": "作战能力",
+      "eventTypeIcon": "icon_battle",
+      "effectType": "GAIN_BUFF",
+      "effectKey": "act1autochess_gar_eff_attrByBond",
+      "battleRuneKey": "env_gbuff_new_with_verify",
+      "charLevel": 0,
+      "bb": {
+        "divide_num": 3,
+        "attack_speed": 1
+      },
+      "bbStr": {
+        "key": "act1autochess_gar_eff_attrByBond",
+        "bond_id": "kazimierzShip"
+      },
+      "owners": [
+        "chess_char_6_17_b"
+      ]
+    },
+    "garrison_160_b": {
+      "garrisonId": "garrison_160_b",
+      "desc": "【145】<战斗开始时>使自身和身前一格干员获得特质“【卡西米尔】每叠加3层，攻击速度+1”",
+      "descRaw": "【145】<战斗开始时>使<@ba.vup>自身</>和<@ba.vup>身前一格</>干员获得特质“【卡西米尔】每叠加3层，攻击速度<@ba.vup>+1</>”",
+      "eventType": "IN_BATTLE",
+      "eventTypeDesc": "持续叠加",
+      "eventTypeIcon": "icon_bond",
+      "effectType": "ADD_BOND",
+      "effectKey": "ADD_BOND",
+      "battleRuneKey": "give_garrison_to_front",
+      "charLevel": 0,
+      "bb": {},
+      "bbStr": {
+        "give_garrison_id": "garrison_159_b"
+      },
+      "owners": [
+        "chess_char_6_17_b"
+      ]
+    },
+    "garrison_25_b": {
+      "garrisonId": "garrison_25_b",
+      "desc": "<获得时>自身所属盟约层数+4（无需激活盟约）",
+      "descRaw": "<获得时>自身所属盟约层数<@ba.vup>+4</>（无需激活盟约）",
+      "eventType": "SERVER_GAIN",
+      "eventTypeDesc": "单次叠加",
+      "eventTypeIcon": "icon_bond",
+      "effectType": "SERVER_ADD_BOND_CHESS_ALL",
+      "effectKey": "SERVER_ADD_BOND_CHESS_ALL",
+      "battleRuneKey": null,
+      "charLevel": 0,
+      "bb": {
+        "count": 4
+      },
+      "bbStr": {},
+      "owners": [
+        "chess_char_1_02_b",
+        "chess_char_1_11_b",
+        "chess_char_1_12_b",
+        "chess_char_1_16_b",
+        "chess_char_1_17_b",
+        "chess_char_1_19_b"
+      ]
+    },
+    "garrison_28_b": {
+      "garrisonId": "garrison_28_b",
+      "desc": "<战斗中>每当范围内1名敌人进入冻结时，有50%概率使已激活的【谢拉格】层数+2",
+      "descRaw": "<战斗中>每当范围内1名敌人进入冻结时，有50%概率使已激活的【谢拉格】层数<@ba.vup>+2</>",
+      "eventType": "IN_BATTLE",
+      "eventTypeDesc": "持续叠加",
+      "eventTypeIcon": "icon_bond",
+      "effectType": "ADD_BOND",
+      "effectKey": "act1autochess_gar_event_enemy_abflag_inrange",
+      "battleRuneKey": "char_dynamic_ability_new",
+      "charLevel": 0,
+      "bb": {
+        "check_ab_flag": 16,
+        "bond_add_count": 2,
+        "prob": 0.5
+      },
+      "bbStr": {
+        "key": "act1autochess_gar_event_enemy_abflag_inrange",
+        "bond_type": "bond_by_id",
+        "bond_id": "kjeragShip",
+        "bond_add_type": "by_count"
+      },
+      "owners": [
+        "chess_char_3_14_b",
+        "chess_char_4_22_b"
+      ]
+    },
+    "garrison_31_b": {
+      "garrisonId": "garrison_31_b",
+      "desc": "<休整期结束时>本回合每获得过1名干员，使已激活的【炎】层数+2",
+      "descRaw": "<休整期结束时>本回合每获得过1名干员，使已激活的【炎】层数<@ba.vup>+2</>",
+      "eventType": "SERVER_PREP_FIN",
+      "eventTypeDesc": "持续叠加",
+      "eventTypeIcon": "icon_bond",
+      "effectType": "SERVER_ADD_BOND_METHOD",
+      "effectKey": "SERVER_ADD_BOND_METHOD",
+      "battleRuneKey": null,
+      "charLevel": 0,
+      "bb": {
+        "multi": 2
+      },
+      "bbStr": {
+        "add_method": "round_gain_char",
+        "bond": "yanShip",
+        "conditionkey": "character_target_inboard"
+      },
+      "owners": [
+        "chess_char_2_04_b"
+      ]
+    },
+    "garrison_35_b": {
+      "garrisonId": "garrison_35_b",
+      "desc": "<获得时>【炎】【维多利亚】层数+10（无需激活盟约）",
+      "descRaw": "<获得时>【炎】【维多利亚】层数<@ba.vup>+10</>（无需激活盟约）",
+      "eventType": "SERVER_GAIN",
+      "eventTypeDesc": "单次叠加",
+      "eventTypeIcon": "icon_bond",
+      "effectType": "SERVER_ADD_BOND",
+      "effectKey": "SERVER_ADD_BOND",
+      "battleRuneKey": null,
+      "charLevel": 0,
+      "bb": {
+        "count": 10
+      },
+      "bbStr": {
+        "bond": "yanShip,victoriaShip"
+      },
+      "owners": [
+        "chess_char_5_03_b"
+      ]
+    },
+    "garrison_37_b": {
+      "garrisonId": "garrison_37_b",
+      "desc": "<进入休整期时>随机获得1名当前人数最多盟约的干员",
+      "descRaw": "<进入休整期时>随机获得1名当前人数最多盟约的干员",
+      "eventType": "SERVER_PREP_START",
+      "eventTypeDesc": "整备能力",
+      "eventTypeIcon": "icon_gold",
+      "effectType": "SERVER_MOST_BOND",
+      "effectKey": "SERVER_MOST_BOND",
+      "battleRuneKey": null,
+      "charLevel": 0,
+      "bb": {},
+      "bbStr": {
+        "conditionkey": "character_target_inboard"
+      },
+      "owners": [
+        "chess_char_6_03_b"
+      ]
+    },
+    "garrison_49_b": {
+      "garrisonId": "garrison_49_b",
+      "desc": "<获得时>获得2件“迅捷作战粮”",
+      "descRaw": "<获得时>获得2件“迅捷作战粮”",
+      "eventType": "SERVER_GAIN",
+      "eventTypeDesc": "整备能力",
+      "eventTypeIcon": "icon_gold",
+      "effectType": "SERVER_GAIN_EQUIP",
+      "effectKey": "SERVER_GAIN_EQUIP",
+      "battleRuneKey": null,
+      "charLevel": 0,
+      "bb": {
+        "count": 2
+      },
+      "bbStr": {
+        "chess": "chess_item_3_05_e_a"
+      },
+      "owners": [
+        "chess_char_4_05_b",
+        "chess_char_4_24_b"
+      ]
+    },
+    "garrison_51_b": {
+      "garrisonId": "garrison_51_b",
+      "desc": "<休整期结束时>使自身已激活的盟约层数+10",
+      "descRaw": "<休整期结束时>使自身已激活的盟约层数<@ba.vup>+10</>",
+      "eventType": "SERVER_PREP_FIN",
+      "eventTypeDesc": "持续叠加",
+      "eventTypeIcon": "icon_bond",
+      "effectType": "SERVER_ADD_BOND_CHESS_ALL",
+      "effectKey": "SERVER_ADD_BOND_CHESS_ALL",
+      "battleRuneKey": null,
+      "charLevel": 0,
+      "bb": {
+        "count": 10
+      },
+      "bbStr": {
+        "conditionkey": "character_target_inboard"
+      },
+      "owners": [
+        "chess_char_4_14_b"
+      ]
+    },
+    "garrison_65_b": {
+      "garrisonId": "garrison_65_b",
+      "desc": "<获得时>自身所属盟约层数+16（无需激活盟约）",
+      "descRaw": "<获得时>自身所属盟约层数<@ba.vup>+16</>（无需激活盟约）",
+      "eventType": "SERVER_GAIN",
+      "eventTypeDesc": "单次叠加",
+      "eventTypeIcon": "icon_bond",
+      "effectType": "SERVER_ADD_BOND_CHESS_ALL",
+      "effectKey": "SERVER_ADD_BOND_CHESS_ALL",
+      "battleRuneKey": null,
+      "charLevel": 0,
+      "bb": {
+        "count": 16
+      },
+      "bbStr": {},
+      "owners": [
+        "chess_char_4_17_b",
+        "chess_char_6_19_b"
+      ]
+    },
+    "garrison_75_b": {
+      "garrisonId": "garrison_75_b",
+      "desc": "<部署时>使已激活的【卡西米尔】层数+2\n<被击倒时>使已激活的【不屈】层数+4",
+      "descRaw": "<部署时>使已激活的【卡西米尔】层数<@ba.vup>+2</>\n<被击倒时>使已激活的【不屈】层数<@ba.vup>+4</>",
+      "eventType": "IN_BATTLE",
+      "eventTypeDesc": "持续叠加",
+      "eventTypeIcon": "icon_bond",
+      "effectType": "ADD_BOND",
+      "effectKey": "act1autochess_gar_event_selfdead",
+      "battleRuneKey": "env_gbuff_new_with_verify",
+      "charLevel": 0,
+      "bb": {
+        "bond_add_count": 4
+      },
+      "bbStr": {
+        "key": "act1autochess_gar_event_selfdead",
+        "bond_type": "bond_by_id",
+        "bond_id": "indomShip",
+        "bond_add_type": "by_count"
+      },
+      "owners": [
+        "chess_char_2_12_b"
+      ]
+    },
+    "garrison_76_b": {
+      "garrisonId": "garrison_76_b",
+      "desc": "<获得时>获得2个“变形同构体”",
+      "descRaw": "<获得时>获得2个“变形同构体”",
+      "eventType": "SERVER_GAIN",
+      "eventTypeDesc": "整备能力",
+      "eventTypeIcon": "icon_gold",
+      "effectType": "SERVER_GAIN_EQUIP",
+      "effectKey": "SERVER_GAIN_EQUIP",
+      "battleRuneKey": null,
+      "charLevel": 0,
+      "bb": {
+        "count": 2
+      },
+      "bbStr": {
+        "chess": "chess_item_6_09_e_a"
+      },
+      "owners": [
+        "chess_char_6_11_b"
+      ]
+    },
+    "garrison_94_b": {
+      "garrisonId": "garrison_94_b",
+      "desc": "<进入休整期时>获得2件“盟约之币”或“萨尔贡浓茶”，有概率发现“黄沙罗盘”",
+      "descRaw": "<进入休整期时>获得2件“盟约之币”或“萨尔贡浓茶”，有概率发现“黄沙罗盘”",
+      "eventType": "SERVER_PREP_START",
+      "eventTypeDesc": "整备能力",
+      "eventTypeIcon": "icon_gold",
+      "effectType": "SERVER_POOL_EQUIP",
+      "effectKey": "SERVER_POOL_EQUIP",
+      "battleRuneKey": null,
+      "charLevel": 0,
+      "bb": {
+        "count": 2
+      },
+      "bbStr": {
+        "pool": "pool_equip_pepe",
+        "conditionkey": "character_target_inboard"
+      },
+      "owners": [
+        "chess_char_6_06_b"
+      ]
+    }
+  },
+  "bossPoolsAbyss": {
+    "boss_1": 3600000,
+    "boss_2": 3000000,
+    "boss_3": 4000000,
+    "boss_4": 4200000,
+    "boss_5": 3000000,
+    "boss_6": 3980000,
+    "boss_7": 4000000,
+    "boss_8": 7200000,
+    "boss_9": 3950000,
+    "boss_10": 7600000
+  },
+  "band": {
+    "bandId": "band_bldsk",
+    "sortId": 1,
+    "name": "华法琳",
+    "iconId": "icon_bldsk",
+    "modeTypeList": [
+      "LOCAL",
+      "SINGLE",
+      "MULTI"
+    ],
+    "totalHp": 28,
+    "effectId": "aceffect_band_21",
+    "effectName": "重点监护",
+    "desc": "【重点监护】开始作战时，使场上每个不同等阶的1个随机我方干员的所属盟约层数+2",
+    "descRaw": "【重点监护】开始作战时，使场上每个不同等阶的1个随机我方干员的所属盟约层数+2",
+    "buffs": [
+      {
+        "key": "prep_finish_char_bond_add_layer",
+        "bb": {
+          "layer": 2
+        },
+        "bbStr": {}
+      }
+    ],
+    "params": {
+      "layer": 2
+    },
+    "victorCount": 3,
+    "rewardModulus": 1,
+    "unlockDesc": null,
+    "bondIds": []
+  }
+}

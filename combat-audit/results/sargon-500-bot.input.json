@@ -1,0 +1,739 @@
+{
+  "kind": "CONSTRUCTED_R14_NOT_NATURAL",
+  "pin": "6ab2468279e926d107788f63d7fe219b85f67b4a",
+  "build": "sargon",
+  "layer": 500,
+  "variant": "bot",
+  "guides": [
+    "BV16YSUBZETc"
+  ],
+  "seed": 6,
+  "bossId": "boss_2",
+  "stageId": "act2autochess_m03",
+  "bans": [
+    "indomShip",
+    "kazimierzShip",
+    "kjeragShip",
+    "miraShip",
+    "raidShip",
+    "siracusaShip",
+    "visiShip"
+  ],
+  "bandId": "band_bldsk",
+  "lpAtStart": 28,
+  "deployCap": 8,
+  "equipmentSlots": 2,
+  "roster": [
+    {
+      "uid": 2,
+      "kind": "chess",
+      "chessId": "chess_char_5_02_b",
+      "row": 12,
+      "col": 4,
+      "dir": "DOWN",
+      "items": [],
+      "skillIndex": 2,
+      "moduleId": "uniequip_002_titi",
+      "potential": 6,
+      "cultivate": 3,
+      "name": "缇缇"
+    },
+    {
+      "uid": 1,
+      "kind": "chess",
+      "chessId": "chess_char_3_13_b",
+      "row": 12,
+      "col": 6,
+      "dir": "DOWN",
+      "items": [
+        "chess_item_6_07_e_b",
+        "chess_item_2_04_e_b"
+      ],
+      "skillIndex": 1,
+      "moduleId": "uniequip_002_malist",
+      "potential": 6,
+      "cultivate": 3,
+      "name": "至简"
+    },
+    {
+      "uid": 7,
+      "kind": "chess",
+      "chessId": "chess_char_4_14_b",
+      "row": 11,
+      "col": 6,
+      "dir": "RIGHT",
+      "items": [],
+      "skillIndex": 1,
+      "moduleId": "uniequip_002_lionhd",
+      "potential": 6,
+      "cultivate": 3,
+      "name": "莱恩哈特"
+    },
+    {
+      "uid": 3,
+      "kind": "chess",
+      "chessId": "chess_char_6_05_b",
+      "row": 11,
+      "col": 7,
+      "dir": "DOWN",
+      "items": [
+        "chess_item_5_03_e_b",
+        "chess_item_2_04_e_b"
+      ],
+      "skillIndex": 2,
+      "moduleId": "uniequip_002_pasngr",
+      "potential": 6,
+      "cultivate": 3,
+      "name": "异客"
+    },
+    {
+      "uid": 6,
+      "kind": "chess",
+      "chessId": "chess_char_4_24_b",
+      "row": 11,
+      "col": 8,
+      "dir": "RIGHT",
+      "items": [],
+      "skillIndex": 1,
+      "moduleId": "uniequip_002_billro",
+      "potential": 6,
+      "cultivate": 3,
+      "name": "卡涅利安"
+    },
+    {
+      "uid": 8,
+      "kind": "chess",
+      "chessId": "chess_char_3_21_b",
+      "row": 10,
+      "col": 5,
+      "dir": "RIGHT",
+      "items": [],
+      "skillIndex": 2,
+      "moduleId": "uniequip_002_archet",
+      "potential": 6,
+      "cultivate": 3,
+      "name": "空弦"
+    },
+    {
+      "uid": 4,
+      "kind": "chess",
+      "chessId": "chess_char_6_06_b",
+      "row": 10,
+      "col": 7,
+      "dir": "RIGHT",
+      "items": [
+        "chess_item_5_03_e_b",
+        "chess_item_2_04_e_b"
+      ],
+      "skillIndex": 2,
+      "moduleId": "uniequip_002_pepe",
+      "potential": 6,
+      "cultivate": 3,
+      "name": "佩佩"
+    },
+    {
+      "uid": 5,
+      "kind": "chess",
+      "chessId": "chess_char_4_23_b",
+      "row": 10,
+      "col": 8,
+      "dir": "LEFT",
+      "items": [],
+      "skillIndex": 2,
+      "moduleId": "uniequip_002_gvial2",
+      "potential": 6,
+      "cultivate": 3,
+      "name": "百炼嘉维尔"
+    }
+  ],
+  "bonds": {
+    "yanShip": {
+      "count": 0,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "sargonShip": {
+      "count": 6,
+      "active": true,
+      "tier": 2,
+      "layers": 500
+    },
+    "victoriaShip": {
+      "count": 0,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "kjeragShip": {
+      "count": 0,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "lateranoShip": {
+      "count": 1,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "egirShip": {
+      "count": 0,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "siracusaShip": {
+      "count": 0,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "kazimierzShip": {
+      "count": 0,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "preciShip": {
+      "count": 3,
+      "active": true,
+      "tier": 2,
+      "layers": 500
+    },
+    "swiftShip": {
+      "count": 2,
+      "active": true,
+      "tier": 1,
+      "layers": 500
+    },
+    "skillfulShip": {
+      "count": 2,
+      "active": true,
+      "tier": 1,
+      "layers": 0
+    },
+    "arcaneShip": {
+      "count": 0,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "steadShip": {
+      "count": 0,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "deputShip": {
+      "count": 1,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "visiShip": {
+      "count": 0,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "miraShip": {
+      "count": 0,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "investShip": {
+      "count": 0,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "raidShip": {
+      "count": 0,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "indomShip": {
+      "count": 1,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "maniShip": {
+      "count": 0,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "emptyShip": {
+      "count": 0,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "soloShip": {
+      "count": 0,
+      "active": false,
+      "tier": 0,
+      "layers": 0
+    },
+    "suntShip": {
+      "count": 8,
+      "active": true,
+      "tier": 2,
+      "layers": 0
+    }
+  },
+  "loadout": {},
+  "playerEffects": [],
+  "waves": [
+    {
+      "players": [
+        "p_0"
+      ],
+      "wave": {
+        "templateId": "act1autochess_h07_02_s",
+        "spawns": [
+          {
+            "time": 10,
+            "enemyKey": "enemy_1010_demon",
+            "routeIndex": 0,
+            "count": 3,
+            "interval": 13.333333333333334,
+            "mods": {
+              "hpMul": 3.583181,
+              "atkMul": 1.948717,
+              "speedMul": 1.15,
+              "slot": "E"
+            },
+            "actionIndex": 0,
+            "preview": {
+              "gate": "lower",
+              "start": [
+                2,
+                10
+              ],
+              "fly": false,
+              "elite": true,
+              "boss": false
+            }
+          },
+          {
+            "time": 30,
+            "enemyKey": "enemy_1430_lrrook",
+            "routeIndex": 1,
+            "count": 1,
+            "interval": 0,
+            "mods": {
+              "hpMul": 3.583181,
+              "atkMul": 1.948717,
+              "speedMul": 1.15,
+              "slot": "EF"
+            },
+            "actionIndex": 1,
+            "preview": {
+              "gate": "lower",
+              "start": [
+                2,
+                10
+              ],
+              "fly": true,
+              "elite": true,
+              "boss": false
+            }
+          },
+          {
+            "time": 90,
+            "enemyKey": "enemy_1430_lrrook",
+            "routeIndex": 2,
+            "count": 1,
+            "interval": 0,
+            "mods": {
+              "hpMul": 3.583181,
+              "atkMul": 1.948717,
+              "speedMul": 1.15,
+              "slot": "EF"
+            },
+            "actionIndex": 2,
+            "preview": {
+              "gate": "lower",
+              "start": [
+                2,
+                10
+              ],
+              "fly": true,
+              "elite": true,
+              "boss": false
+            }
+          },
+          {
+            "time": 0,
+            "enemyKey": "enemy_9017_achunt",
+            "routeIndex": 4,
+            "count": 1,
+            "interval": 0,
+            "mods": {
+              "atkMul": 1.948717,
+              "speedMul": 1.15,
+              "slot": "N"
+            },
+            "actionIndex": 4,
+            "preview": {
+              "gate": "lower",
+              "start": [
+                4,
+                10
+              ],
+              "fly": false,
+              "elite": true,
+              "boss": true
+            },
+            "tag": "boss"
+          }
+        ],
+        "routes": [
+          {
+            "motion": "WALK",
+            "start": [
+              2,
+              10
+            ],
+            "end": [
+              1,
+              3
+            ],
+            "checkpoints": []
+          },
+          {
+            "motion": "WALK",
+            "start": [
+              2,
+              10
+            ],
+            "end": [
+              1,
+              3
+            ],
+            "checkpoints": [
+              [
+                4,
+                6
+              ]
+            ],
+            "steps": [
+              {
+                "t": "move",
+                "p": [
+                  4,
+                  6
+                ]
+              },
+              {
+                "t": "wait",
+                "s": 25
+              }
+            ]
+          },
+          {
+            "motion": "WALK",
+            "start": [
+              2,
+              10
+            ],
+            "end": [
+              1,
+              3
+            ],
+            "checkpoints": [
+              [
+                4,
+                6
+              ]
+            ],
+            "steps": [
+              {
+                "t": "move",
+                "p": [
+                  4,
+                  6
+                ]
+              },
+              {
+                "t": "wait",
+                "s": 25
+              }
+            ]
+          },
+          {
+            "motion": "FLY",
+            "start": [
+              2,
+              10
+            ],
+            "end": [
+              1,
+              3
+            ],
+            "checkpoints": [
+              [
+                2,
+                9
+              ],
+              [
+                5,
+                9
+              ],
+              [
+                5,
+                7
+              ],
+              [
+                2,
+                7
+              ],
+              [
+                2,
+                5
+              ],
+              [
+                5,
+                5
+              ],
+              [
+                5,
+                3
+              ],
+              [
+                2,
+                3
+              ]
+            ]
+          },
+          {
+            "motion": "WALK",
+            "start": [
+              4,
+              10
+            ],
+            "end": [
+              2,
+              2
+            ],
+            "checkpoints": [
+              [
+                3,
+                9
+              ],
+              [
+                2,
+                3
+              ],
+              [
+                5,
+                9
+              ]
+            ],
+            "steps": [
+              {
+                "t": "patrol",
+                "p": [
+                  3,
+                  9
+                ]
+              },
+              {
+                "t": "patrol",
+                "p": [
+                  2,
+                  3
+                ]
+              },
+              {
+                "t": "patrol",
+                "p": [
+                  5,
+                  9
+                ]
+              }
+            ]
+          }
+        ],
+        "extraRoutes": [
+          {
+            "motion": "FLY",
+            "start": [
+              4,
+              10
+            ],
+            "end": [
+              2,
+              2
+            ],
+            "checkpoints": []
+          },
+          {
+            "motion": "WALK",
+            "start": [
+              5,
+              10
+            ],
+            "end": [
+              2,
+              2
+            ],
+            "checkpoints": []
+          },
+          {
+            "motion": "FLY",
+            "start": [
+              5,
+              10
+            ],
+            "end": [
+              2,
+              2
+            ],
+            "checkpoints": [
+              [
+                4,
+                9
+              ],
+              [
+                4,
+                7
+              ],
+              [
+                3,
+                6
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                2,
+                3
+              ]
+            ]
+          }
+        ],
+        "timeLimit": null,
+        "overrides": {
+          "enemy_1430_lrrook": {
+            "stats": {
+              "maxHp": 60000
+            }
+          }
+        },
+        "pick": {
+          "round": 14,
+          "type": "SPECIAL",
+          "key": "enemy_1320_wdrrl_2",
+          "normal": "enemy_1422_lrsldr_2",
+          "elite": "enemy_1010_demon",
+          "fly": false,
+          "firstHalf": false
+        },
+        "entries": {
+          "ground": {
+            "key": "enemy_1320_wdrrl_2",
+            "type": "SPECIAL",
+            "weight": 10,
+            "firstHalf": false,
+            "fly": false,
+            "N": [
+              {
+                "key": "enemy_1422_lrsldr_2"
+              }
+            ],
+            "E": [
+              {
+                "key": "enemy_1010_demon"
+              }
+            ],
+            "inactiveIn": [],
+            "pick": {
+              "round": 14,
+              "type": "SPECIAL",
+              "key": "enemy_1320_wdrrl_2",
+              "normal": "enemy_1422_lrsldr_2",
+              "elite": "enemy_1010_demon",
+              "fly": false,
+              "firstHalf": false
+            }
+          },
+          "fly": null
+        },
+        "actions": [
+          {
+            "index": 0,
+            "key": "enemy_1010_demon",
+            "tplKey": "enemy_1427_lrnazg",
+            "slot": "E",
+            "time": 10,
+            "count": 3,
+            "tplCount": 2,
+            "window": 40,
+            "routeIndex": 0,
+            "valid": true,
+            "server": true
+          },
+          {
+            "index": 1,
+            "key": "enemy_1430_lrrook",
+            "tplKey": "enemy_1430_lrrook",
+            "slot": null,
+            "time": 30,
+            "count": 1,
+            "tplCount": 1,
+            "window": 30,
+            "routeIndex": 1,
+            "valid": true,
+            "server": true
+          },
+          {
+            "index": 2,
+            "key": "enemy_1430_lrrook",
+            "tplKey": "enemy_1430_lrrook",
+            "slot": null,
+            "time": 90,
+            "count": 1,
+            "tplCount": 1,
+            "window": 25,
+            "routeIndex": 2,
+            "valid": true,
+            "server": true
+          },
+          {
+            "index": 3,
+            "key": null,
+            "tplKey": "enemy_1042_frostd",
+            "slot": "EF",
+            "time": 10,
+            "count": 0,
+            "tplCount": 3,
+            "window": 45,
+            "routeIndex": 3,
+            "valid": false,
+            "server": false
+          },
+          {
+            "index": 4,
+            "key": "enemy_9017_achunt",
+            "tplKey": "enemy_9017_achunt",
+            "slot": null,
+            "time": 0,
+            "count": 1,
+            "tplCount": 1,
+            "window": 0,
+            "routeIndex": 4,
+            "valid": true,
+            "server": false
+          }
+        ]
+      }
+    }
+  ]
+}
