@@ -25,7 +25,7 @@ export class ShopEnv {
   reset({ seed = 1, mode = 'solo', difficulty = 'NORMAL', budget = 128, teacher = false } = {}) {
     if (mode !== 'solo') throw new Error('v1 supports solo only');
     if (!['NORMAL', 'HARD', 'ABYSS'].includes(difficulty)) throw new Error('Unsupported difficulty');
-    if (!Number.isInteger(seed) || !Number.isInteger(budget) || budget < 1 || budget > 1024) throw new Error('Invalid seed/budget');
+    if (!Number.isInteger(seed) || seed < 1 || seed > 0xffffffff || !Number.isInteger(budget) || budget < 1 || budget > 1024) throw new Error('Invalid seed/budget: seed must be uint32 in 1..4294967295');
     this.close();
     Object.assign(this, { summary: null, actionErrors: 0, controllerErrors: 0, controllerBlockedSales: 0,
       budgetForcedReady: 0, engineLogErrors: [], steps: 0, prepRound: 0, lastBondState: null, teacher, source: 'fixed-controller', demos: [], demoRejected: 0 });

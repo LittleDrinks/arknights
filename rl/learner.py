@@ -277,6 +277,10 @@ def main():
     ev.add_argument('--difficulty', default='ABYSS', choices=['NORMAL', 'HARD', 'ABYSS'])
     ev.add_argument('--trace-dir')
     args = parser.parse_args()
+    if not 1 <= args.seed <= 0xffffffff:
+        parser.error('seed must be in 1..4294967295 (the actual engine seed range)')
+    if hasattr(args, 'episodes') and (args.episodes < 1 or args.seed + args.episodes - 1 > 0xffffffff):
+        parser.error('episodes must be positive and the full seed range must fit uint32')
     torch.manual_seed(args.seed)
     config = json.loads(Path(args.config).read_text())
     start = time.monotonic()
@@ -333,7 +337,7 @@ def main():
                 results.append(r)
                 print(json.dumps(r), flush=True)
             print(json.dumps({'episodes': len(results), 'wins': sum(r['victory'] for r in results),
-                              'winRate': sum(r['victory'] for r in results) / max(1, len(results))}))
+                              'winRate': sum(r['victory'] for r in results) / len(results)}))
             return
         if args.steps_per_stage < 1:
             raise ValueError('steps-per-stage must be positive')

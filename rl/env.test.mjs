@@ -22,6 +22,9 @@ test('initial legal actions execute through original methods; invalid index does
     const extended = { ...before.observation, seed: 999, victory: true, futureRng: [123] };
     assert.deepEqual(encode(extended, before.candidates, before.schema), before.features);
     assert.throws(() => e.reset({ mode: 'coop' }), /solo only/);
+    for (const seed of [0, -1, 4294967296, 4294967297, -4294967295, 1.5]) {
+      assert.throws(() => e.reset({ seed }), /Invalid seed/);
+    }
   } finally { e.close(); }
 });
 
