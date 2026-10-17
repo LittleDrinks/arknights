@@ -35,7 +35,7 @@ parent 强制为 root 下 `experiments/bc-expansion-v1/all.pt`，SHA 由 main �
 ## 冻结入场和来源边界
 
 读取的是相邻 `preview-tools/collect-natural-coop-teachers.py` 的实际格式，未修改该脚本。
-`manifest.status=running` 或无 finishedAt 一律拒绝。冻结可以是 complete/incomplete/failed，
+`manifest.status=running/failed` 或无 finishedAt 一律拒绝。冻结可以是 complete/incomplete，
 但必须完整列出按原顺序排列的 1024 个 training seed × normal/mixed = 2048 项。
 complete 批次不得含 failed/not-run；失败行必须有 error，已运行行须有开始/结束时间。
 不把“2048 个计划项”写成“2048 个有效完成局”。manifest 原字节保存为 `frozen-manifest.json`。
@@ -131,3 +131,6 @@ python3 -B natural-win-bc/check.py
 验证全计划/冻结、SHA/EOF/CRC、终局/row/label 篡改、dead carry 排除、同 seed 分组、
 原 BC 真实 200 次合成更新及 checkpoint 回读、64 项模拟调度、坏 EOF 原终局保留，
 并用 Python 3.10 AST 语法检查。本机实际运行的解释器不是 3.10，未声称完成 3.10 runtime 验收。
+
+
+采集器独立审计发现 lane 异常退出可能丢失尚未发布的整段结果，not-run 不能据此确认未执行。本入口因此拒绝整体 failed 批次，并在任何导入前核对全部 .json.gz 文件名恰好等于 manifest 声明的产物集合；未知/孤立/缺失产物需独立对账，不自动提升为训练正例。原始失败清单和文件均保留，不编辑仍在运行的采集器。

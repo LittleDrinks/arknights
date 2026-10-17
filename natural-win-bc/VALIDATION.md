@@ -26,3 +26,6 @@ No SSH, installation, subagent, goal, production download, production training o
 was performed. No results for the currently collecting teacher batch are claimed here.
 Collector source trust remains pending main's independent acceptance. Eval supports only
 original/mixed, 64 scheduled dev games; no heldout families and no sealed seeds.
+
+
+Main 接手后针对采集器独立审计 P2 增加整体 failed 拒绝及 raw 文件集合对账，防止执行未知的 not-run 被误当冻结来源。新增整批失败/孤立产物拒绝回归，合成契约重跑通过；未修改采集器、游戏或现有 learner，未运行生产训练。

@@ -12,7 +12,10 @@ def frozen(path, expected):
     raw = bounded(path, 8 * MIB)
     C.require(C.digest(raw) == expected, 'Frozen manifest SHA mismatch')
     m = C.parse(raw)
-    C.require(m['status'] in ('complete', 'incomplete', 'failed') and m.get('finishedAt'), 'Batch not frozen/running')
+    # A crashed lane can lose its unpublished result list. Such not-run rows have unknown
+    # execution status, and may not be treated as a completed collection source.
+    C.require(m['status'] in ('complete', 'incomplete') and m.get('finishedAt'),
+              'Batch not frozen/running or globally failed; independent reconciliation required')
     C.require(m['planned'] == 2048 and m['pairedTrainingSeeds'] == 1024 and len(m['games']) == 2048,
               'Full 2048 planned denominator required')
     C.require([(r['seed'], r['pool']) for r in m['games']] == PLAN and
@@ -84,6 +87,9 @@ def complete_contract(data, row, game, pool_manifest):
 
 def admit(directory, expected, game, pool_manifest, evidence):
     m, raw = frozen(directory / 'manifest.json', expected)
+    declared = {r['artifact'] for r in m['games'] if 'artifact' in r}
+    found = {p.name for p in directory.glob('*.json.gz')}
+    C.require(found == declared, 'Unregistered or missing raw artifacts; execution status requires reconciliation')
     evidence.put('frozen-manifest.json', raw)
     samples, labels, games, identities = [], [], [], {}
     positive_bytes, expanded, compressed = 0, 0, 0

@@ -104,9 +104,17 @@ class Contracts(unittest.TestCase):
         with self.assertRaises(ValueError):
             C.new_output(out)
 
+    def test_orphan_raw_cannot_be_called_unrun(self):
+        directory, _ = fixture(self.base)
+        orphan = directory / 'normal-30003.json.gz'
+        orphan.write_bytes(gzip.compress(b'{}\n'))
+        with self.assertRaisesRegex(ValueError, 'Unregistered or missing raw artifacts'):
+            admit(directory, C.sha(directory / 'manifest.json'), GAME, POOL,
+                  Evidence(C.new_output(self.base / 'orphan-rejected')))
+
     def test_frozen_rejects_running_partial_plan_source_and_hash(self):
         directory, original = fixture(self.base)
-        edits = [lambda m: m.update(status='running'), lambda m: m.pop('finishedAt'),
+        edits = [lambda m: m.update(status='running'), lambda m: m.update(status='failed'), lambda m: m.pop('finishedAt'),
                  lambda m: m['games'].pop(), lambda m: m['games'][0].update(seed=90001),
                  lambda m: m.update(status='complete'),
                  lambda m: m['sourceSHA256'].update({'/bad/source.py': '0' * 64}),
