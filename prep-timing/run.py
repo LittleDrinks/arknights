@@ -171,11 +171,22 @@ def game_job(row, model, ckpt, game, out, deadline, byte_limit, pool_manifest, p
     return result, inventory(directory)
 
 
+def seal_manifest(out):
+    C.require(out.is_dir() and not out.is_symlink(), 'Output root directory symlink/replacement')
+    stat = out.stat()
+    return {**file_identity(out / 'manifest.json'), 'directoryDevice': stat.st_dev, 'directoryInode': stat.st_ino}
+
+
 def audit_evidence(out, rows, seals, manifest_identity, byte_limit, deadline=math.inf):
     C.require(time.monotonic() < deadline, 'Evidence audit deadline')
+    C.require(out.is_dir() and not out.is_symlink(), 'Output root directory symlink/replacement')
+    stat = out.stat()
+    C.require((stat.st_dev, stat.st_ino) == (manifest_identity['directoryDevice'], manifest_identity['directoryInode']),
+              'Output root directory identity drift')
     expected_names = {'manifest.json'} | set(seals)
     C.require({p.name for p in out.iterdir()} == expected_names, 'Run file/directory set drift')
-    C.require(file_identity(out / 'manifest.json', deadline) == manifest_identity, 'Manifest SHA/size drift')
+    C.require(file_identity(out / 'manifest.json', deadline) ==
+              {k: manifest_identity[k] for k in ('bytes', 'sha256')}, 'Manifest SHA/size drift')
     by_id = {r['id']: r for r in rows}
     for ident, recorded in seals.items():
         C.require((out / ident).is_dir() and not (out / ident).is_symlink(),
@@ -254,7 +265,7 @@ def execute(args):
         C.require(all(c['schema'] == game['schema'] for _, c in loaded.values()), 'Game/checkpoint schema mismatch')
         manifest.update(source=source, models=identities, game=game)
         write_new(out / 'manifest.json', manifest)
-        manifest_identity = file_identity(out / 'manifest.json')
+        manifest_identity = seal_manifest(out)
         pool_manifest = C.digest(json.dumps(C.parse((CODE / 'coop/pool.json').read_bytes()), separators=(',', ':')).encode())
         for i, row in enumerate(rows):
             C.require(time.monotonic() < deadline, 'Total evaluation deadline')
@@ -279,7 +290,7 @@ def execute(args):
         if manifest_identity is None and not (out / 'manifest.json').exists():
             manifest.update(admissionFailed=True, error=error)
             write_new(out / 'manifest.json', manifest)
-            manifest_identity = file_identity(out / 'manifest.json')
+            manifest_identity = seal_manifest(out)
         for row in rows:
             if row['status'] == 'unrun' and (out / row['id']).exists():
                 row.update(status='failed', error='Interrupted before evidence seal: ' + error)

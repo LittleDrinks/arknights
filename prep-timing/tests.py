@@ -141,7 +141,7 @@ class Contracts(unittest.TestCase):
         rows = R.schedule()
         rows[0], seal, _ = self.job()
         R.write_new(self.out / 'manifest.json', {'games': R.schedule()})
-        return rows, {rows[0]['id']: seal}, R.file_identity(self.out / 'manifest.json')
+        return rows, {rows[0]['id']: seal}, R.seal_manifest(self.out)
 
     def test_exact_128_schedule_and_counts(self):
         rows, seals = R.schedule(), {}
@@ -149,7 +149,7 @@ class Contracts(unittest.TestCase):
         self.assertEqual({r['seed'] for r in rows}, set(range(1, 17)))
         self.assertNotIn(90001, {r['seed'] for r in rows})
         R.write_new(self.out / 'manifest.json', {'games': copy.deepcopy(rows)})
-        manifest = R.file_identity(self.out / 'manifest.json')
+        manifest = R.seal_manifest(self.out)
         for i, row in enumerate(rows):
             rows[i], seals[row['id']], model = self.job(row)
             self.assertEqual(model.calls, 1)
@@ -173,7 +173,7 @@ class Contracts(unittest.TestCase):
             self.assertEqual(rows[i]['status'], 'stopped' if mode == 'stop' else 'failed')
             self.assertFalse(rows[i]['eof'])
             self.assertIn('result.json', seals[rows[i]['id']])
-        result = R.finalize(rows, self.out, seals, R.file_identity(self.out / 'manifest.json'), R.MIB, lambda: None)
+        result = R.finalize(rows, self.out, seals, R.seal_manifest(self.out), R.MIB, lambda: None)
         self.assertEqual(result['integrity'], 'verified')
         self.assertEqual((result['denominator'], result['stopped'], result['failed'], result['unrun'], result['teamWins']),
                          (128, 1, 6, 121, 0))
@@ -199,7 +199,7 @@ class Contracts(unittest.TestCase):
 
     def test_evidence_tamper_revokes_all_success_credit(self):
         mutations = ('raw', 'action', 'terminal', 'result', 'result-files', 'manifest',
-                     'add', 'delete', 'empty-dir', 'root-add', 'symlink', 'episode-symlink', 'same-size')
+                     'add', 'delete', 'empty-dir', 'root-add', 'symlink', 'episode-symlink', 'root-symlink', 'root-replaced', 'same-size')
         for mutation in mutations:
             with self.subTest(mutation=mutation):
                 d = self.out / mutation
@@ -209,7 +209,7 @@ class Contracts(unittest.TestCase):
                 for i in range(2):
                     rows[i], seals[rows[i]['id']], _ = self.job(rows[i], out=d)
                 R.write_new(d / 'manifest.json', {'games': R.schedule()})
-                md = R.file_identity(d / 'manifest.json')
+                md = R.seal_manifest(d)
                 episode = d / rows[0]['id']
                 names = dict(raw='protocol.jsonl', action='actions.jsonl', terminal='terminal.json', result='result.json')
                 if mutation in names:
@@ -232,6 +232,14 @@ class Contracts(unittest.TestCase):
                     (d / 'extra').mkdir()
                 elif mutation == 'symlink':
                     (episode / 'extra').symlink_to(episode / 'terminal.json')
+                elif mutation in ('root-symlink', 'root-replaced'):
+                    moved = self.out / ('moved-' + mutation)
+                    d.rename(moved)
+                    if mutation == 'root-symlink':
+                        d.symlink_to(moved, target_is_directory=True)
+                    else:
+                        import shutil
+                        shutil.copytree(moved, d)
                 elif mutation == 'episode-symlink':
                     moved = self.out / ('moved-' + mutation)
                     episode.rename(moved)
