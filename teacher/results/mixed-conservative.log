@@ -1,0 +1,35 @@
+(node:951565) ExperimentalWarning: `--experimental-loader` may be removed in the future; instead use `register()`:
+--import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("/home/q2635/research/stronghold-agent-2026-10-17/experiment-teacher/teacher/loader.mjs", pathToFileURL("./"));'
+(Use `node --trace-warnings ...` to show where the warning was created)
+solo:ABYSS seed 1: loss rounds 13 lp 7 · 1680 ms
+solo:ABYSS seed 2: loss rounds 7 lp 0 · 511 ms
+solo:ABYSS seed 3: loss rounds 13 lp 24 · 1797 ms
+solo:ABYSS seed 4: loss rounds 9 lp 0 · 676 ms
+
+| config | run | matches | wins | rounds passed | LP left | reached boss | leaks/match | bounties (leaked) | funds lost/prep | merges/bot | errors |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| solo:ABYSS | run | 4 | 0 (0 %) | 10.50 | 7.8 | 2 | 29.0 | 8 (0) | 0.70 | 2.25 | 0 |
+
+| config | run | shop level R4/7/10/13 | board value R4/7/10/13 | Σ bond tiers | activated layers | elites deployed |
+|---|---|---|---|---|---|---|
+| solo:ABYSS | run | 2.0 / 3.8 / 5.0 / 5.5 | 19.0 / 25.5 / 28.0 / 32.0 | 2.5 / 3.8 / 5.0 / 6.5 | 10 / 30 / 126 / 242 | 0.5 / 1.5 / 1.5 / 1.5 |
+
+| config | run | leaks per alive bot and round R1…R15 |
+|---|---|---|
+| solo:ABYSS | run | 1:0.3 2:0.0 3:0.3 4:0.0 5:1.3 6:2.8 7:3.0 8:4.3 9:3.7 10:2.7 11:3.5 12:8.0 13:11.0 14:2.5 |
+
+| run | bounty kill-chance estimate (bot.bountyKillChance) → share of bounty enemies actually killed, picks per bin |
+|---|---|
+| run | p 0.2–0.5: 100 % (3) · p 0.5–0.8: 100 % (3) · p 0.8–0.95: 100 % (1) · p 0.95–1: 100 % (1) |
+
+| config | run | bounty picks | p < 0.5 picked while a p ≥ 0.5 card was offered | drafts with no card p ≥ 0.5 |
+|---|---|---|---|---|
+| solo:ABYSS | run | 8 | 0 | 3 |
+
+| config | run | bot preps | prep CPU ms p50 / p95 | heuristics CPU ms p50 / p95 | Σ prep CPU s | Σ heuristics CPU s | per match: prep CPU s |
+|---|---|---|---|---|---|---|---|
+| solo:ABYSS | run | 46 | 34.5 / 97.7 | 34.5 / 97.7 | 1.9 | 1.9 | 0.47 |
+
+| config | run | bot preps | prep ms p50 / p95 | heuristics ms p50 / p95 | rehearsal ms p50 / p95 | R1–R10 preps: prep / heuristics p50 / p95 | 机变 pick ms p50 / p95 (n) | match wall s |
+|---|---|---|---|---|---|---|---|---|
+| solo:ABYSS | run | 46 | 26.3 / 63.7 | 26.3 / 63.7 | 0.0 / 0.0 | 38: 19.0 / 54.7 · 19.0 / 54.7 | 0.47 / 1.47 (9) | 4.7 |

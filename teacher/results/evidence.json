@@ -1,0 +1,1979 @@
+{
+  "kind": "natural botbench evidence; no constructed game state",
+  "engineCommit": "6ab2468279e926d107788f63d7fe219b85f67b4a",
+  "sourceHashes": {
+    "loader.mjs": "5320662f5de5075469e15c6e54640118800339693cec6fd67c28e8768c915e7e",
+    "policy.mjs": "f8439ec084b7ee87a9556d4c49ac5cc06e9640f0be7f14c7edb2fae4405a1988",
+    "observe.mjs": "c6f0c085b6820b307ac8ed920dc35397d0b8655d7f91d71678c3599d0cd05d92"
+  },
+  "elapsedSeconds": 43.49495157500132,
+  "peakChildRSSBytes": 333844480,
+  "budgetAudit": "passed for all captured teacher preps",
+  "cases": [
+    {
+      "variant": "off",
+      "budget": "conservative",
+      "games": 4,
+      "wins": 0,
+      "errors": 0,
+      "rounds": [
+        13,
+        12,
+        11,
+        13
+      ],
+      "macroActions": {
+        "refresh": 0,
+        "acquire": 0,
+        "lappland": 0
+      },
+      "macroSeeds": [],
+      "coreBuys": 1,
+      "threeBondsActive": []
+    },
+    {
+      "variant": "mixed",
+      "budget": "aggressive",
+      "games": 4,
+      "wins": 0,
+      "errors": 0,
+      "rounds": [
+        13,
+        8,
+        13,
+        10
+      ],
+      "macroActions": {
+        "refresh": 43,
+        "acquire": 9,
+        "lappland": 0
+      },
+      "macroSeeds": [
+        1,
+        3,
+        4
+      ],
+      "coreBuys": 13,
+      "threeBondsActive": [
+        [
+          1,
+          12
+        ],
+        [
+          1,
+          13
+        ],
+        [
+          1,
+          14
+        ],
+        [
+          2,
+          9
+        ],
+        [
+          3,
+          10
+        ],
+        [
+          3,
+          11
+        ],
+        [
+          3,
+          12
+        ],
+        [
+          3,
+          13
+        ],
+        [
+          3,
+          14
+        ],
+        [
+          4,
+          9
+        ],
+        [
+          4,
+          10
+        ],
+        [
+          4,
+          11
+        ]
+      ]
+    },
+    {
+      "variant": "refresh",
+      "budget": "conservative",
+      "games": 4,
+      "wins": 0,
+      "errors": 0,
+      "rounds": [
+        13,
+        10,
+        13,
+        11
+      ],
+      "macroActions": {
+        "refresh": 52,
+        "acquire": 0,
+        "lappland": 0
+      },
+      "macroSeeds": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "coreBuys": 15,
+      "threeBondsActive": []
+    },
+    {
+      "variant": "acquire",
+      "budget": "conservative",
+      "games": 4,
+      "wins": 0,
+      "errors": 0,
+      "rounds": [
+        12,
+        9,
+        13,
+        12
+      ],
+      "macroActions": {
+        "refresh": 0,
+        "acquire": 24,
+        "lappland": 0
+      },
+      "macroSeeds": [
+        1,
+        3,
+        4
+      ],
+      "coreBuys": 8,
+      "threeBondsActive": []
+    },
+    {
+      "variant": "refresh",
+      "budget": "aggressive",
+      "games": 4,
+      "wins": 0,
+      "errors": 0,
+      "rounds": [
+        13,
+        10,
+        13,
+        11
+      ],
+      "macroActions": {
+        "refresh": 53,
+        "acquire": 0,
+        "lappland": 0
+      },
+      "macroSeeds": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "coreBuys": 15,
+      "threeBondsActive": []
+    },
+    {
+      "variant": "acquire",
+      "budget": "aggressive",
+      "games": 4,
+      "wins": 0,
+      "errors": 0,
+      "rounds": [
+        13,
+        9,
+        13,
+        11
+      ],
+      "macroActions": {
+        "refresh": 0,
+        "acquire": 41,
+        "lappland": 0
+      },
+      "macroSeeds": [
+        1,
+        3,
+        4
+      ],
+      "coreBuys": 8,
+      "threeBondsActive": []
+    },
+    {
+      "variant": "mixed",
+      "budget": "conservative",
+      "games": 4,
+      "wins": 0,
+      "errors": 0,
+      "rounds": [
+        13,
+        7,
+        13,
+        9
+      ],
+      "macroActions": {
+        "refresh": 39,
+        "acquire": 2,
+        "lappland": 0
+      },
+      "macroSeeds": [
+        1,
+        3,
+        4
+      ],
+      "coreBuys": 12,
+      "threeBondsActive": [
+        [
+          1,
+          12
+        ],
+        [
+          1,
+          13
+        ],
+        [
+          1,
+          14
+        ],
+        [
+          3,
+          10
+        ],
+        [
+          3,
+          11
+        ],
+        [
+          3,
+          12
+        ],
+        [
+          3,
+          13
+        ],
+        [
+          3,
+          14
+        ],
+        [
+          4,
+          9
+        ],
+        [
+          4,
+          10
+        ]
+      ]
+    }
+  ],
+  "witness": {
+    "file": "mixed-aggressive-trace.json",
+    "seed": 3,
+    "purchase": {
+      "round": 9,
+      "pid": "ai_0",
+      "id": "chess_char_4_10_a",
+      "uid": 30,
+      "price": 3,
+      "funds": 3
+    },
+    "round9": {
+      "round": 9,
+      "pid": "ai_0",
+      "before": {
+        "funds": 0,
+        "level": 4,
+        "refreshes": 3,
+        "gainedChess": 3,
+        "bonds": {
+          "siracusaShip": {
+            "count": 2,
+            "active": false,
+            "tier": 0,
+            "layers": 6
+          },
+          "arcaneShip": {
+            "count": 2,
+            "active": true,
+            "tier": 1,
+            "layers": 8
+          },
+          "yanShip": {
+            "count": 3,
+            "active": true,
+            "tier": 1,
+            "layers": 11
+          }
+        },
+        "board": [
+          {
+            "uid": 18,
+            "id": "chess_char_1_17_b",
+            "items": [
+              "chess_item_1_01_e_a",
+              "chess_item_1_02_e_a"
+            ]
+          },
+          {
+            "uid": 20,
+            "id": "chess_char_3_03_a",
+            "items": [
+              "chess_item_4_02_e_b"
+            ]
+          },
+          {
+            "uid": 30,
+            "id": "chess_char_4_10_a",
+            "items": []
+          },
+          {
+            "uid": 15,
+            "id": "chess_char_3_04_a",
+            "items": []
+          },
+          {
+            "uid": 29,
+            "id": "chess_char_4_17_a",
+            "items": []
+          },
+          {
+            "uid": 1,
+            "id": "chess_char_1_08_a",
+            "items": []
+          },
+          {
+            "uid": 28,
+            "id": "chess_char_4_20_a",
+            "items": []
+          },
+          {
+            "uid": 19,
+            "id": "chess_char_5_02_a",
+            "items": []
+          }
+        ],
+        "hand": [
+          {
+            "uid": 22,
+            "id": "chess_char_2_02_a"
+          },
+          {
+            "uid": 11,
+            "id": "chess_char_2_10_a"
+          },
+          {
+            "uid": 4,
+            "id": "chess_char_1_19_a"
+          },
+          {
+            "uid": 14,
+            "id": "chess_char_1_03_a"
+          },
+          {
+            "uid": 9,
+            "id": "chess_char_1_04_a"
+          },
+          {
+            "uid": 3,
+            "id": "chess_char_1_08_a"
+          },
+          {
+            "uid": 16,
+            "id": "chess_char_1_19_a"
+          },
+          {
+            "uid": 8,
+            "id": "chess_char_1_04_a"
+          }
+        ]
+      },
+      "after": {
+        "funds": 0,
+        "level": 4,
+        "refreshes": 3,
+        "gainedChess": 3,
+        "bonds": {
+          "siracusaShip": {
+            "count": 2,
+            "active": false,
+            "tier": 0,
+            "layers": 6
+          },
+          "arcaneShip": {
+            "count": 2,
+            "active": true,
+            "tier": 1,
+            "layers": 14
+          },
+          "yanShip": {
+            "count": 3,
+            "active": true,
+            "tier": 1,
+            "layers": 11
+          }
+        },
+        "board": [
+          {
+            "uid": 18,
+            "id": "chess_char_1_17_b",
+            "items": [
+              "chess_item_1_01_e_a",
+              "chess_item_1_02_e_a"
+            ]
+          },
+          {
+            "uid": 20,
+            "id": "chess_char_3_03_a",
+            "items": [
+              "chess_item_4_02_e_b"
+            ]
+          },
+          {
+            "uid": 30,
+            "id": "chess_char_4_10_a",
+            "items": []
+          },
+          {
+            "uid": 15,
+            "id": "chess_char_3_04_a",
+            "items": []
+          },
+          {
+            "uid": 29,
+            "id": "chess_char_4_17_a",
+            "items": []
+          },
+          {
+            "uid": 1,
+            "id": "chess_char_1_08_a",
+            "items": []
+          },
+          {
+            "uid": 28,
+            "id": "chess_char_4_20_a",
+            "items": []
+          },
+          {
+            "uid": 19,
+            "id": "chess_char_5_02_a",
+            "items": []
+          }
+        ],
+        "hand": [
+          {
+            "uid": 22,
+            "id": "chess_char_2_02_a"
+          },
+          {
+            "uid": 11,
+            "id": "chess_char_2_10_a"
+          },
+          {
+            "uid": 4,
+            "id": "chess_char_1_19_a"
+          },
+          {
+            "uid": 14,
+            "id": "chess_char_1_03_a"
+          },
+          {
+            "uid": 9,
+            "id": "chess_char_1_04_a"
+          },
+          {
+            "uid": 3,
+            "id": "chess_char_1_08_a"
+          },
+          {
+            "uid": 16,
+            "id": "chess_char_1_19_a"
+          },
+          {
+            "uid": 8,
+            "id": "chess_char_1_04_a"
+          }
+        ]
+      },
+      "teacher": {
+        "round": 9,
+        "setupCost": 3,
+        "setupBuys": 1,
+        "attempted": 1,
+        "purchases": 0,
+        "cost": 1,
+        "failed": false,
+        "phases": [
+          "begin",
+          "tail"
+        ],
+        "buys": [
+          {
+            "slot": 0,
+            "id": "chess_char_4_10_a",
+            "price": 3,
+            "fundsBefore": 6,
+            "fundsAfter": 3,
+            "result": {
+              "ok": true
+            }
+          }
+        ],
+        "macros": [
+          {
+            "phase": "begin",
+            "enabled": {
+              "refresh": true,
+              "acquire": true,
+              "lappland": true
+            },
+            "before": {
+              "funds": 13,
+              "freeRefreshes": 0,
+              "refreshes": 0,
+              "gainedChess": 0,
+              "spent": 0,
+              "layers": {
+                "arcaneShip": 8,
+                "preciShip": 49,
+                "kazimierzShip": 4,
+                "swiftShip": 4,
+                "soloShip": 6,
+                "siracusaShip": 6,
+                "yanShip": 3,
+                "visiShip": 2
+              },
+              "boardUids": [
+                18,
+                11,
+                14,
+                19,
+                22,
+                20,
+                15,
+                1,
+                26
+              ]
+            },
+            "after": {
+              "funds": 13,
+              "freeRefreshes": 0,
+              "refreshes": 0,
+              "gainedChess": 0,
+              "spent": 0,
+              "layers": {
+                "arcaneShip": 8,
+                "preciShip": 49,
+                "kazimierzShip": 4,
+                "swiftShip": 4,
+                "soloShip": 6,
+                "siracusaShip": 6,
+                "yanShip": 3,
+                "visiShip": 2
+              },
+              "boardUids": [
+                18,
+                11,
+                14,
+                19,
+                22,
+                20,
+                15,
+                1,
+                26
+              ]
+            },
+            "attempted": 0,
+            "accepted": 0,
+            "spent": 0,
+            "credited": 0,
+            "netCost": 0,
+            "projectedLayerGain": 0,
+            "observedLayerDelta": {
+              "arcaneShip": 0,
+              "preciShip": 0,
+              "kazimierzShip": 0,
+              "swiftShip": 0,
+              "soloShip": 0,
+              "siracusaShip": 0,
+              "yanShip": 0,
+              "visiShip": 0
+            },
+            "triggeredModules": [],
+            "actions": [],
+            "stopReason": "complete",
+            "modules": {
+              "refresh": {
+                "attempted": 0,
+                "accepted": 0,
+                "netCost": 0,
+                "stopReason": "no-marginal-layers"
+              },
+              "acquire": {
+                "attempted": 0,
+                "accepted": 0,
+                "netCost": 0,
+                "stopReason": "no-marginal-layers"
+              },
+              "lappland": {
+                "attempted": 0,
+                "accepted": 0,
+                "netCost": 0,
+                "stopReason": "inactive-bond"
+              }
+            }
+          },
+          {
+            "phase": "tail",
+            "enabled": {
+              "refresh": true,
+              "acquire": true,
+              "lappland": true
+            },
+            "before": {
+              "funds": 1,
+              "freeRefreshes": 0,
+              "refreshes": 2,
+              "gainedChess": 3,
+              "spent": 12,
+              "layers": {
+                "arcaneShip": 8,
+                "preciShip": 49,
+                "kazimierzShip": 4,
+                "swiftShip": 4,
+                "soloShip": 6,
+                "siracusaShip": 6,
+                "yanShip": 11,
+                "visiShip": 2
+              },
+              "boardUids": [
+                18,
+                20,
+                30,
+                15,
+                29,
+                1,
+                28,
+                19
+              ]
+            },
+            "after": {
+              "funds": 0,
+              "freeRefreshes": 0,
+              "refreshes": 3,
+              "gainedChess": 3,
+              "spent": 13,
+              "layers": {
+                "arcaneShip": 8,
+                "preciShip": 49,
+                "kazimierzShip": 4,
+                "swiftShip": 4,
+                "soloShip": 6,
+                "siracusaShip": 6,
+                "yanShip": 11,
+                "visiShip": 2
+              },
+              "boardUids": [
+                18,
+                20,
+                30,
+                15,
+                29,
+                1,
+                28,
+                19
+              ]
+            },
+            "attempted": 1,
+            "accepted": 1,
+            "spent": 1,
+            "credited": 0,
+            "netCost": 1,
+            "projectedLayerGain": 2,
+            "observedLayerDelta": {
+              "arcaneShip": 0,
+              "preciShip": 0,
+              "kazimierzShip": 0,
+              "swiftShip": 0,
+              "soloShip": 0,
+              "siracusaShip": 0,
+              "yanShip": 0,
+              "visiShip": 0
+            },
+            "triggeredModules": [
+              "refresh"
+            ],
+            "actions": [
+              {
+                "module": "refresh",
+                "action": "refresh",
+                "accepted": true,
+                "result": {
+                  "ok": true
+                },
+                "before": {
+                  "funds": 1,
+                  "freeRefreshes": 0,
+                  "refreshes": 2,
+                  "gainedChess": 3,
+                  "spent": 12,
+                  "layers": {
+                    "arcaneShip": 8,
+                    "preciShip": 49,
+                    "kazimierzShip": 4,
+                    "swiftShip": 4,
+                    "soloShip": 6,
+                    "siracusaShip": 6,
+                    "yanShip": 11,
+                    "visiShip": 2
+                  },
+                  "boardUids": [
+                    18,
+                    20,
+                    30,
+                    15,
+                    29,
+                    1,
+                    28,
+                    19
+                  ]
+                },
+                "after": {
+                  "funds": 0,
+                  "freeRefreshes": 0,
+                  "refreshes": 3,
+                  "gainedChess": 3,
+                  "spent": 13,
+                  "layers": {
+                    "arcaneShip": 8,
+                    "preciShip": 49,
+                    "kazimierzShip": 4,
+                    "swiftShip": 4,
+                    "soloShip": 6,
+                    "siracusaShip": 6,
+                    "yanShip": 11,
+                    "visiShip": 2
+                  },
+                  "boardUids": [
+                    18,
+                    20,
+                    30,
+                    15,
+                    29,
+                    1,
+                    28,
+                    19
+                  ]
+                },
+                "spent": 1,
+                "netCost": 1
+              }
+            ],
+            "stopReason": "complete",
+            "modules": {
+              "refresh": {
+                "attempted": 1,
+                "accepted": 1,
+                "netCost": 1,
+                "stopReason": "refresh-cap"
+              },
+              "acquire": {
+                "attempted": 0,
+                "accepted": 0,
+                "netCost": 0,
+                "stopReason": "no-marginal-layers"
+              },
+              "lappland": {
+                "attempted": 0,
+                "accepted": 0,
+                "netCost": 0,
+                "stopReason": "inactive-bond"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "round10": {
+      "round": 10,
+      "pid": "ai_0",
+      "before": {
+        "funds": 0,
+        "level": 5,
+        "refreshes": 3,
+        "gainedChess": 1,
+        "bonds": {
+          "siracusaShip": {
+            "count": 3,
+            "active": true,
+            "tier": 1,
+            "layers": 6
+          },
+          "arcaneShip": {
+            "count": 2,
+            "active": true,
+            "tier": 1,
+            "layers": 14
+          },
+          "yanShip": {
+            "count": 3,
+            "active": true,
+            "tier": 1,
+            "layers": 11
+          }
+        },
+        "board": [
+          {
+            "uid": 18,
+            "id": "chess_char_1_17_b",
+            "items": [
+              "chess_item_1_01_e_a",
+              "chess_item_1_02_e_a"
+            ]
+          },
+          {
+            "uid": 30,
+            "id": "chess_char_4_10_a",
+            "items": []
+          },
+          {
+            "uid": 32,
+            "id": "chess_char_3_19_a",
+            "items": []
+          },
+          {
+            "uid": 15,
+            "id": "chess_char_3_04_a",
+            "items": []
+          },
+          {
+            "uid": 29,
+            "id": "chess_char_4_17_a",
+            "items": []
+          },
+          {
+            "uid": 1,
+            "id": "chess_char_1_08_a",
+            "items": []
+          },
+          {
+            "uid": 20,
+            "id": "chess_char_3_03_a",
+            "items": [
+              "chess_item_4_02_e_b",
+              "chess_item_4_04_e_a"
+            ]
+          },
+          {
+            "uid": 19,
+            "id": "chess_char_5_02_a",
+            "items": []
+          }
+        ],
+        "hand": [
+          {
+            "uid": 4,
+            "id": "chess_char_1_19_a"
+          },
+          {
+            "uid": 14,
+            "id": "chess_char_1_03_a"
+          },
+          {
+            "uid": 9,
+            "id": "chess_char_1_04_a"
+          },
+          {
+            "uid": 3,
+            "id": "chess_char_1_08_a"
+          },
+          {
+            "uid": 16,
+            "id": "chess_char_1_19_a"
+          },
+          {
+            "uid": 8,
+            "id": "chess_char_1_04_a"
+          },
+          {
+            "uid": 28,
+            "id": "chess_char_4_20_a"
+          }
+        ]
+      },
+      "after": {
+        "funds": 0,
+        "level": 5,
+        "refreshes": 3,
+        "gainedChess": 1,
+        "bonds": {
+          "siracusaShip": {
+            "count": 3,
+            "active": true,
+            "tier": 1,
+            "layers": 12
+          },
+          "arcaneShip": {
+            "count": 2,
+            "active": true,
+            "tier": 1,
+            "layers": 20
+          },
+          "yanShip": {
+            "count": 3,
+            "active": true,
+            "tier": 1,
+            "layers": 11
+          }
+        },
+        "board": [
+          {
+            "uid": 18,
+            "id": "chess_char_1_17_b",
+            "items": [
+              "chess_item_1_01_e_a",
+              "chess_item_1_02_e_a"
+            ]
+          },
+          {
+            "uid": 30,
+            "id": "chess_char_4_10_a",
+            "items": []
+          },
+          {
+            "uid": 32,
+            "id": "chess_char_3_19_a",
+            "items": []
+          },
+          {
+            "uid": 15,
+            "id": "chess_char_3_04_a",
+            "items": []
+          },
+          {
+            "uid": 29,
+            "id": "chess_char_4_17_a",
+            "items": []
+          },
+          {
+            "uid": 1,
+            "id": "chess_char_1_08_a",
+            "items": []
+          },
+          {
+            "uid": 20,
+            "id": "chess_char_3_03_a",
+            "items": [
+              "chess_item_4_02_e_b",
+              "chess_item_4_04_e_a"
+            ]
+          },
+          {
+            "uid": 19,
+            "id": "chess_char_5_02_a",
+            "items": []
+          }
+        ],
+        "hand": [
+          {
+            "uid": 4,
+            "id": "chess_char_1_19_a"
+          },
+          {
+            "uid": 14,
+            "id": "chess_char_1_03_a"
+          },
+          {
+            "uid": 9,
+            "id": "chess_char_1_04_a"
+          },
+          {
+            "uid": 3,
+            "id": "chess_char_1_08_a"
+          },
+          {
+            "uid": 16,
+            "id": "chess_char_1_19_a"
+          },
+          {
+            "uid": 8,
+            "id": "chess_char_1_04_a"
+          },
+          {
+            "uid": 28,
+            "id": "chess_char_4_20_a"
+          }
+        ]
+      },
+      "teacher": {
+        "round": 10,
+        "setupCost": 3,
+        "setupBuys": 1,
+        "attempted": 3,
+        "purchases": 0,
+        "cost": 3,
+        "failed": false,
+        "phases": [
+          "begin",
+          "tail"
+        ],
+        "buys": [
+          {
+            "slot": 0,
+            "id": "chess_char_3_19_a",
+            "price": 3,
+            "fundsBefore": 16,
+            "fundsAfter": 13,
+            "result": {
+              "ok": true
+            }
+          }
+        ],
+        "macros": [
+          {
+            "phase": "begin",
+            "enabled": {
+              "refresh": true,
+              "acquire": true,
+              "lappland": true
+            },
+            "before": {
+              "funds": 13,
+              "freeRefreshes": 0,
+              "refreshes": 0,
+              "gainedChess": 1,
+              "spent": 3,
+              "layers": {
+                "arcaneShip": 14,
+                "preciShip": 58,
+                "kazimierzShip": 4,
+                "swiftShip": 4,
+                "soloShip": 6,
+                "siracusaShip": 6,
+                "yanShip": 11,
+                "visiShip": 2
+              },
+              "boardUids": [
+                18,
+                20,
+                15,
+                29,
+                1,
+                30,
+                32,
+                19,
+                33
+              ]
+            },
+            "after": {
+              "funds": 10,
+              "freeRefreshes": 0,
+              "refreshes": 3,
+              "gainedChess": 1,
+              "spent": 6,
+              "layers": {
+                "arcaneShip": 14,
+                "preciShip": 58,
+                "kazimierzShip": 4,
+                "swiftShip": 4,
+                "soloShip": 6,
+                "siracusaShip": 6,
+                "yanShip": 11,
+                "visiShip": 2
+              },
+              "boardUids": [
+                18,
+                20,
+                15,
+                29,
+                1,
+                30,
+                32,
+                19,
+                33
+              ]
+            },
+            "attempted": 3,
+            "accepted": 3,
+            "spent": 3,
+            "credited": 0,
+            "netCost": 3,
+            "projectedLayerGain": 12,
+            "observedLayerDelta": {
+              "arcaneShip": 0,
+              "preciShip": 0,
+              "kazimierzShip": 0,
+              "swiftShip": 0,
+              "soloShip": 0,
+              "siracusaShip": 0,
+              "yanShip": 0,
+              "visiShip": 0
+            },
+            "triggeredModules": [
+              "refresh"
+            ],
+            "actions": [
+              {
+                "module": "refresh",
+                "action": "refresh",
+                "accepted": true,
+                "result": {
+                  "ok": true
+                },
+                "before": {
+                  "funds": 13,
+                  "freeRefreshes": 0,
+                  "refreshes": 0,
+                  "gainedChess": 1,
+                  "spent": 3,
+                  "layers": {
+                    "arcaneShip": 14,
+                    "preciShip": 58,
+                    "kazimierzShip": 4,
+                    "swiftShip": 4,
+                    "soloShip": 6,
+                    "siracusaShip": 6,
+                    "yanShip": 11,
+                    "visiShip": 2
+                  },
+                  "boardUids": [
+                    18,
+                    20,
+                    15,
+                    29,
+                    1,
+                    30,
+                    32,
+                    19,
+                    33
+                  ]
+                },
+                "after": {
+                  "funds": 12,
+                  "freeRefreshes": 0,
+                  "refreshes": 1,
+                  "gainedChess": 1,
+                  "spent": 4,
+                  "layers": {
+                    "arcaneShip": 14,
+                    "preciShip": 58,
+                    "kazimierzShip": 4,
+                    "swiftShip": 4,
+                    "soloShip": 6,
+                    "siracusaShip": 6,
+                    "yanShip": 11,
+                    "visiShip": 2
+                  },
+                  "boardUids": [
+                    18,
+                    20,
+                    15,
+                    29,
+                    1,
+                    30,
+                    32,
+                    19,
+                    33
+                  ]
+                },
+                "spent": 1,
+                "netCost": 1
+              },
+              {
+                "module": "refresh",
+                "action": "refresh",
+                "accepted": true,
+                "result": {
+                  "ok": true
+                },
+                "before": {
+                  "funds": 12,
+                  "freeRefreshes": 0,
+                  "refreshes": 1,
+                  "gainedChess": 1,
+                  "spent": 4,
+                  "layers": {
+                    "arcaneShip": 14,
+                    "preciShip": 58,
+                    "kazimierzShip": 4,
+                    "swiftShip": 4,
+                    "soloShip": 6,
+                    "siracusaShip": 6,
+                    "yanShip": 11,
+                    "visiShip": 2
+                  },
+                  "boardUids": [
+                    18,
+                    20,
+                    15,
+                    29,
+                    1,
+                    30,
+                    32,
+                    19,
+                    33
+                  ]
+                },
+                "after": {
+                  "funds": 11,
+                  "freeRefreshes": 0,
+                  "refreshes": 2,
+                  "gainedChess": 1,
+                  "spent": 5,
+                  "layers": {
+                    "arcaneShip": 14,
+                    "preciShip": 58,
+                    "kazimierzShip": 4,
+                    "swiftShip": 4,
+                    "soloShip": 6,
+                    "siracusaShip": 6,
+                    "yanShip": 11,
+                    "visiShip": 2
+                  },
+                  "boardUids": [
+                    18,
+                    20,
+                    15,
+                    29,
+                    1,
+                    30,
+                    32,
+                    19,
+                    33
+                  ]
+                },
+                "spent": 1,
+                "netCost": 1
+              },
+              {
+                "module": "refresh",
+                "action": "refresh",
+                "accepted": true,
+                "result": {
+                  "ok": true
+                },
+                "before": {
+                  "funds": 11,
+                  "freeRefreshes": 0,
+                  "refreshes": 2,
+                  "gainedChess": 1,
+                  "spent": 5,
+                  "layers": {
+                    "arcaneShip": 14,
+                    "preciShip": 58,
+                    "kazimierzShip": 4,
+                    "swiftShip": 4,
+                    "soloShip": 6,
+                    "siracusaShip": 6,
+                    "yanShip": 11,
+                    "visiShip": 2
+                  },
+                  "boardUids": [
+                    18,
+                    20,
+                    15,
+                    29,
+                    1,
+                    30,
+                    32,
+                    19,
+                    33
+                  ]
+                },
+                "after": {
+                  "funds": 10,
+                  "freeRefreshes": 0,
+                  "refreshes": 3,
+                  "gainedChess": 1,
+                  "spent": 6,
+                  "layers": {
+                    "arcaneShip": 14,
+                    "preciShip": 58,
+                    "kazimierzShip": 4,
+                    "swiftShip": 4,
+                    "soloShip": 6,
+                    "siracusaShip": 6,
+                    "yanShip": 11,
+                    "visiShip": 2
+                  },
+                  "boardUids": [
+                    18,
+                    20,
+                    15,
+                    29,
+                    1,
+                    30,
+                    32,
+                    19,
+                    33
+                  ]
+                },
+                "spent": 1,
+                "netCost": 1
+              }
+            ],
+            "stopReason": "complete",
+            "modules": {
+              "refresh": {
+                "attempted": 3,
+                "accepted": 3,
+                "netCost": 3,
+                "stopReason": "refresh-cap"
+              },
+              "acquire": {
+                "attempted": 0,
+                "accepted": 0,
+                "netCost": 0,
+                "stopReason": "no-marginal-layers"
+              },
+              "lappland": {
+                "attempted": 0,
+                "accepted": 0,
+                "netCost": 0,
+                "stopReason": "no-cheap-lappland"
+              }
+            }
+          },
+          {
+            "phase": "tail",
+            "enabled": {
+              "refresh": true,
+              "acquire": true,
+              "lappland": true
+            },
+            "before": {
+              "funds": 0,
+              "freeRefreshes": 0,
+              "refreshes": 3,
+              "gainedChess": 1,
+              "spent": 16,
+              "layers": {
+                "arcaneShip": 14,
+                "preciShip": 58,
+                "kazimierzShip": 4,
+                "swiftShip": 4,
+                "soloShip": 6,
+                "siracusaShip": 6,
+                "yanShip": 11,
+                "visiShip": 2
+              },
+              "boardUids": [
+                18,
+                30,
+                32,
+                15,
+                29,
+                1,
+                20,
+                19,
+                33
+              ]
+            },
+            "after": {
+              "funds": 0,
+              "freeRefreshes": 0,
+              "refreshes": 3,
+              "gainedChess": 1,
+              "spent": 16,
+              "layers": {
+                "arcaneShip": 14,
+                "preciShip": 58,
+                "kazimierzShip": 4,
+                "swiftShip": 4,
+                "soloShip": 6,
+                "siracusaShip": 6,
+                "yanShip": 11,
+                "visiShip": 2
+              },
+              "boardUids": [
+                18,
+                30,
+                32,
+                15,
+                29,
+                1,
+                20,
+                19,
+                33
+              ]
+            },
+            "attempted": 0,
+            "accepted": 0,
+            "spent": 0,
+            "credited": 0,
+            "netCost": 0,
+            "projectedLayerGain": 0,
+            "observedLayerDelta": {
+              "arcaneShip": 0,
+              "preciShip": 0,
+              "kazimierzShip": 0,
+              "swiftShip": 0,
+              "soloShip": 0,
+              "siracusaShip": 0,
+              "yanShip": 0,
+              "visiShip": 0
+            },
+            "triggeredModules": [],
+            "actions": [],
+            "stopReason": "complete",
+            "modules": {
+              "refresh": {
+                "attempted": 0,
+                "accepted": 0,
+                "netCost": 0,
+                "stopReason": "refresh-cap"
+              },
+              "acquire": {
+                "attempted": 0,
+                "accepted": 0,
+                "netCost": 0,
+                "stopReason": "no-marginal-layers"
+              },
+              "lappland": {
+                "attempted": 0,
+                "accepted": 0,
+                "netCost": 0,
+                "stopReason": "no-cheap-lappland"
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "acquireWitness": {
+    "file": "mixed-aggressive-trace.json",
+    "seed": 4,
+    "purchase": {
+      "round": 4,
+      "pid": "ai_0",
+      "id": "chess_char_2_04_a",
+      "uid": 11,
+      "price": 3,
+      "funds": 1
+    },
+    "round6": {
+      "round": 6,
+      "pid": "ai_0",
+      "before": {
+        "funds": 2,
+        "level": 3,
+        "refreshes": 1,
+        "gainedChess": 3,
+        "bonds": {
+          "siracusaShip": {
+            "count": 1,
+            "active": false,
+            "tier": 0,
+            "layers": 0
+          },
+          "arcaneShip": {
+            "count": 1,
+            "active": false,
+            "tier": 0,
+            "layers": 2
+          },
+          "yanShip": {
+            "count": 3,
+            "active": true,
+            "tier": 1,
+            "layers": 3
+          }
+        },
+        "board": [
+          {
+            "uid": 7,
+            "id": "chess_char_1_03_a",
+            "items": []
+          },
+          {
+            "uid": 10,
+            "id": "chess_char_1_07_a",
+            "items": []
+          },
+          {
+            "uid": 1,
+            "id": "chess_char_1_17_a",
+            "items": [
+              "chess_item_1_01_e_a"
+            ]
+          },
+          {
+            "uid": 11,
+            "id": "chess_char_2_04_a",
+            "items": [
+              "chess_item_1_02_e_a"
+            ]
+          },
+          {
+            "uid": 18,
+            "id": "chess_char_2_17_a",
+            "items": []
+          },
+          {
+            "uid": 15,
+            "id": "chess_char_3_03_a",
+            "items": []
+          },
+          {
+            "uid": 14,
+            "id": "chess_char_1_19_b",
+            "items": []
+          },
+          {
+            "uid": 19,
+            "id": "chess_char_3_16_a",
+            "items": []
+          }
+        ],
+        "hand": [
+          {
+            "uid": 2,
+            "id": "chess_char_1_02_a"
+          },
+          {
+            "uid": 3,
+            "id": "chess_char_1_10_a"
+          }
+        ]
+      },
+      "after": {
+        "funds": 2,
+        "level": 3,
+        "refreshes": 1,
+        "gainedChess": 3,
+        "bonds": {
+          "siracusaShip": {
+            "count": 1,
+            "active": false,
+            "tier": 0,
+            "layers": 0
+          },
+          "arcaneShip": {
+            "count": 1,
+            "active": false,
+            "tier": 0,
+            "layers": 2
+          },
+          "yanShip": {
+            "count": 3,
+            "active": true,
+            "tier": 1,
+            "layers": 6
+          }
+        },
+        "board": [
+          {
+            "uid": 7,
+            "id": "chess_char_1_03_a",
+            "items": []
+          },
+          {
+            "uid": 10,
+            "id": "chess_char_1_07_a",
+            "items": []
+          },
+          {
+            "uid": 1,
+            "id": "chess_char_1_17_a",
+            "items": [
+              "chess_item_1_01_e_a"
+            ]
+          },
+          {
+            "uid": 11,
+            "id": "chess_char_2_04_a",
+            "items": [
+              "chess_item_1_02_e_a"
+            ]
+          },
+          {
+            "uid": 18,
+            "id": "chess_char_2_17_a",
+            "items": []
+          },
+          {
+            "uid": 15,
+            "id": "chess_char_3_03_a",
+            "items": []
+          },
+          {
+            "uid": 14,
+            "id": "chess_char_1_19_b",
+            "items": []
+          },
+          {
+            "uid": 19,
+            "id": "chess_char_3_16_a",
+            "items": []
+          }
+        ],
+        "hand": [
+          {
+            "uid": 2,
+            "id": "chess_char_1_02_a"
+          },
+          {
+            "uid": 3,
+            "id": "chess_char_1_10_a"
+          }
+        ]
+      },
+      "teacher": {
+        "round": 6,
+        "setupCost": 0,
+        "setupBuys": 0,
+        "attempted": 2,
+        "purchases": 1,
+        "cost": 0,
+        "failed": false,
+        "phases": [
+          "begin",
+          "tail"
+        ],
+        "buys": [],
+        "macros": [
+          {
+            "phase": "begin",
+            "enabled": {
+              "refresh": true,
+              "acquire": true,
+              "lappland": true
+            },
+            "before": {
+              "funds": 10,
+              "freeRefreshes": 0,
+              "refreshes": 0,
+              "gainedChess": 0,
+              "spent": 0,
+              "layers": {
+                "arcaneShip": 2,
+                "preciShip": 2,
+                "kjeragShip": 2,
+                "steadShip": 2,
+                "kazimierzShip": 8,
+                "swiftShip": 8,
+                "yanShip": 3
+              },
+              "boardUids": [
+                7,
+                10,
+                1,
+                11,
+                15,
+                3,
+                14,
+                2
+              ]
+            },
+            "after": {
+              "funds": 10,
+              "freeRefreshes": 0,
+              "refreshes": 0,
+              "gainedChess": 1,
+              "spent": 1,
+              "layers": {
+                "arcaneShip": 2,
+                "preciShip": 2,
+                "kjeragShip": 2,
+                "steadShip": 2,
+                "kazimierzShip": 8,
+                "swiftShip": 8,
+                "yanShip": 3
+              },
+              "boardUids": [
+                7,
+                10,
+                1,
+                11,
+                15,
+                3,
+                14,
+                2
+              ]
+            },
+            "attempted": 2,
+            "accepted": 2,
+            "spent": 1,
+            "credited": 1,
+            "netCost": 0,
+            "projectedLayerGain": 1,
+            "observedLayerDelta": {
+              "arcaneShip": 0,
+              "preciShip": 0,
+              "kjeragShip": 0,
+              "steadShip": 0,
+              "kazimierzShip": 0,
+              "swiftShip": 0,
+              "yanShip": 0
+            },
+            "triggeredModules": [
+              "acquire"
+            ],
+            "actions": [
+              {
+                "module": "acquire",
+                "action": "buy",
+                "slot": 3,
+                "accepted": true,
+                "result": {
+                  "ok": true
+                },
+                "before": {
+                  "funds": 10,
+                  "freeRefreshes": 0,
+                  "refreshes": 0,
+                  "gainedChess": 0,
+                  "spent": 0,
+                  "layers": {
+                    "arcaneShip": 2,
+                    "preciShip": 2,
+                    "kjeragShip": 2,
+                    "steadShip": 2,
+                    "kazimierzShip": 8,
+                    "swiftShip": 8,
+                    "yanShip": 3
+                  },
+                  "boardUids": [
+                    7,
+                    10,
+                    1,
+                    11,
+                    15,
+                    3,
+                    14,
+                    2
+                  ]
+                },
+                "after": {
+                  "funds": 9,
+                  "freeRefreshes": 0,
+                  "refreshes": 0,
+                  "gainedChess": 1,
+                  "spent": 1,
+                  "layers": {
+                    "arcaneShip": 2,
+                    "preciShip": 2,
+                    "kjeragShip": 2,
+                    "steadShip": 2,
+                    "kazimierzShip": 8,
+                    "swiftShip": 8,
+                    "yanShip": 3
+                  },
+                  "boardUids": [
+                    7,
+                    10,
+                    1,
+                    11,
+                    15,
+                    3,
+                    14,
+                    2
+                  ]
+                },
+                "spent": 1,
+                "netCost": 1
+              },
+              {
+                "module": "acquire",
+                "action": "sell",
+                "uid": 17,
+                "accepted": true,
+                "result": {
+                  "ok": true
+                },
+                "before": {
+                  "funds": 9,
+                  "freeRefreshes": 0,
+                  "refreshes": 0,
+                  "gainedChess": 1,
+                  "spent": 1,
+                  "layers": {
+                    "arcaneShip": 2,
+                    "preciShip": 2,
+                    "kjeragShip": 2,
+                    "steadShip": 2,
+                    "kazimierzShip": 8,
+                    "swiftShip": 8,
+                    "yanShip": 3
+                  },
+                  "boardUids": [
+                    7,
+                    10,
+                    1,
+                    11,
+                    15,
+                    3,
+                    14,
+                    2
+                  ]
+                },
+                "after": {
+                  "funds": 10,
+                  "freeRefreshes": 0,
+                  "refreshes": 0,
+                  "gainedChess": 1,
+                  "spent": 1,
+                  "layers": {
+                    "arcaneShip": 2,
+                    "preciShip": 2,
+                    "kjeragShip": 2,
+                    "steadShip": 2,
+                    "kazimierzShip": 8,
+                    "swiftShip": 8,
+                    "yanShip": 3
+                  },
+                  "boardUids": [
+                    7,
+                    10,
+                    1,
+                    11,
+                    15,
+                    3,
+                    14,
+                    2
+                  ]
+                },
+                "spent": 0,
+                "netCost": -1
+              }
+            ],
+            "stopReason": "complete",
+            "modules": {
+              "refresh": {
+                "attempted": 0,
+                "accepted": 0,
+                "netCost": 0,
+                "stopReason": "no-marginal-layers"
+              },
+              "acquire": {
+                "attempted": 2,
+                "accepted": 2,
+                "netCost": 0,
+                "stopReason": "cost-per-layer"
+              },
+              "lappland": {
+                "attempted": 0,
+                "accepted": 0,
+                "netCost": 0,
+                "stopReason": "inactive-bond"
+              }
+            }
+          },
+          {
+            "phase": "tail",
+            "enabled": {
+              "refresh": true,
+              "acquire": true,
+              "lappland": true
+            },
+            "before": {
+              "funds": 2,
+              "freeRefreshes": 0,
+              "refreshes": 1,
+              "gainedChess": 3,
+              "spent": 10,
+              "layers": {
+                "arcaneShip": 2,
+                "preciShip": 2,
+                "kjeragShip": 2,
+                "steadShip": 2,
+                "kazimierzShip": 8,
+                "swiftShip": 8,
+                "yanShip": 3
+              },
+              "boardUids": [
+                7,
+                10,
+                1,
+                11,
+                18,
+                15,
+                14,
+                19
+              ]
+            },
+            "after": {
+              "funds": 2,
+              "freeRefreshes": 0,
+              "refreshes": 1,
+              "gainedChess": 3,
+              "spent": 10,
+              "layers": {
+                "arcaneShip": 2,
+                "preciShip": 2,
+                "kjeragShip": 2,
+                "steadShip": 2,
+                "kazimierzShip": 8,
+                "swiftShip": 8,
+                "yanShip": 3
+              },
+              "boardUids": [
+                7,
+                10,
+                1,
+                11,
+                18,
+                15,
+                14,
+                19
+              ]
+            },
+            "attempted": 0,
+            "accepted": 0,
+            "spent": 0,
+            "credited": 0,
+            "netCost": 0,
+            "projectedLayerGain": 0,
+            "observedLayerDelta": {
+              "arcaneShip": 0,
+              "preciShip": 0,
+              "kjeragShip": 0,
+              "steadShip": 0,
+              "kazimierzShip": 0,
+              "swiftShip": 0,
+              "yanShip": 0
+            },
+            "triggeredModules": [],
+            "actions": [],
+            "stopReason": "complete",
+            "modules": {
+              "refresh": {
+                "attempted": 0,
+                "accepted": 0,
+                "netCost": 0,
+                "stopReason": "no-marginal-layers"
+              },
+              "acquire": {
+                "attempted": 0,
+                "accepted": 0,
+                "netCost": 0,
+                "stopReason": "reserve-funds"
+              },
+              "lappland": {
+                "attempted": 0,
+                "accepted": 0,
+                "netCost": 0,
+                "stopReason": "inactive-bond"
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "limits": [
+    "Same four seeds reused across variants; not 28 independent seeds.",
+    "No ABYSS wins. No claim of improvement over the reported prior 896 losses.",
+    "No Lappland cycling macro actions in this screen; ordinary Lappland refresh traits did fire.",
+    "Core purchases can consume a spare Lappland offer before the cycling macro sees it.",
+    "Prep-end total gains include native bot activity; projected macro gain is not a counterfactual measurement."
+  ]
+}
