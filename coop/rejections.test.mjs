@@ -3,7 +3,8 @@ import test from 'node:test';
 import { CoopEnv } from './env.mjs';
 import { ShopEnv } from '../rl/env.mjs';
 import { poolConfig } from './pool.mjs';
-import { rejectionState, checkedProposal } from './rejections.mjs';
+import { rejectionState, sameRejectionState, checkedProposal } from './rejections.mjs';
+import { serialize } from 'node:v8';
 import { control } from '../rl/controller.mjs';
 import { capacityFilteredBot } from './controller.mjs';
 import { loadMovePreflight } from './preflight.mjs';
@@ -15,6 +16,33 @@ async function createBase() {
 }
 
 const fixedWeak = () => poolConfig({ COOP_POOL: 'weak', COOP_TEAM: 'buy2-v1,saver-v1,buy2-v1' });
+
+test('state equality ignores V8 representation but preserves projected state differences', () => {
+  const packed = serialize([]), holey = serialize(new Array(0));
+  assert(sameRejectionState(packed, holey));
+  for (const [a, b] of [[[], [undefined]], [new Array(1), [undefined]],
+    [[-0], [0]], [[NaN], [0]], [[['a', 1], ['b', 2]], [['b', 2], ['a', 1]]],
+    [[['function', 1]], [['function', 2]]]]) {
+    assert(!sameRejectionState(serialize(a), serialize(b)));
+  }
+});
+
+test('repeated real snapshots and validation noops do not latch fatal', async () => {
+  const e = new CoopEnv(await createBase(), poolConfig({ COOP_POOL: 'normal' }));
+  try {
+    e.reset({ seed: 11, difficulty: 'ABYSS' });
+    const p = e.m.order[1];
+    for (let i = 0; i < 180; i++) {
+      assert(sameRejectionState(rejectionState(e.m), rejectionState(e.m)));
+      assert.equal(p.buy(-1).error, 'BAD_TARGET');
+      assert.equal(e.partnerAudit[p.playerId].rejections.at(-1).diagnostic, true);
+    }
+    e.assertHealthy();
+    const unknown = checkedProposal(p, 'buy', () => ({ error: 'NEW_ERROR' }));
+    assert.equal(unknown.reason, 'unknown-rejection');
+    assert.equal(unknown.diagnostic, false);
+  } finally { e.close(); }
+});
 
 test('original validation rejection remains audited and the real game continues', async () => {
   const base = await createBase();
@@ -66,7 +94,7 @@ test('only known unchanged validation qualifies; effects and hidden mutations st
     // Real engine rejection, not a fabricated success or a private-view-only comparison.
     const before = rejectionState(e.m);
     assert.equal(p.buy(-1).error, 'BAD_TARGET');
-    assert(before.equals(rejectionState(e.m)));
+    assert(sameRejectionState(before, rejectionState(e.m)));
     for (const method of ['buy', 'sell', 'move', 'equip', 'pickReward', 'useArt', 'destroy']) {
       const r = p[method](-1);
       assert.equal(r.error, 'BAD_TARGET');

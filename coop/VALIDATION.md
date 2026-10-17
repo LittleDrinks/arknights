@@ -1,5 +1,11 @@
 # 验证记录（2026-10-18）
 
+## 独立 review 后修正 V8 状态比较
+
+固定 `419a501` 的独立只读 review 给出 CHANGES REQUIRED：真实 reset 后的连续快照及 BAD_TARGET 空操作可出现 Buffer 字节不同，但解码值深度相同，误锁存 fatal。此问题在 `d70c84b` 基线也存在。不得按空 pathdiff 豁免。现在保留 V8 快照作为不可变投影，使用 `sameRejectionState`：相同字节快路径，否则对解码后的完整投影 `isDeepStrictEqual`；状态字段、Map/Set 顺序编码、callback identity、RNG 和 scheduler 范围未缩小。
+
+主协调进程验证：`python3 -B coop/check.py --only rejections --seconds 14`，9/9 通过，8.567 秒，采样进程组 RSS 峰值410.71 MiB，968 bytes 输出，证据 `/tmp/coop-check-csnnq9l1`。包含180次真实连续快照/validation、V8数组内部表示差异、holes/undefined/-0/NaN/顺序/callback ID不相等，以及既有8类状态污染/effect/异常/候选拒绝与完整终局用例。未运行服务端长前缀或大训练；需独立定点复审后再执行。
+
 ## v3 move preflight：exp/coop-filter
 
 基线 `d70c84b`，工作树 `experiment-coop-filter`；只修改 `coop/`。原规则 pin `6ab2468279e926d107788f63d7fe219b85f67b4a`，父环境的 HEAD/clean 检查保留。无 SSH、依赖安装、subagent 或大 batch。本次未重现主 server 的完整 normal 768 / mixed 3840 steps 前缀，不能宣称那两批已通过。

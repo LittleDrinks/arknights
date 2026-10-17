@@ -50,6 +50,14 @@ export function rejectionState(m) {
 const functionIds = new WeakMap();
 let functionSequence = 0;
 
+// V8 encodes array storage representations differently even for identical JS
+// values (e.g. [] versus new Array(0)). Bytes are only a fast equality path.
+// Compare decoded projections so holes, -0, field order, Map order and callback
+// identity retain the exact semantics captured by rejectionState().
+export function sameRejectionState(before, after) {
+  return before.equals(after) || isDeepStrictEqual(deserialize(before), deserialize(after));
+}
+
 // Coarse field paths only: no values, Map keys, item IDs or teammate offers.
 // This diagnostic does not participate in the unchanged-state decision.
 function changedPaths(before, after) {
@@ -73,7 +81,7 @@ export function checkedProposal(ps, method, invoke, { arrange = false } = {}) {
   let result;
   try { result = invoke(); } finally { m.dispatchItem = dispatch; }
   if (result?.ok) return { result };
-  const after = rejectionState(m), unchanged = before.equals(after);
+  const after = rejectionState(m), unchanged = sameRejectionState(before, after);
   const known = arrange ? method === 'move' && ['BAD_TILE', 'BOARD_FULL'].includes(result?.error) :
     Object.hasOwn(validation, method) && [...validation[method], 'WRONG_PHASE', 'ELIMINATED'].includes(result?.error);
   return { result, diagnostic: known && unchanged && !effectDispatched,

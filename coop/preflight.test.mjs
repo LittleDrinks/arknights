@@ -4,7 +4,7 @@ import { ShopEnv } from '../rl/env.mjs';
 import { CoopEnv } from './env.mjs';
 import { poolConfig } from './pool.mjs';
 import { loadMovePreflight } from './preflight.mjs';
-import { rejectionState } from './rejections.mjs';
+import { rejectionState, sameRejectionState } from './rejections.mjs';
 import { capacityFilteredBot } from './controller.mjs';
 
 const board = (row, col) => ({ area: 'board', row, col });
@@ -67,7 +67,7 @@ test('independent placement fixtures: every BAD_TILE branch, reverse swaps and s
       const before = rejectionState(a.m), cache = a.ps._deployMap;
       const state = structuredClone([a.ps.board, a.ps.hand, a.ps.temp]);
       assert.equal(preflight(a.ps, uid, to, dir), reason, JSON.stringify([reason, to]));
-      assert(before.equals(rejectionState(a.m)), 'preflight changed state');
+      assert(sameRejectionState(before, rejectionState(a.m)), 'preflight changed state');
       assert.equal(a.ps._deployMap, cache, 'preflight warmed live cache');
       const result = b.ps.move(uid, to, dir);
       if (reason) {
@@ -114,7 +114,7 @@ test('two real resets and the same buy prefix prove filtered water moves reject 
       capacityFilteredBot({ arrange: (m, p) => { result = p.move(uid, to, dir); } },
         r => { a.controllerBlockedMoves++; a.controllerBlockedMoveReasons.push(r); }, a.arranging, a.movePreflight).arrange(a.m, a.ps);
       assert.equal(result.error, 'COOP_BAD_TILE_FILTER');
-      assert(guard.equals(rejectionState(a.m)));
+      assert(sameRejectionState(guard, rejectionState(a.m)));
       assert.equal(a.history.actions.length, calls);
       assert.equal(a.controllerErrors, errors);
     }
@@ -124,7 +124,7 @@ test('two real resets and the same buy prefix prove filtered water moves reject 
     p.hand[0] = chess(9876, a.ps.hand.find(p => p?.kind === 'chess').id);
     const hash = audit.hash.copy().digest('hex'), state = rejectionState(a.m);
     assert.equal(p.move(9876, board(10, 6), 'LEFT').error, 'COOP_BAD_TILE_FILTER');
-    assert(state.equals(rejectionState(a.m)));
+    assert(sameRejectionState(state, rejectionState(a.m)));
     assert.equal(audit.filtered, 1);
     assert.equal(audit.rejected, 0);
     assert.equal(a.partnerActionErrors, 0);
