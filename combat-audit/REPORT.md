@@ -28,7 +28,7 @@ python3 combat-audit/run.py yan:200:attribution yan:200:attribution-full
 | BV1X3XUB9EQb | 139–171、258–274；`K/raw/subtitle_BV1X3XUB9EQb.json:315,585` | 空弦高频触发不融冰；转职需同构体和对应装备；维持六谢/灵巧激活。不能只拿冰就声称空弦成为谢拉格。 |
 | BV1g9AGz1EbT 卡西米尔 | 132–205、250–348；扩读410–530；`K/raw/subtitle_BV1g9AGz1EbT.json:375,693,1101` | 瑕光S2、突袭重复部署；远牙授予同行最右边目标；终端玛恩纳/耀骑士临光/锏，临光S2适合自动撤退循环。 |
 | BV1bAd4BhEJa | 82–138、241–267；`K/raw/subtitle_BV1bAd4BhEJa.json:219,699` | 卡西米尔输出三将；部署/被击倒循环和突袭50层；合作时勿抢队友关键牌。不能将623当任意ban局保证。 |
-| BV16YSUBZETc 萨尔贡 | 46–87、112–150；扩读149–302；`K/raw/subtitle_BV16YSUBZETc.json:105,267,381` | 本家层数主要延长增益，技能频率重要；莱恩哈特开精准/迅捷，异客S3为终端；至简携罗盘＋浓茶给全队回SP。ASR“质检”对应至简。 |
+| BV16YSUBZETc 萨尔贡 | 46–87、112–150；扩读149–302；`K/raw/subtitle_BV16YSUBZETc.json:105,267,381` | 本家层数主要延长增益，技能频率重要；莱恩哈特开精准/迅捷，异客S3为终端；至简携罗盘＋浓茶给同玩家、在场且有技能的萨尔贡成员回SP。ASR“质检”对应至简。 |
 | BV1kgwjzqExY 炎 | 319–365、420–501；扩读700–865；`K/raw/subtitle_BV1kgwjzqExY.json:861,1125,1917` | 获得/买卖＋夕小满，六炎过渡；终局调和＋转职凑九炎，补副乘区；作者也明确不确定仇白束缚对Boss是否生效。600层标题不当保底。 |
 | BV1agw6zREss 叙拉古/卡西米尔 | 14–70、70–138；`K/raw/subtitle_BV1agw6zREss.json:27,165` | 叙拉古前期刷新/获得，后期精锐荒芜拉普兰德给全体本家击杀叠层；不是刷新次数直接等于终局输出。卡西米尔需远牙位置与临光/玛恩纳/锏终端。 |
 
@@ -47,7 +47,7 @@ python3 combat-audit/run.py yan:200:attribution yan:200:attribution-full
 
 `G/server/sim/content/garrisons/battle.js:130,300` 校正朝向、同行最右及新冻结语义。Boss场 `match/match/bossRounds.js:111` 禁用 `IN_BATTLE` 层数增长，因此临时补阿斯卡伦/魔王/精锐异拉只能沿用已形成战力，不能指望在Boss战把缺失层数补起来。
 
-**装备是组合条件，不是槽数统计。** `G/server/sim/content/items/battle.js:655,664,735,749`：不融冰在造成伤害时触发寒冷；机械臂在结算前选物理/法术中有效伤害较高者；泪对寒冷目标每秒30%ATK法伤，同持冰才升至100%；罗盘的全队+3SP要求携带者为萨尔贡且同时持茶，明确`ignoreLock:true`。转职要求同构体＋对应装备两槽（`match/bondsMeta.js:35`）。每人两槽意味着“机械臂＋泪＋冰”不能同时戴，转职者也不能再塞第三件DPS装。
+**装备是组合条件，不是槽数统计。** `G/server/sim/content/items/battle.js:655,664,735,749`：不融冰在造成伤害时触发寒冷；机械臂在结算前选物理/法术中有效伤害较高者；泪对寒冷目标每秒30%ATK法伤，同持冰才升至100%；罗盘要求携带者为萨尔贡且同时持茶；每次开技向同玩家、在场且有技能的萨尔贡成员+3SP，明确`ignoreLock:true`。本构筑未转萨的莱恩哈特、空弦不受这项回充。转职要求同构体＋对应装备两槽（`match/bondsMeta.js:35`）。每人两槽意味着“机械臂＋泪＋冰”不能同时戴，转职者也不能再塞第三件DPS装。
 
 **当前自然bot/model缺什么。** [natural-evidence.json](natural-evidence.json) 摘出已有bot seed1 R14录像：300万初始血池，258游戏秒后`forced`，只扣345705.59（11.52%），余2654294.41，0漏怪、8次被击倒。全场总伤害859533.75不能当Boss血池伤害；部件/小怪本体伤害与传递必须分别看。这个局没有漏怪仍失败，重点确为持续输出及生存；不应只优化道中速度。
 

@@ -26,7 +26,7 @@
     "?? public/js/agentReplay.js"
   ],
   "sourceHashes": {
-    "EXPERIMENTS.md": "f71035a428d5662c749387df132279fbd5080ab3a57fbc14e6144cc948d95b17",
+    "EXPERIMENTS.md": "994395b31ecd3b7487d8d63fd84741bad2f9c58073f554835629e44f5dfbb0fd",
     "Stronghold-Protocol/data/assets.json": "34e427ff8304ea063f6bbc4eb2d6755b1baa43641c15a67f9c60a59ded4113c6",
     "Stronghold-Protocol/data/backups.json": "1c2e4e1b65df7f10ff3902f8c74a708f57ed8381e6351e19ecdc9c8c140423f2",
     "Stronghold-Protocol/data/bands.json": "8f18abc99eb50639a1f2fc679a84015d6d8cc8aa3ff7c7d22ad6db5dc347053b",
@@ -534,12 +534,12 @@
     "knowledge/corpus/raw/subtitle_BV1xVdBBWEuu.json": "fbe0713c323719e783e3241220f41d8378766f15ea6d76d07105e88c6e9d6520"
   },
   "artifactHashes": {
-    "REPORT.md": "fb59bdaf50143f437cb69bf732df3de62fb9a14963ac4bf1366bb66b421f5aba",
+    "REPORT.md": "15375b322015df55e4689cc002f2e3117fd887c307e53c35a4b290d9fe87ef81",
     "evidence.py": "1ecb505b0c56315fea8159d672987f64dd6c84cb061e3f7f187d400e5a25ecc1",
     "fixture.mjs": "9999c7e74f9098917e569cb4b387dd556632b9c901f25853a5a17fa7610c8d96",
     "guides.json": "eede3581a17b44e0fe1943bf1a9094d4fa5295d8a699ee52f69cd360dfa71ea2",
     "mechanics.json": "2b57d52b48ff4db1450babe0258606a436c51755f35aa8371cae3d84e06f7776",
-    "natural-evidence.json": "8d658388ddb82d1bb28e8a007bc488b0d8f8acdc2da24e96aa89a4070446a9f3",
+    "natural-evidence.json": "1b278eb5660e4649a3ca89d0e1a1dab33da229467daed6b8e7e601f0f1f0240d",
     "results/budget.json": "9161bf1700228867072834d7b2f52e0c192e2a7b38955dc2dbaa89c0515be1a8",
     "results/kazimierz-200-bot.input.json": "9dea9e0f98553b7831ccf8f9ce0e1a489baa2ed4adb3aa8fd22755d2467c74bf",
     "results/kazimierz-200-bot.jsonl": "7fdb09eaf7878f0f7401cdf3a6822aa761ca52574b84fb79d5440e60f9b811bf",
