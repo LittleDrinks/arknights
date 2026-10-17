@@ -111,7 +111,10 @@ export function validateViewer(episode, recordings) {
 }
 
 export async function replay({ trace: traceFile, checkpoint, out, game,
-  checkpointSha256: expectedCheckpointHash }) {
+  checkpointSha256: expectedCheckpointHash, maxOutputMb = 20 }) {
+  maxOutputMb = Number(maxOutputMb);
+  assert(Number.isInteger(maxOutputMb) && maxOutputMb >= 1 && maxOutputMb <= 256, 'max-output-mb must be an integer in 1..256');
+  const maxOutputBytes = maxOutputMb * 1_000_000;
   const started = performance.now();
   let peakRss = 0;
   const guard = () => {
@@ -235,13 +238,13 @@ export async function replay({ trace: traceFile, checkpoint, out, game,
     result: trace.result, policySteps: state.steps, methodCalls: meta.methodCalls, battles: recordings.length,
     frames: recordings.reduce((n, r) => n + r.frames.length, 0),
     battleEvents: recordings.reduce((n, r) => n + r.frames.reduce((s, f) => s + f.ev.length, 0), 0),
-    provenance, limits: { wallMs: 25000, rssBytes: 768 * 1024 * 1024, outputBytes: MAX_BYTES },
+    provenance, limits: { wallMs: 25000, rssBytes: 768 * 1024 * 1024, outputBytes: maxOutputBytes },
     simulationMs, elapsedMs: performance.now() - started, peakRssBytes: peakRss,
     payloadBytes: [...files.values()].reduce((n, b) => n + b.length, 0),
     files: [...files].map(([file, b]) => ({ file, bytes: b.length, sha256: hash(b) })) };
   files.set('verification.json', Buffer.from(JSON.stringify(report, null, 2)));
   const totalBytes = [...files.values()].reduce((n, b) => n + b.length, 0);
-  assert(totalBytes <= MAX_BYTES, 'Output exceeds 20 MB');
+  assert(totalBytes <= maxOutputBytes, `Output exceeds ${maxOutputMb} MB`);
   guard();
   // Reserve fresh directory atomically only after complete replay/validation. Never overwrite
   // existing paths (including an empty directory/symlink). No writes to the live game's indexes.

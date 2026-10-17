@@ -3,9 +3,9 @@ import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-const help = 'node model-replay/cli.mjs --trace <eval.json> --checkpoint <model.pt> --out <NEW /tmp/directory> [--game <path>] [--checkpoint-sha256 <hash>]';
+const help = 'node model-replay/cli.mjs --trace <eval.json> --checkpoint <model.pt> --out <NEW /tmp/directory> [--game <path>] [--checkpoint-sha256 <hash>] [--max-output-mb <1..256, default 20>]';
 const allowed = new Map([['trace', 'trace'], ['checkpoint', 'checkpoint'], ['out', 'out'],
-  ['game', 'game'], ['checkpoint-sha256', 'checkpointSha256']]);
+  ['game', 'game'], ['checkpoint-sha256', 'checkpointSha256'], ['max-output-mb', 'maxOutputMb']]);
 try {
   if (process.argv.includes('--help')) { console.log(help); process.exit(0); }
   const options = {};

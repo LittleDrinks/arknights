@@ -13,7 +13,7 @@ node model-replay/cli.mjs \
   --out /tmp/model-replay-my-new-export
 ```
 
-可选 `--game /path/to/Stronghold-Protocol`，默认使用相邻 `../Stronghold-Protocol`；可选 `--checkpoint-sha256 <hex>` 校验提供的 checkpoint 文件。输出 stdout 为一条 JSON 验证报告，失败退出非零。每次 CLI 最长 25 秒（含加载和导出），worker heap 上限 512 MiB、RSS 上限 768 MiB，输出所有文件合计不超过 20,000,000 字节。父进程每 20 ms 检查 RSS，并强制终止超时 worker；记录器也在真实方法和战斗 tick 边界检查。RSS 监测是采样，并非操作系统 cgroup 硬上限。
+可选 `--game /path/to/Stronghold-Protocol`，默认使用相邻 `../Stronghold-Protocol`；可选 `--checkpoint-sha256 <hex>` 校验提供的 checkpoint 文件。输出 stdout 为一条 JSON 验证报告，失败退出非零。每次 CLI 最长 25 秒（含加载和导出），worker heap 上限 512 MiB、RSS 上限 768 MiB。输出默认上限 20,000,000 字节；完整14轮录像可能超过，可显式用 `--max-output-mb 128`（整数1–256），实际预算写入 verification。输入 trace 上限仍为20 MB。服务器可设置 `TMPDIR=/data1/zsm/arknights/tmp` 将新产物限制在项目目录。父进程每 20 ms 检查 RSS，并强制终止超时 worker；记录器也在真实方法和战斗 tick 边界检查。RSS 监测是采样，并非操作系统 cgroup 硬上限。
 
 生成目录：
 
