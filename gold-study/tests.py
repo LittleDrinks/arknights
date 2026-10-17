@@ -365,7 +365,7 @@ class Tests(unittest.TestCase):
              patch.object(C, 'game_identity', return_value=(self.base / 'game', {'schema': full_schema})), \
              patch.object(C, 'learner', return_value=self.L), patch.object(run, 'evaluate', side_effect=invalidated), \
              patch.object(run.subprocess, 'run') as version:
-            version.return_value.stdout, version.return_value.stderr = b'v24.0.0\n', b''
+            version.return_value.stdout, version.return_value.stderr = b'v22.23.2\n', b''
             self.assertEqual(run.main(argv), 1)
         invalid = C.parse((self.base / 'invalidated/summary.json').read_bytes())
         self.assertEqual((invalid['failed'], invalid['unrun'], invalid['teamWins']), (1, 95, 0))

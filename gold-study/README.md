@@ -6,7 +6,7 @@
 
 ## 服务器执行顺序
 
-Python 3.10+、已有 PyTorch、Node **24**。不安装依赖。`--root` 示例为 `/data1/zsm/arknights`，规则目录固定为 `ROOT/game`；代码位于 `ROOT/experiment-code` 或显式 `--experiment-code`。CLI 必须来自该代码 checkout。原父模型路径限定为 `ROOT/experiments/bc-expansion-v1/all.pt`，路径和 SHA 均须显式传入。
+Python 3.10+、已有 PyTorch、Node **>=22**（固定游戏 package 要求；服务器实际 v22.23.2）。不安装依赖。`--root` 示例为 `/data1/zsm/arknights`，规则目录固定为 `ROOT/game`；代码位于 `ROOT/experiment-code` 或显式 `--experiment-code`。CLI 必须来自该代码 checkout。原父模型路径限定为 `ROOT/experiments/bc-expansion-v1/all.pt`，路径和 SHA 均须显式传入。
 
 以下命令仅供 main 在服务器执行。先把变量填成实际冻结路径/SHA；不得把一个仍在运行或整体 failed 的采集批次作为输入。`SELECTION` 是冻结源 manifest 下六个自然个人成功 gzip 路径的 JSON 列表，顺序也会被冻结。`COLLECTOR` 必须指向实际原 collector 源码。
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Finite server CLI. Training consumes completed recapture; eval is separately explicit."""
 import argparse
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 import signal
@@ -67,7 +68,10 @@ def main(argv=None):
         parent = C.relative(root, args.parent)
         N.check_parent(root, parent, args.parent_sha256)
         version = subprocess.run(['node', '--version'], env=C.clean_env(), capture_output=True, timeout=5, check=True)
-        C.require(version.stdout.startswith(b'v24.') and not version.stderr, 'Node 24 required')
+        node_version = re.fullmatch(rb'v(\d+)\.(\d+)\.(\d+)\n?', version.stdout)
+        C.require(node_version is not None and int(node_version[1]) >= 22 and not version.stderr,
+                  'Node >=22 required by the fixed game package')
+        report['nodeVersion'] = version.stdout.decode('ascii').strip()
         game_path = root / 'game'
         pin = R.game_identity(code, game_path)
         resolved_game, game = C.game_identity(root, code)  # Static vocabulary only; no Match/Battle.
@@ -89,6 +93,7 @@ def main(argv=None):
                                      C.relative(root, args.collector), game, pin, evidence)
             from training import fit
             report = fit(L, parent, samples, metadata, source, game, evidence)
+            report['nodeVersion'] = version.stdout.decode('ascii').strip()
             guard()
             recheck(metadata)
             evidence.verify()
