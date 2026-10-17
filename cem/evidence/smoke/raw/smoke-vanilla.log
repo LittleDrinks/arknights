@@ -1,0 +1,28 @@
+
+| config | run | matches | wins | rounds passed | LP left | reached boss | leaks/match | bounties (leaked) | funds lost/prep | merges/bot | errors |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| solo:ABYSS | run | 1 | 0 (0 %) | 10.00 | 0.0 | 0 | 40.0 | 3 (1) | 0.27 | 3.00 | 0 |
+
+| config | run | shop level R4/7/10/13 | board value R4/7/10/13 | Σ bond tiers | activated layers | elites deployed |
+|---|---|---|---|---|---|---|
+| solo:ABYSS | run | 2.0 / 4.0 / 5.0 / 0.0 | 21.0 / 28.0 / 32.0 / 0.0 | 1.0 / 4.0 / 7.0 / 0.0 | 4 / 47 / 156 / 0 | 1.0 / 2.0 / 3.0 / 0.0 |
+
+| config | run | leaks per alive bot and round R1…R15 |
+|---|---|---|
+| solo:ABYSS | run | 1:2.0 2:0.0 3:0.0 4:0.0 5:2.0 6:8.0 7:1.0 8:7.0 9:2.0 10:5.0 11:13.0 |
+
+| run | bounty kill-chance estimate (bot.bountyKillChance) → share of bounty enemies actually killed, picks per bin |
+|---|---|
+| run | p 0–0.2: 100 % (1) · p 0.2–0.5: 0 % (1) · p 0.8–0.95: 100 % (1) |
+
+| config | run | bounty picks | p < 0.5 picked while a p ≥ 0.5 card was offered | drafts with no card p ≥ 0.5 |
+|---|---|---|---|---|
+| solo:ABYSS | run | 3 | 0 | 2 |
+
+| config | run | bot preps | prep CPU ms p50 / p95 | heuristics CPU ms p50 / p95 | Σ prep CPU s | Σ heuristics CPU s | per match: prep CPU s |
+|---|---|---|---|---|---|---|---|
+| solo:ABYSS | run | 11 | 36.4 / 93.1 | 36.4 / 93.1 | 0.5 | 0.5 | 0.52 |
+
+| config | run | bot preps | prep ms p50 / p95 | heuristics ms p50 / p95 | rehearsal ms p50 / p95 | R1–R10 preps: prep / heuristics p50 / p95 | 机变 pick ms p50 / p95 (n) | match wall s |
+|---|---|---|---|---|---|---|---|---|
+| solo:ABYSS | run | 11 | 22.1 / 58.4 | 22.1 / 58.4 | 0.0 / 0.0 | 10: 19.0 / 41.9 · 19.0 / 41.9 | 0.69 / 1.81 (3) | 1.6 |
