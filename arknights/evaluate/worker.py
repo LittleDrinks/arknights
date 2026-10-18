@@ -11,7 +11,7 @@ import traceback
 from pathlib import Path
 
 from . import process
-from .runner import (_json, _safe_path, _write_json, check_identity, encoded,
+from .runner import (_json, _safe_path, _write_json, check_identity, encoded, learner_victory,
                      team_victory, validate_case)
 
 
@@ -55,6 +55,7 @@ def perform(spec, case, script, root, directory):
             state = game.observe()
             victory = team_victory(state)
             result.update(status='complete', state=state, teamVictory=victory,
+                          learnerIndividualVictory=learner_victory(state),
                           stateSHA256=hashlib.sha256(encoded(state)).hexdigest())
         # These checks happen after close/EOF has finished recording the pipes.
         from .runner import _json_lines
@@ -64,7 +65,8 @@ def perform(spec, case, script, root, directory):
         _write_json(directory / 'result.json', result, exclusive=True)
         return 0
     except BaseException as exc:
-        result.update(status='failed', error=f'{type(exc).__name__}: {exc}')
+        result.update(status='failed', teamVictory=None, learnerIndividualVictory=None,
+                      error=f'{type(exc).__name__}: {exc}')
         if game is not None:
             result['prefixState'] = getattr(game, 'state', None)
         # Preserve an existing artifact even if publication itself failed.

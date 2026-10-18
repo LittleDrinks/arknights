@@ -23,7 +23,9 @@ for line in sys.stdin:
         state = {'terminal': False, 'seed': request['seed'], 'pid': os.getpid(), 'outcome': None}
     elif request['cmd'] == 'act':
         victory = state['seed'] % 2 == 1
-        state.update(terminal=True, outcome={'team': {'victory': victory}, 'summary': {'victory': victory}})
+        individual = victory and state['seed'] % 4 == 3
+        state.update(terminal=True, outcome={'team': {'victory': victory},
+            'summary': {'victory': victory}, 'learner': {'victory': individual}})
     elif request['cmd'] != 'observe':
         raise ValueError('fixture unsupported command')
     print(json.dumps({'ok': True, 'state': state}), flush=True)
@@ -206,6 +208,7 @@ class EvaluationTests(unittest.TestCase):
         self.assertEqual(summary['status'], 'complete')
         self.assertEqual((summary['planned'], summary['complete'], summary['teamWins'], summary['gameLosses']), (4, 4, 2, 2))
         self.assertEqual(summary['winRate'], .5)
+        self.assertEqual((summary['learnerWins'], summary['learnerWinRate'], summary['learnerWinRateDenominator']), (0, 0, 4))
         self.assertEqual(summary, run.summary)
         self.assertEqual([g['id'] for g in summary['games']],
                          ['0001-original-s1', '0002-original-s2', '0003-mixed-s1', '0004-mixed-s2'])
@@ -222,6 +225,71 @@ class EvaluationTests(unittest.TestCase):
         self.assertEqual(result['status'], 'failed')
         self.assertFalse(result['prefixState']['terminal'])
         self.assertTrue((directory / 'trajectory/protocol.jsonl').stat().st_size)
+
+    def test_team_and_individual_are_distinct_and_partial_rate_uses_all_planned(self):
+        self.script.write_text(STRATEGY.replace("    game.act", "    if game.state['seed'] == 2:\n        raise RuntimeError('technical failure')\n    game.act"))
+        run = evaluate(self.script, root=self.root, seeds=(1, 2, 3), workers=2, timeout=4)
+        summary = verify_run(run.path)
+        self.assertEqual((summary['status'], summary['partial']), ('partial', True))
+        self.assertEqual((summary['planned'], summary['complete'], summary['technicalFailures']), (3, 2, 1))
+        self.assertEqual((summary['teamWins'], summary['learnerWins']), (2, 1))
+        self.assertEqual((summary['winRate'], summary['learnerWinRate']), (2 / 3, 1 / 3))
+        self.assertEqual([row['learnerIndividualVictory'] for row in summary['games']], [False, None, True])
+
+    def test_missing_or_nonboolean_individual_outcome_is_not_inferred_from_team(self):
+        backend = self.root / 'arknights/adapter/backend.py'
+        for value in ('None', '1'):
+            with self.subTest(value=value):
+                backend.write_text(FIXTURE_BACKEND.replace("'victory': individual", "'victory': " + value))
+                run = self.run_eval()
+                self.assertEqual(verify_run(run.path)['technicalFailures'], 1)
+                self.assertIsNone(run.summary['games'][0]['learnerIndividualVictory'])
+
+    def test_parent_independently_rejects_false_individual_worker_claim(self):
+        real_command = runner.run_command
+        def corrupt(*args, **kwargs):
+            result = real_command(*args, **kwargs)
+            path = Path(kwargs['stdout_path']).parent / 'result.json'
+            data = json.loads(path.read_bytes())
+            data['learnerIndividualVictory'] = True
+            path.write_text(json.dumps(data))
+            return result
+        with patch.object(runner, 'run_command', side_effect=corrupt):
+            run = self.run_eval()
+        self.assertEqual(verify_run(run.path)['technicalFailures'], 1)
+        self.assertIsNone(run.summary['games'][0]['learnerIndividualVictory'])
+
+    def test_active_web_and_reference_sources_are_hashed_legacy_is_excluded(self):
+        package = self.root / 'arknights'
+        legacy = package / 'evaluate/_legacy'
+        legacy.mkdir()
+        (legacy / 'old.py').write_text('legacy = 1')
+        active = package / 'adapter/reference.json'
+        active.write_text('{"reference":1}')
+        web = package / 'replay/web'
+        web.mkdir(parents=True)
+        (web / 'viewer.js').write_text('const enabled = true;')
+        (web / 'viewer.css').write_text('body { color: black; }')
+        run = self.run_eval()
+        identity = json.loads((run.path / 'identity.json').read_bytes())
+        names = identity['code']['files']
+        self.assertIn('arknights/adapter/reference.json', names)
+        self.assertIn('arknights/replay/web/viewer.js', names)
+        self.assertIn('arknights/replay/web/viewer.css', names)
+        self.assertFalse(any('_legacy' in name for name in names))
+        (legacy / 'old.py').write_text('legacy = 2')
+        runner.check_identity(self.root, identity)
+        active.write_text('{"reference":2}')
+        with self.assertRaisesRegex(ValueError, 'dependency source changed'):
+            runner.check_identity(self.root, identity)
+
+    def test_bad_partners_rejected_before_run_except_irrelevant_solo_partners(self):
+        with self.assertRaisesRegex(ValueError, 'Unsupported coop partner'):
+            self.run_eval(partners=('unknown',))
+        self.assertFalse((self.root / 'results').exists())
+        run = self.run_eval(mode='solo', partners=('unknown', 'mixed'))
+        self.assertEqual(verify_run(run.path)['planned'], 1)
+        self.assertEqual(run.summary['games'][0]['partner'], 'original')
 
     def test_timeout_preserves_all_planned_denominator(self):
         self.script.write_text('def play(game):\n    import time\n    time.sleep(20)\n')

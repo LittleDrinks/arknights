@@ -23,7 +23,8 @@ from .process import run_command
 
 
 RULES_COMMIT = '6ab2468279e926d107788f63d7fe219b85f67b4a'
-SCHEMA = 'arknights/evaluation-v1'
+SCHEMA = 'arknights/evaluation-v2'
+LEGACY_SCHEMA = 'arknights/evaluation-v1'
 
 
 def encoded(value):
@@ -91,15 +92,15 @@ def _rules_identity(root, expected=None):
 def _code_identity(root):
     package = _safe_path(root / 'arknights')
     files = {}
-    # os.walk deliberately does not follow symlinks, but reject them rather than
-    # silently omit an imported subtree from provenance.
+    # Active Python/JS, browser transforms and reference data are dependencies;
+    # archived legacy tools are disjoint. Reject symlinks in the active tree.
     for directory, dirs, names in os.walk(package, followlinks=False):
-        dirs[:] = sorted(d for d in dirs if d != '__pycache__')
+        dirs[:] = sorted(d for d in dirs if d not in ('__pycache__', '_legacy'))
         for name in dirs + sorted(names):
             path = Path(directory) / name
             if path.is_symlink():
                 raise ValueError('Code identity cannot contain symlinks: ' + str(path))
-            if path.is_file() and path.suffix in ('.py', '.mjs'):
+            if path.is_file() and path.suffix in ('.py', '.mjs', '.js', '.json', '.css', '.html'):
                 files[path.relative_to(root).as_posix()] = sha_file(path)
     if not files:
         raise ValueError('Missing arknights package source')
@@ -167,6 +168,18 @@ def team_victory(state):
     return values[0]
 
 
+def learner_victory(state):
+    """Read individual victory explicitly, without inferring it from team success."""
+    if not isinstance(state, dict) or state.get('terminal') is not True:
+        raise ValueError('Learner outcome requires a true terminal state')
+    outcome = state.get('outcome')
+    learner = outcome.get('learner') if isinstance(outcome, dict) else None
+    value = learner.get('victory') if isinstance(learner, dict) else None
+    if type(value) is not bool:
+        raise ValueError('Terminal learner individual victory must be an explicit boolean')
+    return value
+
+
 def _json_lines(path):
     with _safe_path(path).open('rb') as stream:
         for line in stream:
@@ -190,6 +203,9 @@ def validate_case(directory, case, spec, *, result=None):
         raise ValueError('Worker terminal state digest differs')
     if result.get('teamVictory') is not victory:
         raise ValueError('Worker victory differs from terminal')
+    if spec.get('schema') != LEGACY_SCHEMA:
+        if result.get('learnerIndividualVictory') is not learner_victory(state):
+            raise ValueError('Worker learner individual victory differs from terminal')
     trajectory = directory / 'trajectory'
     if _json(trajectory / 'terminal.json') != state:
         raise ValueError('Saved terminal differs from worker state')
@@ -260,7 +276,7 @@ def _plan(seeds, partners):
 def _perform(root, path, case, spec, cancel):
     directory = _safe_path(path / case['id'])
     directory.mkdir(exist_ok=False)
-    row = {**case, 'status': 'failed', 'teamVictory': None}
+    row = {**case, 'status': 'failed', 'teamVictory': None, 'learnerIndividualVictory': None}
     try:
         check_identity(root, spec['identity'])
         environment = dict(os.environ)
@@ -285,27 +301,35 @@ def _perform(root, path, case, spec, cancel):
         else:
             result = validate_case(directory, case, spec)
             row.update(status='complete', teamVictory=result['teamVictory'],
+                       learnerIndividualVictory=result['learnerIndividualVictory'],
                        stateSHA256=result['stateSHA256'])
         check_identity(root, spec['identity'])
     except Exception as exc:
-        row.update(status='failed', teamVictory=None, error=f'{type(exc).__name__}: {exc}')
+        row.update(status='failed', teamVictory=None, learnerIndividualVictory=None,
+                   error=f'{type(exc).__name__}: {exc}')
     # Never discard a failed worker result, traceback, or partial trajectory.
     _write_json(directory / 'assessment.json', row, exclusive=True)
     _seal(directory)
     return row
 
 
-def _summary(rows, status, guard_error=None):
+def _summary(rows, status, guard_error=None, *, schema=SCHEMA):
     total = len(rows)
     complete = sum(row['status'] == 'complete' for row in rows)
     wins = sum(row['status'] == 'complete' and row.get('teamVictory') is True for row in rows)
     failed = sum(row['status'] == 'failed' for row in rows)
     cancelled = sum(row['status'] == 'cancelled' for row in rows)
-    return {'schema': SCHEMA, 'status': status, 'planned': total, 'total': total,
+    summary = {'schema': schema, 'status': status, 'planned': total, 'total': total,
             'complete': complete, 'failed': failed, 'cancelled': cancelled,
             'technicalFailures': total - complete, 'teamWins': wins,
             'gameLosses': complete - wins, 'winRate': wins / total,
             'winRateDenominator': total, 'guardError': guard_error, 'games': rows}
+    if schema != LEGACY_SCHEMA:
+        learner_wins = sum(row['status'] == 'complete' and row.get('learnerIndividualVictory') is True
+                           for row in rows)
+        summary.update(learnerWins=learner_wins, learnerWinRate=learner_wins / total,
+                       learnerWinRateDenominator=total, partial=0 < complete < total)
+    return summary
 
 
 def evaluate(script, *, root=None, seeds=tuple(range(1, 17)), mode='coop',
@@ -318,9 +342,12 @@ def evaluate(script, *, root=None, seeds=tuple(range(1, 17)), mode='coop',
     """
     root = _safe_path(root or Path(__file__).absolute().parents[2])
     script = _safe_path(Path(script) if Path(script).is_absolute() else root / script)
-    cases = _plan(seeds, partners)
     if mode not in ('coop', 'solo') or difficulty not in ('NORMAL', 'HARD', 'ABYSS'):
         raise ValueError('Unsupported mode or difficulty')
+    partners = ('original',) if mode == 'solo' else tuple(partners)
+    if any(partner not in ('original', 'mixed', 'weak') for partner in partners):
+        raise ValueError('Unsupported coop partner configuration; choose original, mixed, or weak')
+    cases = _plan(seeds, partners)
     if type(workers) is not int or workers < 1:
         raise ValueError('workers must be a positive integer')
     if type(max_requests) is not int or max_requests < 1:
@@ -341,7 +368,8 @@ def evaluate(script, *, root=None, seeds=tuple(range(1, 17)), mode='coop',
             'resume': False}
     _write_json(path / 'identity.json', identity, exclusive=True)
     _write_json(path / 'spec.json', spec, exclusive=True)
-    rows = [{**case, 'status': 'pending', 'teamVictory': None} for case in cases]
+    rows = [{**case, 'status': 'pending', 'teamVictory': None, 'learnerIndividualVictory': None}
+            for case in cases]
     manifest = {'schema': SCHEMA, 'status': 'running', 'spec': 'spec.json',
                 'identity': 'identity.json', 'games': rows}
     _write_json(path / 'manifest.json', manifest)
@@ -391,10 +419,11 @@ def evaluate(script, *, root=None, seeds=tuple(range(1, 17)), mode='coop',
     if guard_error:
         for row in rows:
             if row['status'] == 'complete':
-                row.update(status='failed', teamVictory=None,
+                row.update(status='failed', teamVictory=None, learnerIndividualVictory=None,
                            error='Run end guard failed: ' + guard_error)
     status = ('failed' if guard_error else 'cancelled' if cancelled else
-              'complete' if all(row['status'] == 'complete' for row in rows) else 'failed')
+              'complete' if all(row['status'] == 'complete' for row in rows) else
+              'partial' if any(row['status'] == 'complete' for row in rows) else 'failed')
     manifest.update(status=status, guardError=guard_error)
     _write_json(path / 'manifest.json', manifest)
     _write_json(path / 'summary.json', _summary(rows, status, guard_error), exclusive=True)
@@ -410,11 +439,12 @@ def verify_run(path):
     """
     path = _safe_path(path)
     seal = _json(path / 'seal.json')
-    if seal.get('schema') != SCHEMA or seal.get('files') != _inventory(path, exclude=('seal.json',)):
+    if seal.get('schema') not in (SCHEMA, LEGACY_SCHEMA) or seal.get('files') != _inventory(path, exclude=('seal.json',)):
         raise ValueError('Run artifact inventory/hash mismatch')
     spec, identity = _json(path / 'spec.json'), _json(path / 'identity.json')
     manifest, summary = _json(path / 'manifest.json'), _json(path / 'summary.json')
-    if spec.get('identity') != identity or spec.get('schema') != SCHEMA:
+    schema = spec.get('schema')
+    if spec.get('identity') != identity or schema != seal['schema']:
         raise ValueError('Run identity/specification mismatch')
     if summary.get('guardError') or manifest.get('guardError'):
         raise ValueError('Evaluation end guards failed; run cannot be replayed')
@@ -439,11 +469,16 @@ def verify_run(path):
             result = validate_case(directory, case, spec)
             if row.get('teamVictory') != result['teamVictory'] or row.get('stateSHA256') != result['stateSHA256']:
                 raise ValueError('Case summary differs from sealed result')
+            if schema != LEGACY_SCHEMA and row.get('learnerIndividualVictory') is not result['learnerIndividualVictory']:
+                raise ValueError('Case learner individual victory differs from sealed result')
+        elif schema != LEGACY_SCHEMA and (row.get('teamVictory') is not None or
+                                          row.get('learnerIndividualVictory') is not None):
+            raise ValueError('Incomplete case cannot claim a terminal victory outcome')
         if directory.exists():
             case_seal = _json(directory / 'seal.json')
             if case_seal.get('files') != _inventory(directory, exclude=('seal.json',)):
                 raise ValueError('Case artifact inventory/hash mismatch')
-    if _summary(rows, summary['status']) != summary:
+    if _summary(rows, summary['status'], schema=schema) != summary:
         raise ValueError('Summary totals differ from all planned cases')
     if summary['status'] == 'complete' and summary['complete'] != len(rows):
         raise ValueError('Incomplete cases claimed as a complete run')
