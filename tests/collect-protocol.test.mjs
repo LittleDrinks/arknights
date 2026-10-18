@@ -52,4 +52,13 @@ test('public WS handles malformed JSON shapes, blocks unconsented start/modded b
   assert.equal((await api(`/${id}/timeline?match=${(await api('/'+id)).value.matches[0].id}&seat=0`,undefined,{key:organizers.get(different.id)})).status,403);
   const done=(await api('/'+id)).value;assert.equal(done.matches.length,1);assert.equal(done.matches[0].complete,false);assert.equal(done.matches[0].victory,null);assert.equal(done.matches[0].status,'partial');
   const ref=(await api('/'+id+'/export',{profile:'all-human'})).value;assert.equal(ref.quality.samples,0);
+  // A sealed collection remains exportable when its identity later returns to ordinary play.
+  await client(t,null,a.welcome.token);await delay(80);
+  assert.equal((await api('/'+id+'/export',{profile:'all-human'})).status,200);
+  // A takeover DURING a recording is a genuine capture interruption.
+  const active=(await api('',{label:'Active uninstrumented takeover'})).value,cap=(await api('/'+active.id+'/join',{consent:true})).value;
+  const captured=await client(t,cap);await captured.request('room.create',{mode:'solo',difficulty:'ABYSS'});await captured.request('room.start');
+  const bare=await client(t,null,captured.welcome.token);await bare.request('g.leave');await delay(100);
+  const broken=(await api('/'+active.id)).value.matches[0];assert.equal(broken.status,'technical-failure');assert.equal(broken.complete,false);assert.equal(broken.victory,null);
+  assert.equal((await api('/'+active.id+'/export',{profile:'all-human'})).status,400);
 });

@@ -18,7 +18,7 @@ test('four isolated native browser contexts: consent, normal room, manual action
   const report={source:'automated browser actions through original Net/UI, not expert demonstrations',base,actions:[],browserErrors:[],screenshots:[],started:new Date().toISOString()};
   const browser=await puppeteer.launch({executablePath:process.env.ARK_CHROME,headless:true,pipe:true,timeout:90000,args:['--no-sandbox','--disable-dev-shm-usage','--enable-unsafe-swiftshader']});
   const pages=[];let organizer;
-  const shot=async(page,name)=>{await page.screenshot({path:path.join(proof,name+'.png'),fullPage:true});report.screenshots.push(name+'.png');};
+  const shot=async(page,name)=>{await page.bringToFront();await page.screenshot({path:path.join(proof,name+'.png'),fullPage:true,waitForFonts:false,timeout:60000});report.screenshots.push(name+'.png');};
   t.after(async()=>{report.finished=new Date().toISOString();fs.writeFileSync(path.join(proof,'report.json'),JSON.stringify(report,null,2));await browser.close();});
   try {
     const context=await browser.createBrowserContext();organizer=await context.newPage();await organizer.setViewport({width:1440,height:1000});
@@ -144,6 +144,10 @@ test('four isolated native browser contexts: consent, normal room, manual action
     await guest.click('#timeline a');await guest.waitForFunction(()=>globalThis.__collectReplay?.ready,{timeout:60000});
     assert.equal(await guest.evaluate(()=>__collectReplay.seat),1);await shot(guest,'guest-own-seat-replay');
     report.guestReplay={actualAnchor:true,sameTab:true,ready:true,otherSeatDenied:true};
+    // Sealed expert data cannot be invalidated by later ordinary play from the same identity.
+    await guest.evaluate(()=>sessionStorage.removeItem('ark-collection'));await guest.goto(base+'/',{waitUntil:'domcontentloaded'});
+    await guest.waitForFunction(()=>globalThis.__SP__?.net.status==='online',{timeout:60000});
+    const afterResume=await api('/'+id+'/export',{profile:'all-human'});assert.equal(afterResume.quality.samples,all.quality.samples);report.sealedUninstrumentedResume=true;
     const replay=await context.newPage();await replay.setViewport({width:1440,height:1000});
     replay.on('pageerror',e=>report.browserErrors.push({replay:true,message:e.message}));
     await replay.goto(`${base}/collect/replay?id=${id}&match=${match.id}&seat=0`,{waitUntil:'domcontentloaded'});

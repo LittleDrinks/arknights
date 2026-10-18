@@ -59,3 +59,26 @@ test('capture write failure lets the real game settle but latches technical-fail
   assert.equal(meta.status,'technical-failure');assert.equal(meta.complete,false);assert.equal(meta.victory,null);
   assert.throws(()=>collector.store.export(on.collection),/storage failed/);
 });
+
+test('native bot and autoplay actions retain their actual source even when the only human occupies seat 2', {timeout:30000},async t=>{
+  const collector=fixture(t), c=collector.store.create('source attribution'),p=collector.join(c.id,true);
+  collector.players.set('p_seat2',collector.participants.get(p.key));
+  const C=collector.matchClass(Match,Battle),m=new C({roomCode:'AUTO',matchNo:1,seed:106,mode:'coop',difficulty:'ABYSS',data,
+    timerScale:.02,combatSpeed:200,botRehearsal:0,clientCombat:false,
+    seats:Array.from({length:4},(_,seat)=>({seat,playerId:seat===2?'p_seat2':'ai_'+seat,name:'Seat'+seat,isBot:seat!==2,connected:true})),
+    log:quiet,send(){return true;},broadcast(){},onEnd(){}});
+  try {
+    m.start();assert.equal(m.handle('p_seat2',{t:'g.autoplay',on:true}).ok,true);
+    const started=Date.now();let operations;
+    for(;;) {
+      operations=collector.store.rows(c.id,'verification').filter(r=>r.kind==='operation');
+      if(operations.some(r=>r.seat===2&&r.source==='autoplay'&&r.action.t==='g.buy')&&operations.some(r=>r.seat===0&&r.source==='bot'))break;
+      assert(Date.now()-started<15000,'native auto prep did not execute');await delay(10);
+    }
+    assert(operations.filter(r=>r.seat===2).every(r=>r.source!=='human'));
+    assert(operations.filter(r=>r.seat===0).every(r=>r.source!=='human'));
+    m.onDisconnect('p_seat2');m.onReconnect('p_seat2');
+    const lifecycle=collector.store.rows(c.id,'verification');assert(lifecycle.some(r=>r.kind==='onDisconnect'));assert(lifecycle.some(r=>r.kind==='onReconnect'));
+  }finally{m.dispose();}
+  const meta=collector.store.get(c.id).matches[0];assert.equal(meta.complete,false);assert.equal(meta.victory,null);
+});

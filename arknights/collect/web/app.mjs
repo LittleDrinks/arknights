@@ -12,7 +12,7 @@ const api = async (url, body) => { const r = await fetch('/api/collect' + url, {
   const value = await r.json(); if (!r.ok) throw Error(value.error); return value; };
 const run = fn => async e => { e?.preventDefault(); $('error').textContent = ''; try { await fn(e); } catch (err) { $('error').textContent = err.message; } };
 const el = (tag, text) => { const node = document.createElement(tag); if (text) node.textContent = text; return node; };
-const id = new URLSearchParams(location.search).get('id'); let current, selected, annotationId = null;
+const id = new URLSearchParams(location.search).get('id'); let current, selected, annotationId = null, selectedRows = [];
 $('create-button').onclick = run(async () => { const c = await api('', { label: $('label').value }); localStorage.setItem('ark-organizer:' + c.id, c.organizerKey); location.href = '/collect?id=' + c.id; });
 $('join').onclick = run(async () => {
   if (!$('consent').checked) throw Error('请先阅读并勾选记录同意');
@@ -23,7 +23,7 @@ $('join').onclick = run(async () => {
 $('refresh').onclick = run(load);
 async function timeline(match, seat) {
   selected = { matchId: match.id, seat }; annotationId = null;
-  const rows = await api(`/${id}/timeline?match=${match.id}&seat=${seat}`);
+  const rows = await api(`/${id}/timeline?match=${match.id}&seat=${seat}`); selectedRows = rows;
   $('timeline').replaceChildren(el('h3', `席 ${seat + 1} · ${match.status} · ${rows.length} 条记录`));
   const replay = el('a', '原生页面回看本席 / 战斗'); replay.href = `/collect/replay?id=${id}&match=${match.id}&seat=${seat}`; $('timeline').append(replay);
   const names = { 'g.buy':'购买', 'g.move':'布阵 / 调整朝向', 'g.equip':'配发装备', 'g.reward':'选择奖励', 'g.choice':'机变选择',
@@ -54,7 +54,13 @@ function revisions() {
   $('revisions').replaceChildren(el('h3', '标注修订（追加保存）'));
   for (const a of current.annotations.filter(a => a.matchId === selected?.matchId && a.seat === selected?.seat)) {
     const button = el('button', `${a.annotationId.slice(0, 8)} v${a.revision} · ${a.goalCore} · ${a.quality} · ${a.note}`);
-    button.onclick = () => { annotationId = a.annotationId; for (const [key, value] of Object.entries({ start:a.start, end:a.end, core:a.goalCore, support:a.goalSupport, stage:a.stage, quality:a.quality, note:a.note, author:a.author })) $(key).value = value; };
+    button.onclick = () => { annotationId = a.annotationId; for (const [key, value] of Object.entries({ start:a.start, end:a.end, core:a.goalCore, support:a.goalSupport, stage:a.stage, quality:a.quality, note:a.note, author:a.author })) {
+      if (['start','end'].includes(key) && ![...$(key).options].some(o => o.value === value)) {
+        const index = selectedRows.findIndex(r => r.eventId === value), row = selectedRows[index];
+        if (row) $(key).add(new Option(`已保存区间边界 · 事件 ${index} ${row.message?.t || row.kind}`, value));
+      }
+      $(key).value = value;
+    } };
     $('revisions').append(button);
   }
 }

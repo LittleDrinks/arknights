@@ -23,7 +23,7 @@ export class Collector {
     if (consent !== true) throw Error('Explicit consent required');
     const key = randomUUID(), p = { id: 'p-' + randomUUID(), collectionId, seq: 0 };
     this.participants.set(key, p);
-    this.store.append(collectionId, 'players', { kind: 'consent', participantId: p.id, consentVersion: 1 });
+    this.store.append(collectionId, 'players', { kind: 'consent', participantId: p.id, consentVersion: 2, scope: 'collection-batch' });
     return { key, participantId: p.id, collectionId };
   }
   takeRequest(playerId, message) {
@@ -237,7 +237,12 @@ if (credentials) installProbe(net, credentials);\n`;
         }
         else if (this.players.has(playerId)) {
           // A consented identity resumed outside the instrumented page: never silently certify its decisions.
-          const prior = this.players.get(playerId); this.store.failed.set(prior.collectionId, 'identity resumed without capture probe');
+          const prior = this.players.get(playerId), active = this.active.get(playerId);
+          if (active && this.matches.get(active.captureId) === active && !active.ended && !active.disposed) {
+            this.store.fail(prior.collectionId, 'active identity resumed without capture probe');
+          } else {
+            this.players.delete(playerId); this.active.delete(playerId);
+          }
         }
       }
       if (p) {

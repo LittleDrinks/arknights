@@ -29,6 +29,10 @@ export class Collections {
     for (const channel of ['players', 'verification', 'annotations']) fs.writeFileSync(this.file(id, channel + '.jsonl'), '', { flag: 'wx', mode: 0o600 });
     atomic(this.file(id), value); return value;
   }
+  fail(id, failure) {
+    this.failed.set(id, failure);
+    try { atomic(this.file(id, 'failure.json'), { failure }); } catch { /* interrupted/full storage cannot certify a capture */ }
+  }
   append(id, channel, row) {
     try {
       const file = this.file(id, channel + '.jsonl');
@@ -43,8 +47,7 @@ export class Collections {
       finally { fs.closeSync(fd); }
       return true;
     } catch (e) {
-      const failure = 'capture write failed: ' + (e.code || 'integrity'); this.failed.set(id, failure);
-      try { atomic(this.file(id, 'failure.json'), { failure }); } catch { /* full disk: next recovery keeps interrupted matches partial */ }
+      const failure = 'capture write failed: ' + (e.code || 'integrity'); this.fail(id, failure);
       return false;
     }
   }
