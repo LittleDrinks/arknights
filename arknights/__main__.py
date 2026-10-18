@@ -47,6 +47,13 @@ def main(argv=None):
     rep.add_argument("--no-serve", action="store_true")
     serve = commands.add_parser("preview", help="Start/reuse the native viewer")
     serve.add_argument("--port", type=int, default=38181)
+    collect = commands.add_parser("collect", help="Human demonstration capture and export")
+    collect_commands = collect.add_subparsers(dest="collect_command", required=True)
+    collect_serve = collect_commands.add_parser("serve")
+    collect_serve.add_argument("--port", type=int, default=38181)
+    collect_export = collect_commands.add_parser("export")
+    collect_export.add_argument("collection_id")
+    collect_export.add_argument("--profile", choices=("human-reviewed", "all-human"), default="human-reviewed")
     commands.add_parser("check", help="Check the frozen game checkout")
     legacy = commands.add_parser("legacy", help="Historical SHA-pinned experiments (compatibility only)")
     legacy.add_argument("arguments", nargs=argparse.REMAINDER)
@@ -80,6 +87,12 @@ def main(argv=None):
     elif args.command == "preview":
         from arknights.replay import preview
         print(preview(root=ROOT, port=args.port))
+    elif args.command == "collect":
+        from arknights.collect import serve, export
+        if args.collect_command == "serve":
+            print(serve(root=ROOT, port=args.port).url)
+        else:
+            print(json.dumps(export(args.collection_id, args.profile, root=ROOT).metadata, ensure_ascii=False, indent=2))
     elif args.command == "check":
         from arknights.adapter import RULES
         actual = subprocess.check_output(["git", "-C", str(ROOT / "game"), "rev-parse", "HEAD"], text=True).strip()

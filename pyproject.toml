@@ -19,3 +19,5 @@ exclude = ["arknights.evaluate._legacy*"]
 [tool.setuptools.package-data]
 "arknights.adapter" = ["*.mjs"]
 "arknights.replay" = ["*.mjs", "web/*.js", "web/*.css", "web/i18n/*.json"]
+
+"arknights.collect" = ["*.mjs", "web/*.mjs", "web/*.html", "web/*.css"]

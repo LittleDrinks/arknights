@@ -232,6 +232,7 @@ export function TitleScreen() {
       <div>
         <div class="title-corner__tools">
           <a class="btn btn--ghost btn--sm" href="/?replay=solo-ABYSS-s1">${t('轨迹回放')} ↗</a>
+          <a class="btn btn--ghost btn--sm" href="/collect">真人采集 ↗</a>
           <a class="btn btn--ghost btn--sm" href="/evaluations">评测队列 ↗</a>
           <${Button} variant="ghost" size="sm" icon="chart" class="title-stats" onClick=${openStats} title=${t('统计数据')}>${t('统计')}<//>
           <${LangToggle} class="title-lang" />
