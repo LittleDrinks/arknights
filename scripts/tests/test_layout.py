@@ -71,18 +71,26 @@ class Migration(unittest.TestCase):
             self.assertEqual((outside/'assets').read_text(),'keep outside')
             self.assertTrue((r/'experiments/a.json').exists())
     def test_resume_after_preservation_and_during_runtime_updates(self):
-        for stop in ('before-runtime','during-runtime'):
+        for stop in ('before-runtime','during-runtime','after-ledger','before-replace','partial-temporary'):
             with self.subTest(stop=stop),tempfile.TemporaryDirectory() as t:
                 r=self.fixture(t);script=r/'venvs/v/bin/pip';script.parent.mkdir(parents=True);script.write_text('#!'+str(r/'venvs/v/bin/python')+'\n')
                 if stop=='before-runtime':
                     with patch.object(M,'finish_runtime',side_effect=RuntimeError('stop')),self.assertRaises(RuntimeError):self.run_main(r)
+                elif stop=='before-replace':
+                    with patch.object(M.os,'replace',side_effect=RuntimeError('stop')),self.assertRaises(RuntimeError):self.run_main(r)
+                elif stop=='partial-temporary':
+                    def interrupted_replace(*args):
+                        Path(args[0]).write_bytes(b'partial')
+                        raise RuntimeError('stop')
+                    with patch.object(M.os,'replace',interrupted_replace),self.assertRaises(RuntimeError):self.run_main(r)
                 else:
                     original=M.write_new
                     def interrupt(path,value):
-                        if path.name=='runtime-script-updates.json':raise RuntimeError('stop')
+                        if path.name==('complete.json' if stop=='after-ledger' else 'runtime-script-updates.json'):raise RuntimeError('stop')
                         return original(path,value)
                     with patch.object(M,'write_new',interrupt),self.assertRaises(RuntimeError):self.run_main(r)
                 self.run_main(r,resume=True)
+                self.run_main(r,resume=True)  # Completed migrations remain idempotent.
                 self.assertIn(str(r/'runtime/venvs/v/bin/python'),(r/'runtime/venvs/v/bin/pip').read_text())
                 self.assertEqual(os.readlink(r/'node_modules'),'runtime/node_modules')
                 self.assertTrue((r/'results/migrations/layout-20261018/complete.json').exists())

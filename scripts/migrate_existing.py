@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import stat
 import subprocess
+import uuid
 
 MOVE = {
  'experiments':'results/runs', 'logs':'results/logs', 'trajectories':'results/trajectories',
@@ -81,6 +82,8 @@ def staged_game(stage):
 def make_plan(root,stage):
     staged_game(stage)
     operations=[]
+    for temporary in (root/'venvs').glob('*/bin/*.layout.tmp'):
+        raise ValueError('Reserved runtime temporary already exists: '+str(temporary))
     for old,new in MOVE.items():
         if exists(root/old):operations.append(dict(source=old,target=new,identity=node_identity(root/old)))
     for old,new in SPECIAL.items():
@@ -114,6 +117,7 @@ def finish_runtime(root,out):
     changes=[]
     for bin_dir in (root/'runtime/venvs').glob('*/bin'):
         for path in bin_dir.iterdir():
+            if path.name.endswith('.layout.tmp'):continue
             if not path.is_file() or path.is_symlink() or path.stat().st_size>20000:continue
             backup=out/'venv-script-originals'/path.relative_to(root/'runtime/venvs')
             current=path.read_bytes()
@@ -129,8 +133,15 @@ def finish_runtime(root,out):
                 with backup.open('xb') as f:f.write(raw);f.flush();os.fsync(f.fileno())
             if current!=wanted:
                 temporary=path.with_name(path.name+'.layout.tmp')
-                if exists(temporary):raise ValueError('Inspect interrupted runtime temporary: '+str(temporary))
-                with temporary.open('xb') as f:f.write(wanted);f.flush();os.fsync(f.fileno())
+                if exists(temporary):
+                    if temporary.is_symlink() or not temporary.is_file():raise ValueError('Unexpected runtime temporary type')
+                    if temporary.read_bytes()!=wanted:
+                        retained=out/'runtime-partials'/path.relative_to(root/'runtime/venvs')
+                        retained=retained.with_name(retained.name+'-'+uuid.uuid4().hex)
+                        retained.parent.mkdir(parents=True,exist_ok=True)
+                        temporary.rename(retained)  # Preserve an interrupted write before creating a complete one.
+                if not exists(temporary):
+                    with temporary.open('xb') as f:f.write(wanted);f.flush();os.fsync(f.fileno())
                 temporary.chmod(path.stat().st_mode)
                 os.replace(temporary,path)
             changes.append(str(path.relative_to(root)))
@@ -141,7 +152,7 @@ def finish_runtime(root,out):
     value=json.dumps(changes,indent=2)
     path=out/'runtime-script-updates.json'
     if path.exists():
-        if path.read_text()!=value:raise ValueError('Runtime update ledger mismatch')
+        if json.loads(path.read_text())!=changes:raise ValueError('Runtime update ledger mismatch')
     else:write_new(path,changes)
     done=out/'complete.json'
     if not done.exists():write_new(done,dict(status='complete',at=datetime.now(timezone.utc).isoformat(),runtimeScriptsUpdated=len(changes)))
