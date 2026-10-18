@@ -32,13 +32,50 @@
 !/results/workspaces/.gitkeep
 /runtime/*
 !/runtime/.gitkeep
-/node_modules
+# Local editor and operating-system files
+.vscode/
+.idea/
+*.code-workspace
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+
+# Dependencies, virtual environments and tool caches
+node_modules/
+.venv/
+venv/
+.tox/
+.nox/
+.cache/
 __pycache__/
 *.py[cod]
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+.coverage
+.coverage.*
+htmlcov/
+coverage/
+*.tsbuildinfo
+
+# Local configuration, logs and temporary output
 .env
 .env.*
 !.env.example
+*.log
+*.tmp
+
+# Historical generated reports/data live under ignored results/archive.
+/arknights/evaluate/_legacy/evaluation/combat/guides.json
+/arknights/evaluate/_legacy/evaluation/combat/mechanics.json
+/arknights/evaluate/_legacy/evaluation/combat/natural-evidence.json
+/arknights/evaluate/_legacy/evaluation/combat/sources.json
+/arknights/evaluate/_legacy/evaluation/combat/summary.csv
+/arknights/evaluate/_legacy/strategies/dagger/evidence.json
 
 # Python editable-install metadata
 *.egg-info/

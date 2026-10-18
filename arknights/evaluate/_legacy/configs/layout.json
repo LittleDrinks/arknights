@@ -468,21 +468,21 @@
     },
     {
       "virtual": "combat-audit/guides.json",
-      "source": "arknights/evaluate/_legacy/evaluation/combat/guides.json",
+      "source": "results/archive/source-results/combat-audit/guides.json",
       "sha256": "eede3581a17b44e0fe1943bf1a9094d4fa5295d8a699ee52f69cd360dfa71ea2",
-      "archive": false
+      "archive": true
     },
     {
       "virtual": "combat-audit/mechanics.json",
-      "source": "arknights/evaluate/_legacy/evaluation/combat/mechanics.json",
+      "source": "results/archive/source-results/combat-audit/mechanics.json",
       "sha256": "2b57d52b48ff4db1450babe0258606a436c51755f35aa8371cae3d84e06f7776",
-      "archive": false
+      "archive": true
     },
     {
       "virtual": "combat-audit/natural-evidence.json",
-      "source": "arknights/evaluate/_legacy/evaluation/combat/natural-evidence.json",
+      "source": "results/archive/source-results/combat-audit/natural-evidence.json",
       "sha256": "1b278eb5660e4649a3ca89d0e1a1dab33da229467daed6b8e7e601f0f1f0240d",
-      "archive": false
+      "archive": true
     },
     {
       "virtual": "combat-audit/results/budget.json",
@@ -858,15 +858,15 @@
     },
     {
       "virtual": "combat-audit/sources.json",
-      "source": "arknights/evaluate/_legacy/evaluation/combat/sources.json",
+      "source": "results/archive/source-results/combat-audit/sources.json",
       "sha256": "46022beb6fd45faad468d2486dc16581fd68b0967a21a2dc6c9fea34ccdf5e38",
-      "archive": false
+      "archive": true
     },
     {
       "virtual": "combat-audit/summary.csv",
-      "source": "arknights/evaluate/_legacy/evaluation/combat/summary.csv",
+      "source": "results/archive/source-results/combat-audit/summary.csv",
       "sha256": "2719c0a1f0f196643552d948670f8c7a55da53fb0d4797916797f45fba91ba9a",
-      "archive": false
+      "archive": true
     },
     {
       "virtual": "controller-v2/README.md",
@@ -1146,9 +1146,9 @@
     },
     {
       "virtual": "dagger/evidence.json",
-      "source": "arknights/evaluate/_legacy/strategies/dagger/evidence.json",
+      "source": "results/archive/source-results/dagger/evidence.json",
       "sha256": "b7de7043d157fdce9d8197294fc73c66c3a159b492107d65d13ce8b22d3ab34c",
-      "archive": false
+      "archive": true
     },
     {
       "virtual": "dagger/run.py",
