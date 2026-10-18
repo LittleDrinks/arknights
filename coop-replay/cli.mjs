@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { limits } from './replay.mjs';
+import { profileFor } from './profiles.mjs';
+import { PROFILE, LOADER, workerEnvironment, validateOptions } from '../frozen-replay/profile.mjs';
 
 const help = `node coop-replay/cli.mjs --trace <training.json> --out <NEW directory>
   [--mode verify|record] [--prefix <action count; verify only>] [--game <path>] [--trace-sha256 <hex>]
@@ -10,20 +12,34 @@ const help = `node coop-replay/cli.mjs --trace <training.json> --out <NEW direct
 Default: action replay only; no battle recordings. Full record mode is intended for server use.`;
 const flags = { trace: 'trace', out: 'out', mode: 'mode', game: 'game', 'trace-sha256': 'traceSha256',
   prefix: 'prefix', seconds: 'seconds', 'rss-mb': 'rssMb', 'heap-mb': 'heapMb', 'max-output-mb': 'maxOutputMb', 'frame-every': 'frameEvery' };
+export function workerLaunch(options) {
+  const selected = profileFor(options.profile), budget = limits(options);
+  const frozen = selected.id === PROFILE;
+  if (frozen) validateOptions(options);
+  return { args: [`--max-old-space-size=${budget.heapMb}`,
+    ...(frozen ? ['--no-warnings', '--loader', fileURLToPath(LOADER)] : []),
+    fileURLToPath(new URL('./worker.mjs', import.meta.url)), JSON.stringify(options)],
+    env: frozen ? workerEnvironment() : process.env };
+}
+
+export function runCLI({ argv = process.argv.slice(2), profile, usage = help } = {}) {
 try {
-  if (process.argv.includes('--help')) { console.log(help); process.exit(0); }
-  const options = {};
-  for (let i = 2; i < process.argv.length; i += 2) {
-    const flag = process.argv[i], value = process.argv[i + 1], key = flags[flag.slice(2)];
-    if (!flag.startsWith('--') || !key || !value || value.startsWith('--') || key in options) throw new Error(help);
+  profileFor(profile);
+  const acceptedFlags = profile === PROFILE
+    ? { ...flags, receipt: 'receipt', 'receipt-sha256': 'receiptSha256' } : flags;
+  if (argv.includes('--help')) { console.log(usage); return; }
+  const options = profile === undefined ? {} : { profile };
+  for (let i = 0; i < argv.length; i += 2) {
+    const flag = argv[i], value = argv[i + 1], key = acceptedFlags[flag.slice(2)];
+    if (!flag.startsWith('--') || !key || !value || value.startsWith('--') || key in options) throw new Error(usage);
     options[key] = value;
   }
-  if (!options.trace || !options.out) throw new Error(help);
+  if (!options.trace || !options.out) throw new Error(usage);
   const budget = limits(options);
   if (budget.heapMb >= budget.rssMb) throw new Error('Heap budget must be below RSS budget');
-  const child = spawn(process.execPath, [`--max-old-space-size=${budget.heapMb}`,
-    fileURLToPath(new URL('./worker.mjs', import.meta.url)), JSON.stringify(options)],
-  { stdio: ['ignore', 'inherit', 'inherit', 'ipc'] });
+  const launch = workerLaunch(options);
+  const child = spawn(process.execPath, launch.args,
+    { env: launch.env, stdio: ['ignore', 'inherit', 'inherit', 'ipc'] });
   let failure, progress;
   child.on('message', value => { progress = value; });
   const stop = message => { failure ||= message; child.kill('SIGKILL'); };
@@ -44,3 +60,6 @@ try {
     process.exitCode = failure || code !== 0 ? 1 : 0;
   });
 } catch (e) { console.error(e.message); process.exitCode = 1; }
+
+}
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) runCLI();

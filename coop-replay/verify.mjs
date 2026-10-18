@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { RULES } from '../rl/env.mjs';
 import { MANIFEST, MANIFEST_SHA256, poolConfig, selectTeam } from '../coop/pool.mjs';
+import { profileFor } from './profiles.mjs';
+import { PROFILE, validateFrozenTrace } from '../frozen-replay/profile.mjs';
 export { verifyCandidate } from '../model-replay/replay.mjs';
 
 export const KIND = 'actual-training-trajectory-not-frozen-model-evaluation';
@@ -17,10 +19,11 @@ export function configuration(trace) {
   return config;
 }
 
-export function validateTrace(trace) {
-  assert.equal(trace.kind, KIND);
+export function validateTrace(trace, profile) {
+  const selected = profileFor(profile);
+  assert.equal(trace.kind, selected.kind);
   assert.equal(trace.rules, RULES);
-  assert.equal(trace.controller, CONTROLLER);
+  assert.equal(trace.controller, selected.controller);
   const t = trace.terminal, e = t.episode;
   assert.equal(t.ok, true);
   assert.equal(e.mode, 'coop');
@@ -36,7 +39,7 @@ export function validateTrace(trace) {
     assert(['buy', 'sell', 'refresh', 'levelUp', 'ready'].includes(a.action?.type));
   }
   configuration(trace);
-  verifyState(t, trace);
+  verifyState(t, trace, profile);
   assert.equal(t.done, true);
   assert.equal(t.summary.players.length, 4);
   assert.equal(t.summary.errors, 0);
@@ -45,17 +48,20 @@ export function validateTrace(trace) {
   assert.equal(t.reward, t.victory ? 1 : -1);
   for (const id of ['partner-1', 'partner-2', 'partner-3'])
     assert(/^[a-f0-9]{64}$/.test(t.partnerAudit[id].actionSHA256));
+  if (selected.id === PROFILE) validateFrozenTrace(trace);
   return trace;
 }
 
-export function verifyState(state, trace) {
+export function verifyState(state, trace, profile) {
   assert.equal(state.rules, RULES, 'Rules drift');
-  assert.equal(state.controller, CONTROLLER, 'Controller drift');
+  assert.equal(state.controller, profileFor(profile).controller, 'Controller drift');
   const { diagnostics: _actual, ...actual } = state.episode;
   const { diagnostics: _expected, ...expected } = trace.terminal.episode;
   assert.deepEqual(actual, expected, 'Episode configuration drift');
   // This particular trace has no diagnostic rejections either. Never broaden acceptance.
   for (const k of ['engineErrors', 'actionErrors', 'controllerErrors']) assert.equal(state[k], 0, k);
+  if (profileFor(profile).id === PROFILE)
+    for (const k of ['partnerActionErrors', 'controllerDiagnosticErrors']) assert.equal(state[k], 0, k);
 }
 
 export function verifyTerminal(state, trace) {

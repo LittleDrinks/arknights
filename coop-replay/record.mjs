@@ -1,3 +1,4 @@
+import { profileFor } from './profiles.mjs';
 // Observe real calls and real Battle ticks. Views are never restored into a simulator.
 export const copy = value => value == null ? null : JSON.parse(JSON.stringify(value));
 
@@ -21,7 +22,8 @@ const methods = {
 };
 
 export class Recorder {
-  constructor({ id, guard = () => {}, record = false, maxBytes = 12_000_000, frameEvery = 3 }) {
+  constructor({ id, guard = () => {}, record = false, maxBytes = 12_000_000, frameEvery = 3, profile }) {
+    this.profile = profileFor(profile);
     Object.assign(this, { id, guard, record, maxBytes, frameEvery, events: [], battles: [], stack: [], traceIndex: null,
       retainedBytes: 0, failure: null });
   }
@@ -107,7 +109,7 @@ export class Recorder {
         if (!record) { this.pending = []; return; }
         this.pending ||= []; // _ev can run during super(): retain those events too.
         const name = `${recorder.id}-r${m.round}-${recorder.battles.length}`;
-        this.recording = { version: 1, name, title: `合作训练轨迹（跨 PPO 行为版本） · ${m.difficulty} · R${m.round}`,
+        this.recording = { version: 1, name, title: `${recorder.profile.battleLabel} · ${m.difficulty} · R${m.round}`,
           kind: opts.kind, stageId: m.stageId, modeId: m.modeId, round: m.round,
           tick: this.dt, participants: opts.players.map(p => p.playerId), frameEvery: recorder.frameEvery, field: null, frames: [] };
         recorder.battles.push(this);

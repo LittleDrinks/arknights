@@ -1,5 +1,8 @@
 # 合作训练真实胜局 → 原页面离线回放
 
+本页为原 training profile；默认 CLI/API 语义保持。冻结 BC 开发 seed65 使用独立命令和
+显式 profile，见 [frozen-replay/README.md](../frozen-replay/README.md)，不能套用本页的训练来源说明。
+
 仅新增 `coop-replay/`，基线 `53bc0f1a9f451b61bde7c209c8bf013b81540517`。复用原 `CoopEnv.create/reset/step`、规则 pin、动作合法性和健康检查；没有修改游戏、coop、model-replay 或 rl，没有恢复 snapshot 来模拟，也不加载模型、训练、安装或联网。
 
 输入为项目根 `experiments/coop-training-win-50003.json`（本 checkout 相邻 `../experiments/`），默认必须匹配 SHA256：

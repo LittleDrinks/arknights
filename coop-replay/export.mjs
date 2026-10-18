@@ -2,7 +2,8 @@ import assert from 'node:assert/strict';
 import { gzipSync } from 'node:zlib';
 import { createHash } from 'node:crypto';
 import { viewerIds } from './record.mjs';
-import { KIND } from './verify.mjs';
+import { profileFor } from './profiles.mjs';
+import { PROFILE, CHECKPOINT } from '../frozen-replay/profile.mjs';
 export { mergeIndexes } from '../model-replay/index.mjs';
 import { mergeIndexes } from '../model-replay/index.mjs';
 
@@ -80,7 +81,18 @@ export function battleViews(refs) {
   return views;
 }
 
-export function bundle({ id, state, recorder, recordings, provenance, guard = () => {}, maxBytes }) {
+export function bundle({ id, state, recorder, recordings, provenance, guard = () => {}, maxBytes, profile }) {
+  const selected = profileFor(profile);
+  if (selected.id === PROFILE) {
+    assert.equal(state.done, true, 'Frozen bundle requires terminal');
+    assert.equal(state.controller, selected.controller);
+    assert.equal(recorder.profile.id, PROFILE);
+    assert.equal(provenance.kind, selected.kind);
+    assert.equal(provenance.singleCheckpoint, CHECKPOINT);
+    assert.equal(provenance.inferenceRerun, false);
+    assert.equal(provenance.execution, 'saved-action-replay-only');
+    assert.equal(provenance.independentPythonReproduction?.reportedInferenceRerun, true);
+  }
   validateRecordings(recordings);
   const steps = episodeSteps(recorder.events); validateSteps(steps);
   const viewerRecordings = viewerIds(recordings);
@@ -91,9 +103,9 @@ export function bundle({ id, state, recorder, recordings, provenance, guard = ()
   const actions = {};
   for (const e of recorder.events) actions[e.action.t] = (actions[e.action.t] || 0) + 1;
   const base = { config: `coop:${state.episode.difficulty}`, seed: state.episode.seed, players: 4,
-    commit: state.rules, source: KIND, rehearsal: 0, schema: SCHEMA,
+    commit: state.rules, source: selected.kind, rehearsal: 0, schema: SCHEMA,
     observation_scope: 'four-seat-private-offline-terminal-replay-only', provenance,
-    note: '真实训练轨迹跨多个 PPO 行为版本；不是冻结 checkpoint 成功。四席私有视图仅用于离线终局回放。',
+    note: selected.note,
     victory: state.victory, roundsPassed: state.rounds, hiddenReached: state.summary.hiddenReached,
     policySteps: state.steps, steps: steps.length, methodCalls: recorder.events.length,
     accepted: steps.filter(e => e.accepted).length, engineErrors: state.engineErrors, schedulerErrors: 0,
@@ -113,7 +125,7 @@ export function bundle({ id, state, recorder, recordings, provenance, guard = ()
   const entries = [];
   for (const view of battleViews(refs)) {
     const entryId = id + view.suffix;
-    const meta = { ...base, id: entryId, policyLabel: `合作训练真实轨迹 · ${view.label}`, battles: view.refs };
+    const meta = { ...base, id: entryId, policyLabel: `${selected.label} · ${view.label}`, battles: view.refs };
     add(`agent/episodes/${entryId}.json`, { meta, steps, engineCalls });
     // Download keeps literal engine IDs, including the full original terminal.
     const download = gzipSync(`${JSON.stringify({ type: 'episode', ...meta })}\n${transitions}\n${JSON.stringify({ type: 'terminal', ...state })}\n`);
@@ -122,7 +134,7 @@ export function bundle({ id, state, recorder, recordings, provenance, guard = ()
     entries.push({ ...indexMeta, bytes: download.length, transitionHash, file: `episodes/${entryId}.json` });
   }
   const manifest = { schema: SCHEMA, createdAt: new Date().toISOString(), commit: state.rules,
-    quality: KIND, episodes: entries, totalSteps: entries.reduce((n, e) => n + e.steps, 0),
+    quality: selected.kind, episodes: entries, totalSteps: entries.reduce((n, e) => n + e.steps, 0),
     totalBytes: entries.reduce((n, e) => n + e.bytes, 0) };
   mergeIndexes({ schema: SCHEMA, episodes: [] }, [], manifest, refs);
   add('agent/index.json', manifest);
