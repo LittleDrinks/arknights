@@ -24,6 +24,6 @@ for row in cfg['files']:
 modules=subprocess.check_output(['git','-C',str(ROOT),'ls-files','--stage','game']).decode()
 if not modules.startswith('160000 '+cfg['rules']):
     raise ValueError('game is not the pinned gitlink')
-for folder in ('runs','benchmarks','tests','logs','trajectories','replays','archive','migrations','workspaces'):
+for folder in ('runs','benchmarks','tests','logs','trajectories','replays','archive','datasets','migrations','workspaces'):
     subprocess.run(['git','-C',str(ROOT),'check-ignore','--quiet','results/'+folder+'/example.json'],check=True)
 print(json.dumps(dict(status='pass',game=cfg['rules'],sourceFiles=sum(not r['archive'] for r in cfg['files']),generatedResultsTracked=False)))

@@ -35,6 +35,10 @@ def check_game():
     actual = git('rev-parse', 'HEAD', cwd=ROOT/'game').decode().strip()
     if actual != cfg['rules']:
         raise ValueError('game does not match the pinned rules')
+    for relative in ('node_modules', '.cache', 'public/assets', 'public/vendor', 'public/fonts'):
+        candidate = ROOT/'game'/relative
+        if candidate.exists() or candidate.is_symlink():
+            raise ValueError('Generated files must be outside game: '+relative)
     dirty = git('status', '--porcelain', '--untracked-files=all', cwd=ROOT/'game')
     if dirty.strip():
         raise ValueError('game must be pristine; put adaptations/assets/results outside the submodule')
