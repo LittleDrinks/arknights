@@ -59,6 +59,14 @@ test('real small trace static contracts; defaults stay training and fixed allowl
   }
 });
 
+test('real CoopEnv view checks live frozen counters without requiring terminal-only fields early', () => {
+  const launch = workerLaunch(options);
+  const result = spawnSync(process.execPath, [...launch.args.slice(0, -2),
+    fileURLToPath(new URL('./view-regression.mjs', import.meta.url))],
+  { env: launch.env, timeout: 3000, encoding: 'utf8' });
+  assert.equal(result.status, 0, result.stderr + result.stdout);
+});
+
 test('receipt is hashed, bound and attributed, never a local inference assertion', () => {
   const p = metadata();
   assert.equal(p.singleCheckpoint, CHECKPOINT); assert.equal(p.inferenceRerun, false);

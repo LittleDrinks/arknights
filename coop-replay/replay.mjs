@@ -68,7 +68,7 @@ export async function replay(options, progress = () => {}) {
   try {
     const simulationStart = performance.now();
     state = env.reset(trace.terminal.episode);
-    verifyState(state, trace, options.profile);
+    verifyState(state, trace, options.profile, env);
     for (const [i, entry] of trace.actions.slice(0, count).entries()) {
       progress({ completedActions: i, nextRound: entry.round, nextAction: entry.action.type });
       guard(); verifyCandidate(state, entry, i);
@@ -76,7 +76,7 @@ export async function replay(options, progress = () => {}) {
       recorder.traceIndex = i;
       state = env.step(entry.candidateIndex);
       recorder.traceIndex = null;
-      recorder.check(); verifyState(state, trace, options.profile);
+      recorder.check(); verifyState(state, trace, options.profile, env);
       const calls = recorder.events.slice(first).filter(e => e.playerId === 'learner' && e.source === 'policy' &&
         e.parentSeq === null && ['buy', 'sell', 'refresh', 'levelUp', 'setReady'].includes(e.method));
       assert.equal(calls.length, 1, `Actual learner action count at ${i}`);

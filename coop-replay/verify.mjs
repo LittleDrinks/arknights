@@ -52,7 +52,7 @@ export function validateTrace(trace, profile) {
   return trace;
 }
 
-export function verifyState(state, trace, profile) {
+export function verifyState(state, trace, profile, env) {
   assert.equal(state.rules, RULES, 'Rules drift');
   assert.equal(state.controller, profileFor(profile).controller, 'Controller drift');
   const { diagnostics: _actual, ...actual } = state.episode;
@@ -60,8 +60,16 @@ export function verifyState(state, trace, profile) {
   assert.deepEqual(actual, expected, 'Episode configuration drift');
   // This particular trace has no diagnostic rejections either. Never broaden acceptance.
   for (const k of ['engineErrors', 'actionErrors', 'controllerErrors']) assert.equal(state[k], 0, k);
-  if (profileFor(profile).id === PROFILE)
-    for (const k of ['partnerActionErrors', 'controllerDiagnosticErrors']) assert.equal(state[k], 0, k);
+  if (profileFor(profile).id === PROFILE) {
+    for (const k of ['partnerActionErrors', 'controllerDiagnosticErrors']) {
+      // CoopEnv exposes these in views only at terminal. Replay must check the
+      // live counters after reset/every step; absence is never evidence of zero.
+      if (env !== undefined || !state.done) assert.equal(env?.[k], 0, `env.${k}`);
+      // Static trace validation has no env. Terminal fields remain mandatory,
+      // including when live counters were supplied and passed above.
+      if (state.done) assert.equal(state[k], 0, k);
+    }
+  }
 }
 
 export function verifyTerminal(state, trace) {

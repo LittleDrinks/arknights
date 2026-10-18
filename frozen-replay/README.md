@@ -144,11 +144,15 @@ python3 -B frozen-replay/check.py
 函数在 VM 中运行（mock DOM/network/store）。不调用真实 create/reset/Match/Battle，
 不执行真实 80 步，不加载 checkpoint，不训练。测试临时文件退出清理。
 
-9 项合同测试已通过；具体测量见 [VALIDATION.md](VALIDATION.md)。这不等于 server 完整
+10 项合同测试已通过；具体测量见 [VALIDATION.md](VALIDATION.md)。这不等于 server 完整
 verify/record 或 native 浏览器视觉验收。真实录制大小、帧数、耗时、RSS 和原页面播放仍待 main。
 
-API 扩展：`validateTrace(trace, profile)`、`verifyState(state, trace, profile)`、
+API 扩展：`validateTrace(trace, profile)`、`verifyState(state, trace, profile, env)`、
 `Recorder({..., profile})`、`bundle({..., profile})`、`replay({...options, profile})`；
 profile 必须为固定名字，未传时仍为 `training/v1`。冻结 metadata 由 SHA 绑定的
 `receiptMetadata` 产生，不接受 CLI 随意覆盖 kind/controller/label 的入口。
+冻结 replay 在 reset 和每次 step 后传入真实 `env`，严格要求实例上的
+`partnerActionErrors` / `controllerDiagnosticErrors` 为零；非终局 view 本来不含这两个字段，
+不能将缺失值视为零。终局还必须包含两个零值字段，并继续完整 deep exact 比较 terminal / partnerAudit。
+静态终局校验仍支持三参数调用；training 默认行为不变。
 直接调用冻结 replay API 的宿主同样必须在进程启动时安装原 loader；推荐始终使用受监督的新 CLI。

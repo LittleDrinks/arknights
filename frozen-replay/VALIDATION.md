@@ -1,5 +1,25 @@
 # 验证记录
 
+2026-10-18，针对干净 HEAD `37037882d693531154396810be392d3aa9bd9527` 的 P1 修复：
+
+- 核对 `coop/env.mjs`：reset 初始化两个实例计数器，真实 `CoopEnv.view()` 仅在终局公开
+  `partnerActionErrors` / `controllerDiagnosticErrors`。冻结 replay 现在于 reset 和每次 step
+  后将 env 传给 verifier，严格读取实例计数；终局仍要求两个字段为零并保留完整
+  terminal / partnerAudit deep exact 比较。没有修改环境或 training 默认行为。
+- 新回归通过生产 worker 的 deferred loader 调用真实 `CoopEnv.prototype.view()`，
+  使用假依赖和静态 observation；未调用 create/reset/step 或真实 Match/Battle。
+  覆盖 step=0 与后续非终局省略字段、缺少 env、实例计数缺失/null/非零拒绝，
+  终局缺失/非零字段拒绝（即使实例为零）、完整 terminal/partnerAudit 漂移拒绝、旧 training API。
+- 同一命令 `python3 -B frozen-replay/check.py`，修复前 9 pass / 1 fail：
+  新回归在真实 view 上报 `partnerActionErrors: undefined !== 0`；1.667s，
+  峰值进程树 RSS 320,204,800 bytes，采样临时产物峰值 416,993 bytes。
+- 修复后 **10 pass / 0 fail / 0 skipped**（含未修改的旧 4 项）：1.998s，
+  峰值进程树 RSS 376,037,376 bytes，采样临时产物峰值 416,993 bytes。
+  两次合成执行合计 3.665s，均由原 check.py 约束，未重复运行重测试。
+- 真实 80 步、full record、native 浏览器仍未验证；未发布任何索引。
+
+以下为初始实现的历史验证记录，9/9 当时未覆盖上述真实 view 接口差异：
+
 base `4b6069b1e2000f6e4b62195c488a3e78c285dd2c`，仅 `coop-replay/` 向后兼容扩展与
 新 `frozen-replay/`。未修改旧测试及其他模块。日期 2026-10-18。
 
