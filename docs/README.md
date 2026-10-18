@@ -1,5 +1,6 @@
 # 文档索引
 
+- ARCHITECTURE.md：基于当前源码的架构重设计提案、infra抽取顺序与验收；尚未实施。
 - research/PAUSE-HANDOFF-2026-10-18.md：实验状态、结果、下一阶段候选方案。
 - research/EXPERIMENTS.md：历史实验台账，保留原始路径及指标。
 - literature/：两轮OpenAlex引用检索和代码核查结论。
