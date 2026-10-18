@@ -3,7 +3,7 @@ import gzip
 import hashlib
 import time
 
-from reuse import C, REQUEST_BYTES, DISK_BYTES
+from reuse import A, C, REQUEST_BYTES, DISK_BYTES
 from storage import identity
 from collector import base_row, case_name
 
@@ -16,8 +16,9 @@ def read_record(path):
     return C.parse(raw)
 
 
-def payload_identity(path, limit, deadline):
+def payload_identity(path, limit, deadline, *, retain=False):
     h, n, last = hashlib.sha256(), 0, b''
+    payload = bytearray() if retain else None
     with gzip.open(path, 'rb') as f:
         while True:
             C.require(time.monotonic() < deadline, 'Freeze payload deadline')
@@ -27,9 +28,11 @@ def payload_identity(path, limit, deadline):
             n += len(block)
             C.require(n <= limit, 'Expanded raw limit')
             h.update(block)
+            if retain:
+                payload.extend(block)
             last = block[-1:]
     C.require(last == b'\n', 'Case JSON/newline EOF')
-    return dict(payloadBytes=n, payloadSHA256=h.hexdigest(), jsonNewline=True, gzipEOF=True)
+    return dict(payloadBytes=n, payloadSHA256=h.hexdigest(), jsonNewline=True, gzipEOF=True), payload
 
 
 def reconcile(out, planned, deadline, *, byte_limit=REQUEST_BYTES):
@@ -37,6 +40,7 @@ def reconcile(out, planned, deadline, *, byte_limit=REQUEST_BYTES):
     errors, files, expected = [], {}, {'plan.json', 'source-before.json', 'source-after.json'}
     starts, dones, lanes, artifacts = {}, {}, {}, {}
     ambiguous = False
+    source = {}
 
     def fail(message):
         errors.append(message)
@@ -68,7 +72,8 @@ def reconcile(out, planned, deadline, *, byte_limit=REQUEST_BYTES):
     try:
         schedule = read_record(out / 'plan.json')
         C.require(schedule == dict(games=planned, planned=len(planned), split='train'), 'Immutable plan mismatch')
-        C.require(read_record(out / 'source-before.json') == read_record(out / 'source-after.json'), 'Source drift')
+        source = read_record(out / 'source-before.json')
+        C.require(source == read_record(out / 'source-after.json'), 'Source drift')
     except Exception as e:
         fail('Plan/source evidence: ' + str(e))
 
@@ -125,16 +130,28 @@ def reconcile(out, planned, deadline, *, byte_limit=REQUEST_BYTES):
                     C.require(d.get('jsonEOF') is True and 'artifact' in d, 'Complete case without full JSON raw')
                 else:
                     C.require(d.get('error') or d.get('syncError'), 'Failed case without reason')
+                    C.require(d.get('eligiblePositive') is False, 'Failed case claims positive label')
             if raw_name in files:
                 C.require(i in dones and dones[i].get('artifact') == raw_name, 'Orphan raw response')
-                actual = {**files[raw_name], **payload_identity(out / raw_name, byte_limit, deadline)}
+                payload_id, payload = payload_identity(out / raw_name, byte_limit, deadline,
+                                                       retain=dones[i]['status'] == 'complete')
+                actual = {**files[raw_name], **payload_id}
                 C.require(actual == dones[i]['artifactIdentity'], 'Raw SHA/gzip/payload binding')
                 artifacts[i] = actual
+                if dones[i]['status'] == 'complete':
+                    # Pass the journal row itself, not outcome()'s overwritten copy:
+                    # complete_contract rechecks every sample and strictly compares
+                    # type AND value of all eight independently derived outcome fields.
+                    A.complete_contract(C.parse(payload), dones[i], source['game'], source['poolSHA256'])
+                    C.require(time.monotonic() < deadline, 'Semantic audit deadline')
+                del payload
             if i in dones and 'artifact' in dones[i]:
                 C.require(raw_name in files and dones[i]['artifact'] == raw_name, 'Missing raw response')
             if i in starts:
                 C.require(i in dones, 'Missing completed journal; started remains interrupted')
         except Exception as e:
+            if time.monotonic() >= deadline:
+                raise TimeoutError('Full semantic reconciliation exceeded cleanup deadline') from e
             fail(f'Case {i}: {type(e).__name__}: {e}')
             r.update(status='interrupted', error=str(e), eligiblePositive=False)
 

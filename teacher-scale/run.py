@@ -61,7 +61,8 @@ def main():
                     base='ffbe8cc6b994f0676cb386b7c9f88d9e8281333f', startedAt=clock(),
                     planned=8192, pairedTrainingSeeds=4096, seedSplit='train only 32001..36096',
                     workers=32, lanesPerPool=16, cpus=cpus, workSeconds=WORK_SECONDS,
-                    cleanupSeconds=CLEANUP_SECONDS, requestSeconds=120, requestWireLimit=REQUEST_BYTES,
+                    cleanupSeconds=CLEANUP_SECONDS, totalSeconds=WORK_SECONDS+CLEANUP_SECONDS,
+                    requestSeconds=120, requestWireLimit=REQUEST_BYTES,
                     aggregateWireLimit=8192*REQUEST_BYTES, diskLimit=DISK_BYTES,
                     primaryMetric='team victory; learner individual alive14 victory and rejectedLabels separate',
                     games=rows, lanes={}, globalErrors=[])

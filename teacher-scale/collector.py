@@ -98,7 +98,7 @@ def lane_task(rows, out, command, env, game, pool_hash, budget, wire, stop, regi
                 errors.append(error_text(e))
                 stop.set()
             try:
-                channel.close()  # always kill private group, even after successful EOF
+                channel.close()  # kill only while owning the unreaped private-group leader
             except BaseException as e:
                 errors.append(error_text(e))
                 stop.set()

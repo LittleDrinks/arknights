@@ -25,7 +25,7 @@ MIB = 1024 ** 2
 REQUEST_BYTES = 64 * MIB
 DISK_BYTES = 64 * 1024 * MIB
 WORK_SECONDS = 3600
-CLEANUP_SECONDS = 180
+CLEANUP_SECONDS = 1800  # Full inline semantic audit; shared by manifest and absolute supervisor.
 
 
 def plan():
@@ -66,14 +66,30 @@ def game_identity(root):
     return game, {**identity, 'rules': C.RULES, 'treeSHA256': pin['treeSha256'], 'files': pin['files']}
 
 
+def guard_wait(process, timeout):
+    # SIGALRM must not land between waitpid reaping and Popen recording returncode;
+    # the surrounding finally would otherwise mistake a reused PID for ownership.
+    previous = signal.pthread_sigmask(signal.SIG_BLOCK, {signal.SIGALRM})
+    try:
+        return process.wait(timeout=timeout)
+    finally:
+        signal.pthread_sigmask(signal.SIG_SETMASK, previous)
+
+
 def static_command(command, seconds):
     """Bounded guard subprocess, including all descendant cleanup on timeout/error."""
     selector, process = selectors.DefaultSelector(), None
     output, errors = bytearray(), bytearray()
     deadline = time.monotonic()+seconds
     try:
-        process = subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE, env=C.clean_env(), start_new_session=True, bufsize=0)
+        # The main-thread alarm must not interrupt Popen before its returned child
+        # is assigned: this guard is not registered with the lane registry.
+        previous = signal.pthread_sigmask(signal.SIG_BLOCK, {signal.SIGALRM})
+        try:
+            process = subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                                       stderr=subprocess.PIPE, env=C.clean_env(), start_new_session=True, bufsize=0)
+        finally:
+            signal.pthread_sigmask(signal.SIG_SETMASK, previous)
         selector.register(process.stdout, selectors.EVENT_READ, output)
         selector.register(process.stderr, selectors.EVENT_READ, errors)
         while selector.get_map():
@@ -86,17 +102,26 @@ def static_command(command, seconds):
                     selector.unregister(key.fileobj)
                 else:
                     key.data.extend(chunk)
-        C.require(process.wait(timeout=max(.001, deadline-time.monotonic())) == 0 and not errors,
+        while os.waitid(os.P_PID, process.pid, os.WEXITED | os.WNOHANG | os.WNOWAIT) is None:
+            C.require(time.monotonic() < deadline, 'Static guard exit deadline')
+            time.sleep(min(.01, max(0, deadline-time.monotonic())))
+        # Keep the exited leader unreaped until its private group is cleared.
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+        C.require(guard_wait(process, max(.001, deadline-time.monotonic())) == 0 and not errors,
                   'Static guard exit/stderr: ' + errors.decode(errors='replace'))
         return bytes(output)
     finally:
         if process:
             try:
-                os.killpg(process.pid, signal.SIGKILL)
+                if process.returncode is None:
+                    os.killpg(process.pid, signal.SIGKILL)
             except ProcessLookupError:
                 pass
             try:
-                process.wait(timeout=2)
+                guard_wait(process, 2)
             finally:
                 process.stdout.close()
                 process.stderr.close()

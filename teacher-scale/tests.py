@@ -1,20 +1,25 @@
 """Fault-injection tests using tiny synthetic data and Python line servers only."""
 import ast
 import copy
+from contextlib import redirect_stdout
 import gzip
+import io
 import os
 from pathlib import Path
 import queue
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
 import threading
 import time
 import unittest
-from unittest.mock import patch
+from types import SimpleNamespace
+from unittest.mock import Mock, patch
 
-from reuse import A, C, CODE, E, HERE, outcome, plan, source_identity
+from reuse import (A, C, CODE, E, HERE, WORK_SECONDS, CLEANUP_SECONDS,
+                   outcome, plan, source_identity, static_command)
 from storage import Budget, Sink, case_raw, identity, new_output, publish
 from wire import LaneProtocol, Registry, WireBudget
 from collector import case_name, lane_task, run_lanes
@@ -42,7 +47,7 @@ class Contracts(unittest.TestCase):
         rows, budget = small_plan(n), Budget(1_000_000, 100_000)
         publish(out / 'plan.json', dict(games=rows, planned=n, split='train'), budget)
         for name in ('source-before.json', 'source-after.json'):
-            publish(out / name, dict(synthetic=True), budget)
+            publish(out / name, dict(synthetic=True, game=GAME, poolSHA256=POOL), budget)
         manifest = dict(games=rows, lanes={}, globalErrors=[], status='running')
         publish(out / 'manifest.json', manifest, budget)
         return out, rows, budget, manifest
@@ -57,6 +62,14 @@ class Contracts(unittest.TestCase):
         audit = reconcile(out, small_plan(n), time.monotonic()+2, byte_limit=limit)
         return out, rows, budget, manifest, audit
 
+    def channel(self, registry):
+        out, _, budget, _ = self.prepare(1)
+        directory = out / 'lanes/normal-00'
+        directory.mkdir()
+        return LaneProtocol([sys.executable, '-B', str(HERE / 'fake_child.py'), 'good'],
+                            os.environ.copy(), directory, time.monotonic()+1,
+                            budget, WireBudget(65536), threading.Event(), registry, 65536)
+
     def test_fixed_production_plan_and_readonly_reuse(self):
         rows = plan()
         self.assertEqual(len(rows), 8192)
@@ -68,6 +81,7 @@ class Contracts(unittest.TestCase):
         self.assertEqual(source_identity()['base'], 'ffbe8cc6b994f0676cb386b7c9f88d9e8281333f')
         self.assertNotIn('torch', sys.modules)
         self.assertNotIn('rl.learner', sys.modules)
+        self.assertEqual((WORK_SECONDS, CLEANUP_SECONDS, WORK_SECONDS+CLEANUP_SECONDS), (3600, 1800, 5400))
         for p in HERE.glob('*.py'):
             ast.parse(p.read_text(), feature_version=(3, 10))
 
@@ -143,6 +157,317 @@ class Contracts(unittest.TestCase):
             data = C.parse(gzip.decompress((out / row['artifact']).read_bytes()))
             self.assertEqual(len(data['samples']), 2)
             self.assertIn('summary', data['terminal'])
+
+    def test_reconcile_recomputes_every_outcome_from_raw(self):
+        out, _, _, _, audit = self.run_batch('carry', n=1)
+        self.assertEqual(audit['errors'], [])
+        row = audit['games'][0]
+        done = out / 'journals' / (case_name(row)+'.completed.json')
+        original = done.read_bytes()
+        for key in ('eligiblePositive', 'learnerAlive', 'learnerVictory', 'teamVictory',
+                    'rounds', 'learnerRounds', 'samples', 'rejectedLabels'):
+            for mutation in ('value', 'type', 'missing'):
+                changed = C.parse(original)
+                value = changed[key]
+                if mutation == 'missing':
+                    del changed[key]
+                elif mutation == 'type':
+                    changed[key] = int(value) if type(value) is bool else float(value)
+                else:
+                    changed[key] = not value if type(value) is bool else value+1
+                done.write_bytes(C.encoded(changed))
+                checked = reconcile(out, small_plan(1), time.monotonic()+1, byte_limit=65536)
+                self.assertTrue(checked['errors'], (key, mutation))
+                self.assertFalse(checked['games'][0]['eligiblePositive'])
+        done.write_bytes(original)
+        self.assertEqual(reconcile(out, small_plan(1), time.monotonic()+1)['errors'], [])
+
+    def test_no_kill_after_finish_or_close_reaps(self):
+        registry = Registry()
+        channel = self.channel(registry)
+        try:
+            channel.finish_lane(time.monotonic()+1)
+            with patch('wire.os.killpg') as kill:
+                channel.close()
+                registry.kill()
+                channel.close()
+                registry.kill()
+                kill.assert_not_called()
+            self.assertEqual(registry.channels, [])
+            self.assertIsNone(channel.process)
+        finally:
+            channel.close()
+
+    def test_kill_serializes_with_finish_wait_and_close_wait(self):
+        for finish in (False, True):
+            registry = Registry()
+            channel = self.channel(registry)
+            process = channel.process
+            entered, release, attempting, killed = (threading.Event() for _ in range(4))
+            failures = []
+            original_wait, original_kill = process.wait, os.killpg
+            def wait(*args, **kwargs):
+                entered.set()
+                if not release.wait(1):
+                    raise TimeoutError('Test did not release wait')
+                return original_wait(*args, **kwargs)
+            def kill(pid, sig):
+                self.assertEqual(pid, process.pid)
+                self.assertIsNone(process.returncode, 'Signalled a reaped PID')
+                return original_kill(pid, sig)
+            def cleanup():
+                try:
+                    if finish:
+                        channel.finish_lane(time.monotonic()+1)
+                    else:
+                        channel.close()
+                except BaseException as e:
+                    failures.append(e)
+            def registry_kill():
+                attempting.set()
+                registry.kill()
+                killed.set()
+            worker = threading.Thread(target=cleanup)
+            killer = threading.Thread(target=registry_kill)
+            with patch.object(process, 'wait', side_effect=wait), patch('wire.os.killpg', side_effect=kill):
+                try:
+                    worker.start()
+                    self.assertTrue(entered.wait(1))
+                    killer.start()
+                    self.assertTrue(attempting.wait(.2))
+                    self.assertFalse(killed.wait(.03), 'Registry kill entered during wait/reap')
+                finally:
+                    release.set()
+                    worker.join(1)
+                    if killer.ident is not None:
+                        killer.join(1)
+                    channel.close()
+            self.assertEqual(failures, [])
+            self.assertTrue(killed.is_set())
+            self.assertEqual(registry.channels, [])
+
+    def test_construction_ownership_and_partial_failure_cleanup(self):
+        popen, constructor = subprocess.Popen, E.Protocol.__init__
+        for mode in ('before-spawn', 'after-spawn', 'spawn-race'):
+            registry, children, failures = Registry(), [], []
+            attempted, killed = threading.Event(), threading.Event()
+            def kill():
+                attempted.set()
+                registry.kill()
+                killed.set()
+            killer = threading.Thread(target=kill)
+            def spawn(*args, **kwargs):
+                child = popen(*args, **kwargs)
+                children.append(child)
+                if mode == 'spawn-race':
+                    killer.start()
+                    self.assertTrue(attempted.wait(.2))
+                    # Popen returned, but E.__init__ has not assigned process yet.
+                    self.assertFalse(killed.wait(.03))
+                return child
+            def construct(channel, *args, **kwargs):
+                if mode == 'before-spawn':
+                    raise RuntimeError('Injected before base constructor')
+                constructor(channel, *args, **kwargs)
+                if mode == 'after-spawn':
+                    raise RuntimeError('Injected after base constructor')
+            channel = None
+            try:
+                with patch('wire.E.subprocess.Popen', side_effect=spawn), patch.object(E.Protocol, '__init__', construct):
+                    if mode == 'spawn-race':
+                        channel = self.channel(registry)
+                    else:
+                        with self.assertRaisesRegex(RuntimeError, 'Injected'):
+                            self.channel(registry)
+            finally:
+                if killer.ident is not None:
+                    killer.join(1)
+                if channel is not None:
+                    channel.close()
+                # Keep the regression harness safe even if construction regresses.
+                for child in children:
+                    if child.returncode is None:
+                        failures.append('Constructor leaked child')
+                        os.killpg(child.pid, signal.SIGKILL)
+                        child.wait(timeout=1)
+                        for stream in (child.stdin, child.stdout, child.stderr):
+                            stream.close()
+            self.assertEqual(failures, [])
+            self.assertEqual(registry.channels, [])
+        registry = Registry()
+        registry.kill()
+        with patch('wire.E.subprocess.Popen') as spawn:
+            with self.assertRaisesRegex(ValueError, 'stopped before spawn'):
+                self.channel(registry)
+            spawn.assert_not_called()
+
+    def test_static_guard_unregistered_child_alarm_and_no_stale_group_kill(self):
+        popen, killpg = subprocess.Popen, os.killpg
+        handle_exit = popen._handle_exitstatus
+        spectator = popen([sys.executable, '-c', 'import time; time.sleep(10)'], start_new_session=True)
+        children, signalled = [], []
+        def alarm(*_):
+            raise TimeoutError('Injected absolute deadline')
+        previous = signal.signal(signal.SIGALRM, alarm)
+        try:
+            for mode in ('good', 'timeout', 'spawn-alarm', 'reap-alarm'):
+                def spawn(*args, **kwargs):
+                    child = popen(*args, **kwargs)
+                    children.append(child)
+                    if mode == 'spawn-alarm':
+                        os.kill(os.getpid(), signal.SIGALRM)
+                    return child
+                def kill(pid, sig):
+                    self.assertEqual(pid, children[-1].pid)
+                    self.assertIsNone(children[-1].returncode)
+                    signalled.append(pid)
+                    return killpg(pid, sig)
+                def reaped(child, status):
+                    if mode == 'reap-alarm':
+                        os.kill(os.getpid(), signal.SIGALRM)
+                    return handle_exit(child, status)
+                command = [sys.executable, '-c', "print('ok')" if mode in ('good', 'reap-alarm')
+                           else 'import time; time.sleep(10)']
+                with patch('reuse.subprocess.Popen', side_effect=spawn), patch('reuse.os.killpg', side_effect=kill), \
+                        patch.object(popen, '_handle_exitstatus', reaped):
+                    if mode == 'good':
+                        self.assertEqual(static_command(command, 1), b'ok\n')
+                        self.assertEqual(signalled.count(children[-1].pid), 1)
+                    else:
+                        with self.assertRaises((TimeoutError, ValueError)):
+                            static_command(command, .05)
+                        self.assertEqual(signalled.count(children[-1].pid), 1)
+                self.assertIsNotNone(children[-1].returncode)
+                self.assertIsNone(spectator.poll())
+        finally:
+            signal.signal(signal.SIGALRM, previous)
+            for child in [*children, spectator]:
+                if child.returncode is None:
+                    killpg(child.pid, signal.SIGKILL)
+                    child.wait(timeout=1)
+
+    def test_semantic_contract_rejects_raw_even_with_matching_hashes(self):
+        out, _, _, _, audit = self.run_batch(n=1)
+        row = audit['games'][0]
+        path = out / row['artifact']
+        raw = gzip.decompress(path.read_bytes())
+        changed = raw.replace(b'"action": 0', b'"action": 1', 1)
+        self.assertNotEqual(changed, raw)
+        self.assertEqual(len(changed), len(raw))
+        path.write_bytes(gzip.compress(changed, mtime=0))
+        row['artifactIdentity'] = dict(**identity(path), payloadBytes=len(changed), payloadSHA256=C.digest(changed),
+                                       jsonNewline=True, gzipEOF=True)
+        (out / 'journals' / (case_name(row)+'.completed.json')).write_bytes(C.encoded(row))
+        lane = out / 'lanes/normal-00'
+        wire = gzip.decompress((lane / 'stdout.gz').read_bytes())
+        (lane / 'stdout.gz').write_bytes(gzip.compress(changed+wire[len(raw):], mtime=0))
+        journal = C.parse((lane / 'completed.json').read_bytes())
+        journal['files']['stdout.gz'] = identity(lane / 'stdout.gz')
+        (lane / 'completed.json').write_bytes(C.encoded(journal))
+        with patch.object(A, 'complete_contract', wraps=A.complete_contract) as contract:
+            audit = reconcile(out, small_plan(1), time.monotonic()+1)
+            contract.assert_called_once()
+        self.assertTrue(any(e.startswith('Case 0:') for e in audit['errors']))
+        self.assertFalse(any('SHA' in e for e in audit['errors']))
+        self.assertFalse(audit['games'][0]['eligiblePositive'])
+
+    def test_main_global_failure_for_death_label_and_shared_cleanup_budget(self):
+        import run
+        for tamper in (False, True):
+            out = self.base / ('main-'+str(tamper))
+            def collect(directory, rows, commands, game, pool_hash, budget, manifest,
+                        work_end, cleanup_end, stop, registry):
+                self.assertEqual(cleanup_end-work_end, 1800)
+                fake = {'normal': ([sys.executable, '-B', str(HERE / 'fake_child.py'), 'carry'],
+                                   os.environ.copy())}
+                now = time.monotonic()
+                run_lanes(directory, rows[:1], fake, game, pool_hash, budget, manifest,
+                          now+1, now+2, stop, registry=registry, request_seconds=.5, byte_limit=65536)
+                # The other 31 lanes were never dispatched; retain the real fixed
+                # 8192 plan and let the production reconciliation prove not-run.
+                idle = [r for r in rows if r['lane'] != rows[0]['lane']]
+                run_lanes(directory, idle, {'normal': ([], {}), 'mixed': ([], {})}, game, pool_hash,
+                          budget, manifest, time.monotonic()-1, time.monotonic()+2, stop, registry=registry)
+                if tamper:
+                    path = directory / 'journals' / (case_name(rows[0])+'.completed.json')
+                    row = C.parse(path.read_bytes())
+                    row['eligiblePositive'] = True
+                    path.write_bytes(C.encoded(row))
+            timer = signal.setitimer
+            with patch.object(sys, 'argv', ['run.py', '--root', str(self.base), '--out', str(out)]), \
+                    patch.object(run, 'affinity', return_value=[min(os.sched_getaffinity(0))]), \
+                    patch.object(run, 'game_identity', return_value=(self.base, GAME)), \
+                    patch.object(run.N, 'pool_sha', return_value=POOL), \
+                    patch.object(run, 'run_lanes', side_effect=collect), \
+                    patch.object(signal, 'setitimer', wraps=timer) as alarm, redirect_stdout(io.StringIO()):
+                self.assertEqual(run.main(), 2)
+            result = C.parse((out / 'manifest.json').read_bytes())
+            self.assertEqual((result['workSeconds'], result['cleanupSeconds'], result['totalSeconds']),
+                             (3600, 1800, 5400))
+            self.assertGreater(alarm.call_args_list[0].args[1], 5390)
+            self.assertLessEqual(alarm.call_args_list[0].args[1], 5400)
+            self.assertEqual(alarm.call_args_list[-1].args[1], 0)
+            self.assertTrue(result['frozen'])
+            self.assertEqual(result['globalFailed'], tamper)
+            self.assertEqual(result['status'], 'failed' if tamper else 'incomplete')
+            self.assertFalse(result['trainingAllowed'])
+            self.assertEqual(len(result['games']), 8192)
+            self.assertFalse(result['games'][0]['eligiblePositive'])
+            if tamper:
+                self.assertTrue(any('Manifest/raw mismatch: eligiblePositive' in e for e in result['globalErrors']))
+            shutil.rmtree(out)
+
+    def test_request_rechecks_deadline_and_stop_after_durable_intent(self):
+        for closing, late, stopped in ((False, True, False), (False, False, True),
+                                       (True, True, True), (True, False, True),
+                                       (False, False, False)):
+            channel = object.__new__(LaneProtocol)
+            channel.deadline, channel.closing = 11, closing
+            channel.stop = threading.Event()
+            now = [10]
+            def sync():
+                now[0] = 12 if late else 10
+                if stopped:
+                    channel.stop.set()
+            channel.actions = Mock(sync=Mock(side_effect=sync))
+            channel.process = SimpleNamespace(stdin=Mock())
+            channel.buffer = bytearray(b'{"ok":true}\n')
+            with patch('wire.time', SimpleNamespace(monotonic=lambda: now[0])):
+                if late or (stopped and not closing):
+                    with self.assertRaises((ValueError, TimeoutError, InterruptedError)):
+                        channel.receive({'cmd': 'close' if closing else 'demo'})
+                    channel.process.stdin.write.assert_not_called()
+                else:
+                    channel.receive({'cmd': 'close' if closing else 'demo'})
+                    channel.process.stdin.write.assert_called_once()
+            channel.actions.sync.assert_called_once()
+
+    def test_stop_or_deadline_during_intent_fsync_preserves_failed_started_account(self):
+        original, receive = Sink.sync, LaneProtocol.receive
+        for mode in ('stop', 'deadline'):
+            stop, active = threading.Event(), []
+            def track(channel, *args, **kwargs):
+                active[:] = [channel]
+                return receive(channel, *args, **kwargs)
+            def sync(sink):
+                original(sink)
+                if sink.path.name == 'actions.jsonl' and active and not active[0].closing:
+                    if mode == 'stop':
+                        stop.set()
+                    else:
+                        active[0].deadline = time.monotonic()-1
+            out, rows, budget, manifest = self.prepare(1)
+            with patch.object(Sink, 'sync', sync), patch.object(LaneProtocol, 'receive', track):
+                now = time.monotonic()
+                run_lanes(out, rows, {'normal': ([sys.executable, '-B', str(HERE / 'fake_child.py'), 'good'],
+                          os.environ.copy())}, GAME, POOL, budget, manifest, now+1, now+2, stop,
+                          request_seconds=.5, byte_limit=65536)
+            row = rows[0]
+            self.assertEqual(row['status'], 'failed')
+            self.assertTrue((out / 'journals' / (case_name(row)+'.started.json')).exists())
+            self.assertTrue((out / 'journals' / (case_name(row)+'.completed.json')).exists())
+            self.assertFalse(list((out / 'cases').iterdir()))
+            self.assertEqual(gzip.decompress((out / 'lanes/normal-00/stdout.gz').read_bytes()), b'{"ok":true}\n')
 
     def test_error_and_malformed_full_response_retained(self):
         for mode in ('error', 'malformed'):
