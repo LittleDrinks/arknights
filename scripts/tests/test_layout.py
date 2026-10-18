@@ -63,6 +63,30 @@ class Migration(unittest.TestCase):
                 self.run_main(r,resume=True)
                 self.assertEqual((r/'results/runs/a.json').read_text(),'original')
                 self.assertEqual((r/'game/file.txt').read_text(),'clean')
+    def test_source_ancestor_link_rejected_without_touching_external_files(self):
+        with tempfile.TemporaryDirectory() as t:
+            r=self.fixture(t);outside=Path(t)/'outside';outside.mkdir();(outside/'assets').write_text('keep outside')
+            (r/'game/public').symlink_to(outside,target_is_directory=True)
+            with self.assertRaisesRegex(ValueError,'crosses a symlink'):self.run_main(r)
+            self.assertEqual((outside/'assets').read_text(),'keep outside')
+            self.assertTrue((r/'experiments/a.json').exists())
+    def test_resume_after_preservation_and_during_runtime_updates(self):
+        for stop in ('before-runtime','during-runtime'):
+            with self.subTest(stop=stop),tempfile.TemporaryDirectory() as t:
+                r=self.fixture(t);script=r/'venvs/v/bin/pip';script.parent.mkdir(parents=True);script.write_text('#!'+str(r/'venvs/v/bin/python')+'\n')
+                if stop=='before-runtime':
+                    with patch.object(M,'finish_runtime',side_effect=RuntimeError('stop')),self.assertRaises(RuntimeError):self.run_main(r)
+                else:
+                    original=M.write_new
+                    def interrupt(path,value):
+                        if path.name=='runtime-script-updates.json':raise RuntimeError('stop')
+                        return original(path,value)
+                    with patch.object(M,'write_new',interrupt),self.assertRaises(RuntimeError):self.run_main(r)
+                self.run_main(r,resume=True)
+                self.assertIn(str(r/'runtime/venvs/v/bin/python'),(r/'runtime/venvs/v/bin/pip').read_text())
+                self.assertEqual(os.readlink(r/'node_modules'),'runtime/node_modules')
+                self.assertTrue((r/'results/migrations/layout-20261018/complete.json').exists())
+                self.assertIn(str(r/'venvs/v/bin/python'),(r/'results/migrations/layout-20261018/venv-script-originals/v/bin/pip').read_text())
     def test_real_staged_checkout_must_be_clean(self):
         with tempfile.TemporaryDirectory() as t:
             stage=Path(t)/'game'

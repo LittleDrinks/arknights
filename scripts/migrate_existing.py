@@ -84,6 +84,7 @@ def make_plan(root,stage):
     for old,new in MOVE.items():
         if exists(root/old):operations.append(dict(source=old,target=new,identity=node_identity(root/old)))
     for old,new in SPECIAL.items():
+        plain_parents(root,(root/old).parent)
         if exists(root/old):operations.append(dict(source=MOVE['game']+'/'+old.removeprefix('game/'),target=new,identity=node_identity(root/old)))
     operations.append(dict(source=str(stage.relative_to(root)),target='game',identity=node_identity(stage)))
     # Check EVERY destination before moving anything; existing runtime/results data stays intact.
@@ -109,12 +110,48 @@ def move_one(root,op,journal):
         with journal.open('a') as f:f.write(json.dumps(dict(source=op['source'],target=op['target'],state=state))+'\n');f.flush();os.fsync(f.fileno())
     log('intent');source.rename(target);log('moved')
 
+def finish_runtime(root,out):
+    changes=[]
+    for bin_dir in (root/'runtime/venvs').glob('*/bin'):
+        for path in bin_dir.iterdir():
+            if not path.is_file() or path.is_symlink() or path.stat().st_size>20000:continue
+            backup=out/'venv-script-originals'/path.relative_to(root/'runtime/venvs')
+            current=path.read_bytes()
+            raw=backup.read_bytes() if backup.exists() else current
+            old=str(root/'venvs').encode();new=str(root/'runtime/venvs').encode()
+            if old not in raw:continue
+            try:raw.decode('utf-8')
+            except UnicodeDecodeError:continue
+            wanted=raw.replace(old,new)
+            if current not in (raw,wanted):raise ValueError('Runtime script changed outside migration: '+str(path))
+            if not backup.exists():
+                backup.parent.mkdir(parents=True,exist_ok=True)
+                with backup.open('xb') as f:f.write(raw);f.flush();os.fsync(f.fileno())
+            if current!=wanted:
+                temporary=path.with_name(path.name+'.layout.tmp')
+                if exists(temporary):raise ValueError('Inspect interrupted runtime temporary: '+str(temporary))
+                with temporary.open('xb') as f:f.write(wanted);f.flush();os.fsync(f.fileno())
+                temporary.chmod(path.stat().st_mode)
+                os.replace(temporary,path)
+            changes.append(str(path.relative_to(root)))
+    target=root/'node_modules'
+    if exists(target):
+        if not target.is_symlink() or os.readlink(target)!='runtime/node_modules':raise ValueError('Unexpected root dependency target')
+    else:target.symlink_to('runtime/node_modules',target_is_directory=True)
+    value=json.dumps(changes,indent=2)
+    path=out/'runtime-script-updates.json'
+    if path.exists():
+        if path.read_text()!=value:raise ValueError('Runtime update ledger mismatch')
+    else:write_new(path,changes)
+    done=out/'complete.json'
+    if not done.exists():write_new(done,dict(status='complete',at=datetime.now(timezone.utc).isoformat(),runtimeScriptsUpdated=len(changes)))
+    return changes
+
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--root',type=Path,required=True);p.add_argument('--resume',action='store_true');args=p.parse_args()
     root=args.root.resolve();out=root/'results/migrations/layout-20261018'
     if (root/'.git').exists():raise ValueError('Root is already a repository; migration is one-time')
     if args.resume:
-        if (out/'preservation.json').exists():print('File preservation already verified; finish project deployment separately.');return
         operations=json.loads((out/'operations.json').read_text());before=json.loads((out/'inventory-before.json').read_text());mapping=json.loads((out/'path-map.json').read_text())
     else:
         unknown={x.name for x in root.iterdir()}-set(MOVE)-{'.migration-stage','results','runtime'}
@@ -123,24 +160,17 @@ def main():
         operations=make_plan(root,root/'.migration-stage/game');before=inventory(root);mapping={name:mapped(name) for name in before}
         out.mkdir(parents=True,exist_ok=False)
         write_new(out/'inventory-before.json',before);write_new(out/'path-map.json',mapping);write_new(out/'prefix-map.json',{**MOVE,**SPECIAL});write_new(out/'operations.json',operations)
-    for op in operations:move_one(root,op,out/'moves.jsonl')
-    rows={}
-    for old,expected in before.items():
-        actual=identity(root/mapping[old])
-        if actual!=expected:raise ValueError('Preservation mismatch: '+old)
-        rows[old]=dict(new=mapping[old],identity=actual)
-    write_new(out/'preservation.json',dict(status='verified',method='same-filesystem rename; inode/device/bytes/mtime/type/link identity retained for every original file',files=len(rows),totalOriginalBytes=sum(x['bytes'] for x in before.values()),at=datetime.now(timezone.utc).isoformat(),entries=rows))
-    changes=[]
-    for bin_dir in (root/'runtime/venvs').glob('*/bin'):
-        for path in bin_dir.iterdir():
-            if not path.is_file() or path.is_symlink() or path.stat().st_size>20000:continue
-            raw=path.read_bytes();old=str(root/'venvs').encode();new=str(root/'runtime/venvs').encode()
-            if old not in raw:continue
-            try:raw.decode('utf-8')
-            except UnicodeDecodeError:continue
-            backup=out/'venv-script-originals'/path.relative_to(root/'runtime/venvs');backup.parent.mkdir(parents=True,exist_ok=True);backup.write_bytes(raw)
-            path.write_bytes(raw.replace(old,new));changes.append(str(path.relative_to(root)))
-    write_new(out/'runtime-script-updates.json',changes)
-    if not exists(root/'node_modules'):(root/'node_modules').symlink_to('runtime/node_modules',target_is_directory=True)
-    print(json.dumps(dict(status='verified',originalFiles=len(rows),runtimeScriptsUpdated=len(changes),receipt=str(out/'preservation.json'))))
+    if not (out/'preservation.json').exists():
+        for op in operations:move_one(root,op,out/'moves.jsonl')
+        rows={}
+        for old,expected in before.items():
+            actual=identity(root/mapping[old])
+            if actual!=expected:raise ValueError('Preservation mismatch: '+old)
+            rows[old]=dict(new=mapping[old],identity=actual)
+        write_new(out/'preservation.json',dict(status='verified',method='same-filesystem rename; inode/device/bytes/mtime/type/link identity retained for every original file',files=len(rows),totalOriginalBytes=sum(x['bytes'] for x in before.values()),at=datetime.now(timezone.utc).isoformat(),entries=rows))
+    else:
+        receipt=json.loads((out/'preservation.json').read_text())
+        if receipt['status']!='verified' or receipt['files']!=len(before):raise ValueError('Invalid preservation receipt')
+    changes=finish_runtime(root,out)
+    print(json.dumps(dict(status='complete',originalFiles=len(before),runtimeScriptsUpdated=len(changes),receipt=str(out/'preservation.json'))))
 if __name__=='__main__':main()
