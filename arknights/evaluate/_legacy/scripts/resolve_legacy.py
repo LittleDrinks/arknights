@@ -2,7 +2,7 @@
 """Resolve an old receipt path without modifying the immutable receipt itself."""
 import argparse,json
 from pathlib import Path
-ROOT=Path(__file__).resolve().parents[1]
+ROOT=Path(__file__).resolve().parents[4]
 p=argparse.ArgumentParser(description=__doc__);p.add_argument('path');a=p.parse_args()
 value=a.path
 for prefix in (str(ROOT),'/data1/zsm/arknights','/home/tzb/zsm/arknights'):

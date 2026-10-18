@@ -13,8 +13,8 @@ import sys
 import uuid
 import tarfile
 
-ROOT = Path(__file__).resolve().parents[1]
-CATALOG = ROOT / 'configs/layout.json'
+ROOT = Path(__file__).resolve().parents[4]
+CATALOG = ROOT / 'arknights/evaluate/_legacy/configs/layout.json'
 
 def git(*args, cwd=ROOT, **kwargs):
     return subprocess.check_output(['git', '-C', str(cwd), *args], **kwargs)
@@ -123,7 +123,7 @@ def main():
         print(json.dumps(dict(game=check_game(), sourceFiles=sum(not r['archive'] for r in catalog()['files']))))
         return
     if options.command == 'preview':
-        os.execvp('node', ['node', str(ROOT/'adapters/web/server.mjs'), *args])
+        os.execvp('node', ['node', str(ROOT/'arknights/replay/server.mjs'), *args])
     output_paths(args, options.command)
     if options.command == 'analyze' and '--help' not in args and not any(x.split('=')[0] == '--out-dir' for x in args):
         args += ['--out-dir', str(ROOT/'results/benchmarks'/('analysis-'+uuid.uuid4().hex[:12]))]

@@ -1,71 +1,89 @@
-# Arknights 卫戍协议 Agent
+# 卫戍协议 Agent
 
-固定开源游戏规则下的策略、训练、评测和回放。**训练目标暂停中**；目录整理不恢复训练。当前尚无未见种子通关率提升，详见 `docs/research/PAUSE-HANDOFF-2026-10-18.md`。
+完整玩家接口、统一策略测评、原游戏页面回放。固定复刻规则 `6ab2468`（盟约 `act2autochess`）；这不代表官方跨赛季通关能力。代码及问题跟踪：[LittleDrinks/arknights](https://github.com/LittleDrinks/arknights)，本次重构见 [#1](https://github.com/LittleDrinks/arknights/issues/1)。
 
-## 目录
+```text
+arknights/
+  adapter/       玩家能看什么、能做什么、能查什么
+  evaluate/      创建对局、运行策略、记录轨迹、统一结果
+  replay/        核对保存的操作、录制战斗、原页面展示
+game/            固定且干净的上游 submodule
+experiments/     策略和实验入口
+tests/          公开接口及故障回归
+results/         对局、日志、模型、资料与回放；忽略提交
+runtime/         依赖、环境、素材和缓存；忽略提交
+```
 
-| 目录 | 内容 |
-|---|---|
-| `game/` | 上游 submodule，锁定 `6ab2468279e926d107788f63d7fe219b85f67b4a`；保持干净，不放补丁、依赖或结果 |
-| `adapters/` | 游戏接口、合作伙伴、控制器、特征、奖励和网页外部覆盖层 |
-| `strategies/` | `heuristic/`、`stacking/`、`builds/`、`teacher/`、`bc/`、`ppo/`、`cem/`、`dagger/`、`interaction/`、`tensor-bc/` |
-| `studies/` | 按 data/training/features/controllers 分类的消融；历史启动器与未验收代码单列 |
-| `evaluation/` | 统计分析、构造战斗审计、宽开发评测 |
-| `replay/` | 模型、合作训练及冻结策略的离线回放导出 |
-| `configs/` | 固定版本、目录映射、训练及实验配置 |
-| `scripts/` | 统一命令、布局核查和一次性迁移工具 |
-| `docs/` | 调研、攻略、文献和实验交接说明 |
-| `results/` | 所有运行结果、benchmark、测试报告、日志、轨迹、回放、历史源码快照；只提交 `.gitkeep` |
-| `runtime/` | Python环境、Node依赖实体、下载素材、缓存、临时文件；忽略提交 |
+## 开始使用
 
-## 常用命令
+需要 Python 3.10+、Node 22+。新测评框架和示例启发式不需要 PyTorch。
 
 ```bash
-git submodule update --init game
+git clone --recurse-submodules https://github.com/LittleDrinks/arknights.git
+cd arknights
 npm ci --ignore-scripts
-npm run vendor                         # 仅写runtime/web/vendor
-python3 scripts/ark.py check
-python3 scripts/check_layout.py
-python3 scripts/ark.py prepare            # 仅整理导入工作目录，不跑训练/对局
-bash scripts/start-preview.sh              # 保持38181，供VS Code转发
+python3 -m pip install -e .
+ark check
+ark vendor                 # 为网页生成外部 runtime/web/vendor，不改 game
+ark evaluate experiments/heuristic.py --suite smoke --plan
+ark evaluate experiments/heuristic.py --suite smoke
 ```
 
-已部署服务器的Python环境：`runtime/venvs/learner-20261018/bin/python`。Node依赖实体保存在 `runtime/node_modules/`，根目录的忽略链接 `node_modules` 用于标准Node包解析。全新安装也可直接用根目录 `npm ci --ignore-scripts` 创建忽略的 `node_modules/`。不要在game里运行安装或vendor生成。
+也可以在仓库根目录用 `python3 -m arknights` 代替 `ark`。示例是简单的接口基线，不是强策略；真实败局也是正常完成，不能当作框架故障。
 
-原页面回放：`/?replay=frozen-bc-eval-s65-d1fdb2b3ad67`，选择AI3、R14、本回合作战。网页适配文件在 `adapters/web/overlay/`，录像在 `results/replays/public/dev/`，素材在 `runtime/web/`；服务从外部合并请求并转发到干净的上游服务器，支持WebSocket。
+`smoke` 是 seed17、原版伙伴、合作终极模拟的一局；`abyss-dev` 是开发 seed1–16 × 原版/混合伙伴，共32局。`--seeds 1:4` 是包含两端的范围；支持 `--mode solo`、`--partners original mixed weak`、`--workers`、`--timeout`。100001–100064继续封存。每次执行创建新 run，不覆盖或冒称精确续跑。
 
-## 策略入口与历史兼容
+命令返回 `results/runs/<run-id>` 和汇总。失败/超时计为技术失败，正常败局单列；团队和学习席个人结果分开。全部计划项保留在分母中。同一个种子的不同伙伴配置不自动视为独立随机样本。
 
-历史模块用相对路径互相导入，并有完整文件SHA锁；直接改这些源码的导入语句，会使过去的规则/源码证明失效。因此本次只移动源文件，**251个源/配置/说明文件逐字节保持**，不把旧策略重写成另一算法。
+## 写一个策略
 
-`configs/layout.json` 记录新源码位置与原虚拟路径。统一入口在 `results/workspaces/<项目版本>-<映射哈希>/` 生成隔离运行目录，以Git提交记录实际内容；旧固定import和SHA守卫正常工作。153个旧生成文件从当前Git工作树移除，必要的历史fixture从原Git提交恢复到忽略的运行目录。不要直接运行策略子目录中的旧相对路径脚本。
+唯一入口是同步 `play(game)`；使用字典观测和参数化动作：
+
+```python
+def play(game):
+    state = game.observe()
+    while not state['terminal']:
+        if not state['can_act']:
+            state = game.wait()
+            continue
+        action = choose_action(state)  # 你的启发式或模型
+        reply = game.act(action)
+        state = reply['state']
+```
+
+完整示例见 [experiments/heuristic.py](experiments/heuristic.py)。它读取开局信息、查说明、选策略、购买、布阵、装备、领奖并准备；不使用自动布阵或装备控制器。
+
+- `observe()`：返回 `phase/round/terminal/can_act/own/public/actions`、接口版本、固定规则和赛季。`actions` 是参数域和约束说明，并非承诺所有参数组合合法的扁平候选表。
+- `act(action)`：例如 `{'type':'move','uid':42,'to':{'area':'board','row':9,'col':3},'dir':'RIGHT'}`。返回 `accepted/result/state`。原生协议字段名保持一致，也接受完整 `t`；可附 `revision` 拒绝过期动作。游戏最终校验，拒绝也原样记录。
+- `wait()`：显式推进虚拟时间。开局、策略、机变和休整都可以由策略自己决策；作战分段推进，保留观察/暂停能力。等待可能使游戏原生倒计时到期，相应自动行为会被记录。
+- `lookup({'kind':'bonds','id':'lateranoShip'})`：返回带赛季和来源的公开说明，支持 `chess/items/bonds/bands/garrisons/bosses` 与文本查询。默认不返回黑板、隐藏数值表或未来随机结果。查资料和 observe 不推进游戏时间。
+
+购物、冻结、升级、售出、部署/换位/朝向、装备/替换、道具、奖励、选择、准备与游戏允许的观察控制均可调用。`confirm` 对应本局情报确认；`band` 选择策略。受控席是真实玩家席，不会自动帮你完成开局。局前持有/自选配置通过 `Session` 的初始参数提供，技能/模组配置遵守上游允许的阶段。客户端战斗结果上报不提供给策略。
+
+策略是受信任的研究代码，子进程用于故障隔离及资源收尾，不是安全沙箱。框架隐藏命令、进程和文件管理；训练算法可直接使用 `from arknights.adapter import Session` 创建对局。原有训练实现保存在 `arknights/evaluate/_legacy/`，尚未改造成新的训练入口，正式训练保持暂停。
+
+## 看结果和回放
+
+每局保留 requests、原始协议、stderr、终局和结果；运行保存完整配置、代码/规则身份、逐局状态、汇总和文件校验。`summary.json` 中的 `games[].id` 是 episode ID。
 
 ```bash
-python3 scripts/ark.py learner -- --help
-python3 scripts/ark.py ppo -- --help
-python3 scripts/ark.py analyze -- --help
-python3 scripts/ark.py replay -- --help
-# 只验证接口，不启动训练；环境从stdin接受JSONL：
-python3 scripts/ark.py env -- --coop
+ark replay <run-id> --episode <episode-id>
+ark preview
 ```
 
-`learner/ppo/replay/analyze` 的 `--out/--out-dir/--trace-dir` 必须位于 `results/`。已有SHA锁定的研究入口需要在生成目录内按原契约显式调用；历史launchers保留取证用途，含旧绝对路径，不作为当前启动入口。
+回放会核对原产物，重新执行保存的操作并逐响应比较，再录制真实战斗、追加到回放索引，返回 `http://127.0.0.1:38181/?replay=...`。这是保存操作的重放，不是重新运行模型推理。端口38181在服务器保持运行，使用VS Code端口转发。首次部署需要网页依赖和角色素材；服务器已有素材留在 `runtime/web`。旧45个入口/169场录像保留，新录像追加发布。
 
-修改既有策略时，应显式更新layout身份和该模块的版本/源锁，生成新运行目录；不覆盖历史快照。新增策略直接放在 `strategies/<策略名>/`，公共游戏接入放在adapters，输出全部指向results。
+资料和规则分别固定版本；当前仅实现这个复刻赛季，不宣称任意赛季可直接运行，也不宣称镜像数值和官方逻辑完全一致。
 
-## 数据与迁移
+## 历史实验与检查
 
-迁移没有删除原始数据。`results/migrations/layout-20261018/`保存移动日志、逐文件旧新路径表和inode/大小/mtime身份核验；只有虚拟环境的嵌入路径脚本在保存原件后被改写。旧实验报告和模型metadata不重写。
-
-- 旧 `experiments/` → `results/runs/`
-- 旧根目录benchmark → `results/benchmarks/legacy-root/`
-- 旧 `logs/`、`trajectories/` → `results/logs/`、`results/trajectories/`
-- 旧 `code-*` → `results/archive/snapshots/`
-- 旧服务端散装代码及修改过的game → `results/archive/source/`
-- 原始攻略/文献数据 → `results/datasets/`；精简阅读文档 → `docs/`
+历史实现及说明集中在 `arknights/evaluate/_legacy/`，VS Code默认隐藏。源代码按原SHA保留，旧数据仍在results；不复制旧目录到根目录。服务器上可用以下兼容入口生成历史运行目录（依赖保留的本地Git历史）：
 
 ```bash
-python3 scripts/resolve_legacy.py /data1/zsm/arknights/experiments/wide-dev-v1/summary.json
+python3 -m arknights legacy prepare
+python3 -m arknights legacy ppo -- --help
+python3 -m unittest discover -s tests -p 'test_*.py'
+node --test tests/*.test.mjs
 ```
 
-`studies/pending/scale-bc/`为已保存、尚未独立审查的实现，不表示数据已验收或新训练已完成。停止时的新教师数据仍是未冻结状态，不能因为目录整理而变成可训练数据。
+公开代码不包含服务器的数据、模型、素材或依赖；新clone以当前测评和回放入口为准。历史重现实例需要相应历史源码、结果和环境。游戏更新时更换adapter实现及契约测试；不得原地修改冻结game再将结果当成旧版本复现。

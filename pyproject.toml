@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "arknights-lab"
+version = "0.1.0"
+description = "Player adapters, reproducible evaluation and native game replays"
+requires-python = ">=3.10"
+license = {text = "GPL-3.0-or-later"}
+
+[project.scripts]
+ark = "arknights.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["arknights*"]
+exclude = ["arknights.evaluate._legacy*"]
+
+[tool.setuptools.package-data]
+"arknights.adapter" = ["*.mjs"]
+"arknights.replay" = ["*.mjs", "web/*.js", "web/*.css", "web/i18n/*.json"]

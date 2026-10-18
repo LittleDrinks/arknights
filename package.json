@@ -6,10 +6,11 @@
   "license": "GPL-3.0-or-later",
   "type": "module",
   "scripts": {
-    "preview": "node adapters/web/server.mjs",
-    "check": "python3 scripts/check_layout.py",
-    "prepare:runtime": "python3 scripts/ark.py prepare",
-    "vendor": "node scripts/vendor.mjs"
+    "preview": "node arknights/replay/server.mjs",
+    "check": "python3 -m arknights check",
+    "prepare:runtime": "python3 -m arknights legacy prepare",
+    "vendor": "node arknights/evaluate/_legacy/scripts/vendor.mjs",
+    "test": "node --test tests/*.test.mjs"
   },
   "engines": {
     "node": ">=22"

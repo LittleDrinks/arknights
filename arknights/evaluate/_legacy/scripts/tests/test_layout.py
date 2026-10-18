@@ -9,8 +9,8 @@ import sys
 import tempfile
 import unittest
 from unittest.mock import patch
-ROOT=Path(__file__).resolve().parents[2]
-sys.path.insert(0,str(ROOT/'scripts'))
+ROOT=Path(__file__).resolve().parents[5]
+sys.path.insert(0,str(ROOT/'arknights/evaluate/_legacy/scripts'))
 import ark
 import migrate_existing as M
 
