@@ -53,10 +53,10 @@ def play(game):
 
 完整示例见 [experiments/heuristic.py](experiments/heuristic.py)。它读取开局信息、查说明、选策略、购买、布阵、装备、领奖并准备；不使用自动布阵或装备控制器。
 
-- `observe()`：返回 `phase/round/terminal/can_act/own/public/actions`、接口版本、固定规则和赛季。`actions` 是参数域和约束说明，并非承诺所有参数组合合法的扁平候选表。
+- `observe()`：返回 `phase/round/terminal/can_act/own/public/actions`、接口版本、固定规则和赛季。`own.deployment` 提供当前部署场地的公开地面/高台坐标，跟随地形变化。`actions` 是参数域和约束说明，并非承诺所有参数组合合法的扁平候选表。
 - `act(action)`：例如 `{'type':'move','uid':42,'to':{'area':'board','row':9,'col':3},'dir':'RIGHT'}`。返回 `accepted/result/state`。原生协议字段名保持一致，也接受完整 `t`；可附 `revision` 拒绝过期动作。游戏最终校验，拒绝也原样记录。
 - `wait()`：显式推进虚拟时间。开局、策略、机变和休整都可以由策略自己决策；作战分段推进，保留观察/暂停能力。等待可能使游戏原生倒计时到期，相应自动行为会被记录。
-- `lookup({'kind':'bonds','id':'lateranoShip'})`：返回带赛季和来源的公开说明，支持 `chess/items/bonds/bands/garrisons/bosses` 与文本查询。默认不返回黑板、隐藏数值表或未来随机结果。查资料和 observe 不推进游戏时间。
+- `lookup({'kind':'bonds','id':'lateranoShip'})`：返回带赛季和来源的公开说明，支持 `chess/items/bonds/bands/garrisons/bosses` 与文本查询。干员条目包含 `bonds/garrisonIds` 标识列表，可继续查询对应盟约与特质。默认不返回黑板、隐藏数值表或未来随机结果。查资料和 observe 不推进游戏时间。
 
 购物、冻结、升级、售出、部署/换位/朝向、装备/替换、道具、奖励、选择、准备与游戏允许的观察控制均可调用。`confirm` 对应本局情报确认；`band` 选择策略。受控席是真实玩家席，不会自动帮你完成开局。局前持有/自选配置通过 `Session` 的初始参数提供，技能/模组配置遵守上游允许的阶段。客户端战斗结果上报不提供给策略。
 

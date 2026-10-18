@@ -180,6 +180,26 @@ test('online allowlist and recursive public-text lookup never expose hidden stat
   assert.throws(() => game.lookup({ kind: 'chess', limit: 0 }), /limit/);
 });
 
+test('player-visible terrain and card memberships are available without action probes', async t => {
+  const game = await create(t);
+  const state = await prep(game);
+  assert(state.own.deployment.cells.length > 0);
+  assert.deepEqual(game.observe(), state, 'reading terrain is observational');
+  const card = game.lookup({ kind: 'chess', id: 'chess_char_2_16_a' }).entries[0];
+  assert(card.bonds.includes('siracusaShip'));
+  assert(card.garrisonIds.length > 0);
+  const trait = game.lookup({ kind: 'garrisons', id: card.garrisonIds[0] }).entries[0];
+  assert(trait.desc);
+  const old = state.own.deployment.cells[0];
+  const key = `${old.row},${old.col}`;
+  game.ps.tileOverrides[key] = old.kind === 'melee' ? 'ranged' : 'melee';
+  game.ps.invalidateDeployMap();
+  const updated = game.observe().own.deployment;
+  assert.equal(updated.cells.find(c => c.row === old.row && c.col === old.col).kind, game.ps.tileOverrides[key]);
+  assert.deepEqual(game.observe().own.deployment, updated);
+  assert(updated.cells.every(c => ['melee', 'ranged'].includes(c.kind)));
+});
+
 test('room loadout/reroll route upstream, ownership and DIY are pre-start settings', async t => {
   const game = await create(t);
   let state = await game.reset({ ownership: ['chess_char_3_01_a'], diy: {} });

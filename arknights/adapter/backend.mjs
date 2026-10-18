@@ -27,6 +27,7 @@ const TEXT_KEYS = new Set(['name', 'appellation', 'desc', 'description', 'text',
 const ID_KEYS = new Set(['id', 'chessId', 'baseId', 'goldenId', 'charId', 'skillId', 'garrisonId', 'bandId', 'bossId',
   'effectId', 'uniEquipId', 'subProfessionId']);
 const TEXT_CONTAINERS = new Set(['trait', 'skill', 'skills', 'talents', 'module', 'modules', 'abilities']);
+const IDENTIFIER_LISTS = new Set(['bonds', 'garrisonIds']);
 const ALIASES = { confirm: 'g.infoReady', infoReady: 'g.infoReady', loadout: 'room.loadout',
   reroll: 'room.rerollSetup', rerollSetup: 'room.rerollSetup', cancelReroll: 'room.cancelReroll',
   ownership: 'room.ownership', diy: 'room.diy' };
@@ -40,6 +41,7 @@ function publicText(value, depth = 0) {
   const out = {};
   for (const [key, v] of Object.entries(value)) {
     if ((TEXT_KEYS.has(key) || ID_KEYS.has(key)) && typeof v === 'string') out[key] = v;
+    else if (IDENTIFIER_LISTS.has(key) && Array.isArray(v)) out[key] = v.filter(id => typeof id === 'string');
     else if (TEXT_CONTAINERS.has(key)) {
       const text = publicText(v, depth + 1);
       if (text != null) out[key] = text;
@@ -210,6 +212,13 @@ export class PlayerGame {
   observe() {
     this.requireMatch();
     const own = copy(this.ps.privateView());
+    // Public terrain geometry, including this player's current field/terrain changes.
+    // Build from the native map without probing actions or mutating the player's legality cache.
+    const field = this.m.deployFieldOf(this.ps);
+    own.deployment = { field, cells: [...this.m.deployMapFor(this.ps, field)].map(([key, kind]) => {
+      const [row, col] = key.split(',').map(Number);
+      return { row, col, kind };
+    }) };
     own.nextEnemies = own.nextEnemies.map(v => pick(v, PREVIEW_KEYS));
     const pub = pick(this.m.publicView(), PUBLIC_KEYS);
     const terminal = !!this.m.ended;
