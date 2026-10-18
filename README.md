@@ -7,6 +7,7 @@ arknights/
   adapter/       玩家能看什么、能做什么、能查什么
   evaluate/      创建对局、运行策略、记录轨迹、统一结果
   replay/        核对保存的操作、录制战斗、原页面展示
+  collect/       真人联机采集、片段标注和示范集导出
 game/            固定且干净的上游 submodule
 experiments/     策略和实验入口
 tests/          公开接口及故障回归
