@@ -357,6 +357,52 @@ class Tests(unittest.TestCase):
         self.assertIn('Input file/size', report['error'])
         self.assertFalse(manifest['unseenSeedsClaim'])
 
+    def test_spawn_submission_remains_interruptible_and_reaps_unregistered_child(self):
+        script = self.out / 'slow_spawn.py'
+        script.write_text("""import time
+if __name__ == '__mp_main__':
+    time.sleep(1.5)
+import sys, signal, multiprocessing
+from pathlib import Path
+from concurrent.futures import ProcessPoolExecutor
+from unittest.mock import patch
+sys.path.insert(0, CODE_PATH)
+import evaluation as V
+import processes
+class DelayedPool(ProcessPoolExecutor):
+    def __init__(self, **kwargs):
+        kwargs['initializer'] = None
+        kwargs['initargs'] = (b'x' * (2 * 1024 * 1024),)
+        super().__init__(**kwargs)
+class Expired(BaseException):
+    pass
+def alarm(*args):
+    raise Expired('absolute deadline')
+if __name__ == '__main__':
+    rows = V.schedule()
+    signal.signal(signal.SIGALRM, alarm)
+    start = time.monotonic()
+    signal.setitimer(signal.ITIMER_REAL, .15)
+    try:
+        with patch.object(V, 'ProcessPoolExecutor', DelayedPool):
+            seals, errors = V.dispatch(rows, {}, None, Path(sys.argv[1]), start+.15, 1, 1, 1048576, None,
+                                      worker_config={'deadline':start+.15})
+    finally:
+        signal.setitimer(signal.ITIMER_REAL, 0)
+    elapsed = time.monotonic()-start
+    assert elapsed < 1, elapsed
+    assert errors and rows[0]['status']=='failed' and rows[0]['evidenceUnsealed']
+    assert sum(r['status']=='unrun' for r in rows)==2047
+    assert not multiprocessing.active_children()
+    tracker = multiprocessing.resource_tracker._resource_tracker._pid
+    assert set(processes.descendants()) <= {tracker}, processes.descendants()
+    print('interrupted-and-reaped', elapsed)
+""".replace('CODE_PATH', repr(str(W.HERE))))
+        result = subprocess.run([sys.executable, '-B', str(script), str(self.out)],
+                                env={**os.environ, 'PYTHONDONTWRITEBYTECODE':'1'}, capture_output=True, timeout=3)
+        self.assertEqual(result.returncode, 0, result.stderr.decode()+result.stdout.decode())
+        self.assertIn(b'interrupted-and-reaped', result.stdout)
+
     def test_pins_and_syntax_no_training_calls(self):
         source = W.source_identity(W.CODE)
         self.assertEqual(source['base'], W.BASE)

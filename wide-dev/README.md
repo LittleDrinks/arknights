@@ -86,3 +86,5 @@ python3 -B wide-dev/check.py
 合成检查和源码接线审查记录见 [CHECKS.md](CHECKS.md)。本地不导入 Torch，不加载真实/合成 checkpoint，不训练，不运行 Node/game/static loader/Match/Battle，不 SSH、下载、安装或使用子 agent。
 
 服务器提供的历史时间为 4-thread E.Protocol 的 96 局约 464s、串行 128 局约 1699s；本任务未复测。进程池避免不同 Python worker 共享 GIL，但初始化成本、CPU 竞争、JSON/特征校验、证据多次哈希及磁盘吞吐仍可能使 **2048 局无法在 2400s 内完成**。没有真实 checkpoint/game 性能试跑，不承诺吞吐或胜率；预算仍固定，未完成项留下且返回非零。是否另行设计更长预算由 main 决定，本 CLI 不接受 >2400s。
+
+spawn submit 保持 SIGALRM 可中断；提交前记录当前行，若初始化管道写入中断，则将该行标为 failed/evidenceUnsealed（执行状态未知），并回收包括尚未进入 multiprocessing 注册表的已启动后代。原 0.1s 截止被 startup import 拖延的缺陷已修复，新增慢启动回归。

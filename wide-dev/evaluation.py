@@ -1,7 +1,6 @@
 """Paired development schedule, original P jobs, reservation-based bounded dispatch."""
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, wait, FIRST_COMPLETED
 import multiprocessing
-import signal
 import time
 
 from contracts_wide import C, F, P, MODELS, MIB, TOTAL_BYTES, META_BYTES, digest, require, safe, write_new
@@ -112,7 +111,7 @@ def dispatch(rows, models, game, out, deadline, workers, timeout, byte_limit, po
             'Finite dispatch limits')
     seals, errors, pending = {}, [], {}
     index, used, reserved = 0, metadata_bytes, 0
-    hard, protected = False, set()
+    hard, protected, submitting = False, set(), None
     if worker_config is not None:
         import processes
         from workers import initialize, perform_job
@@ -138,20 +137,20 @@ def dispatch(rows, models, game, out, deadline, workers, timeout, byte_limit, po
                        time.monotonic() < deadline and used + reserved + byte_limit <= total_bytes):
                     row = rows[index]
                     job_deadline = min(deadline, time.monotonic() + timeout)
-                    # Do not lose an already-started future if the CLI alarm
-                    # lands between submit() and registration in pending.
-                    mask = signal.pthread_sigmask(signal.SIG_BLOCK, {signal.SIGALRM})
-                    try:
-                        if worker_config is None:
-                            future = executor.submit(job, dict(row), *models[row['model']], game, out,
-                                                     job_deadline, byte_limit, pool)
-                        else:
-                            future = executor.submit(job, dict(row), job_deadline, byte_limit, pool)
-                        pending[future] = index
-                        reserved += byte_limit
-                        index += 1
-                    finally:
-                        signal.pthread_sigmask(signal.SIG_SETMASK, mask)
+                    # Spawn may block while writing initialization data to a pipe.
+                    # Keep the absolute alarm interruptible, and remember the row
+                    # even before submit returns a future. Hard cleanup also owns
+                    # spawned descendants not yet registered by multiprocessing.
+                    submitting = index
+                    if worker_config is None:
+                        future = executor.submit(job, dict(row), *models[row['model']], game, out,
+                                                 job_deadline, byte_limit, pool)
+                    else:
+                        future = executor.submit(job, dict(row), job_deadline, byte_limit, pool)
+                    pending[future] = index
+                    reserved += byte_limit
+                    index += 1
+                    submitting = None
                 if not pending:
                     break
                 done, _ = wait(pending, timeout=.25, return_when=FIRST_COMPLETED)
@@ -176,6 +175,15 @@ def dispatch(rows, models, game, out, deadline, workers, timeout, byte_limit, po
             except BaseException as exc:
                 # Includes CLI signal/submit/wait exceptions. Keep pending and drain.
                 errors.append(f'{type(exc).__name__}: {exc}'[:2000])
+                if worker_config is not None and (submitting is not None or
+                        time.monotonic() >= worker_config['deadline']):
+                    hard = True
+                    if submitting is not None:
+                        rows[submitting].update(status='failed', evidenceUnsealed=True,
+                                                error='Submission interrupted; execution unknown: ' + errors[-1])
+                    for i in pending.values():
+                        rows[i].update(status='failed', evidenceUnsealed=True, error=errors[-1])
+                    break
                 if not pending:
                     break
     finally:
