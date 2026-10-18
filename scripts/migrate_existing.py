@@ -67,6 +67,7 @@ def plain_parents(root,path):
     for parent in (path,*path.parents):
         if parent==root:break
         if parent.is_symlink():raise ValueError('Destination crosses a symlink: '+str(parent))
+        if exists(parent) and not parent.is_dir():raise ValueError('Destination parent is not a directory: '+str(parent))
 
 def staged_game(stage):
     if not stage.is_dir() or stage.is_symlink():raise ValueError('Pristine staged game clone required')
