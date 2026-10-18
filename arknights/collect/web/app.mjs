@@ -4,7 +4,7 @@ const headers = route => {
   const organizer = localStorage.getItem('ark-organizer:' + collectionId);
   let participant; try { participant = JSON.parse(sessionStorage.getItem('ark-collection')); } catch {}
   return { ...(organizer ? { 'X-Collect-Organizer': organizer } : {}),
-    ...(participant?.collectionId === collectionId ? { 'X-Collect-Participant': participant.key } : {}) };
+    ...(participant && participant.collectionId === collectionId ? { 'X-Collect-Participant': participant.key } : {}) };
 };
 const api = async (url, body) => { const r = await fetch('/api/collect' + url, {
   method: body === undefined ? 'GET' : 'POST', headers: { ...headers(url), ...(body === undefined ? {} : { 'Content-Type': 'application/json' }) },
