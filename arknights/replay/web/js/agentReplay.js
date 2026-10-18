@@ -14,7 +14,7 @@ import { installDeviceSupport } from './ui/device.js';
 import { t } from '../../shared/i18n.js';
 
 const state = { manifest: null, episode: null, steps: [], index: 0, mode: 'actions', playing: false,
-  speed: 1, frameIndex: 0, recording: null, elapsed: 0, lastAt: 0, loading: false, request: 0 };
+  speed: 1, frameIndex: 0, recording: null, elapsed: 0, lastAt: 0, loading: false, request: 0, error: '', selectedId: null };
 let controls;
 const $ = (name) => controls.querySelector(`[data-control="${name}"]`);
 const clone = (x) => JSON.parse(JSON.stringify(x));
@@ -23,20 +23,29 @@ const label = (s) => ({ 'g.buy': '购买', 'g.sell': '出售', 'g.refresh': '刷
   'g.levelUp': '升级', 'g.ready': '准备战斗', 'g.reward': '选择奖励', 'g.choice': '机变选择', 'g.band': '策略',
   'g.freeze': '冻结', 'g.art': '使用法术', 'g.destroy': '销毁' }[s.action.t] || s.action.t);
 
-function showError(error) { state.playing = false; state.loading = false; $('status').textContent = String(error.message || error); updateControls(); }
+function showError(error) {
+  state.playing = false; state.loading = false;
+  state.error = `${t('回放载入失败')}：${String(error.message || error)}。${t('可重试或选择其他回放')}`;
+  updateControls();
+}
 function updateControls() {
   $('play').textContent = t(state.playing ? '暂停' : '播放');
   const battle = state.mode === 'battle';
   $('scrub').max = String(Math.max(0, battle ? state.recording.frames.length - 1 : state.steps.length - 1));
   $('scrub').value = String(battle ? state.frameIndex : state.index);
   const s = state.steps[state.index];
-  if (s) {
+  if (state.error) $('status').textContent = state.error;
+  else if (state.loading) $('status').textContent = t('正在载入…');
+  else if (s) {
     $('round').value = String(s.before.round);
     $('status').textContent = state.loading ? t('正在载入…') : battle
       ? `${t('作战')} R${state.recording.round} · ${state.elapsed.toFixed(1)} / ${state.recording.duration.toFixed(1)}s`
       : `R${s.before.round} · ${t(label(s))} · ${state.index + 1}/${state.steps.length}${s.accepted ? '' : ` · ${t('已拒绝')}`}`;
   }
-  $('battle').disabled = state.loading || !state.episode?.meta.battles.some(b => b.round === s?.before.round);
+  const unavailable = state.loading || !!state.error || !s;
+  for (const name of ['play', 'prev', 'next', 'player', 'round', 'scrub', 'speed']) $(name).disabled = unavailable;
+  $('retry').hidden = !state.error;
+  $('battle').disabled = unavailable || !state.episode?.meta.battles.some(b => b.round === s?.before.round);
 }
 
 function publicOf(obs) {
@@ -68,16 +77,19 @@ function showStep(index, { pause = true } = {}) {
 
 async function loadEpisode(id) {
   const req = ++state.request;
-  state.playing = false; state.loading = true; updateControls();
-  const meta = state.manifest.episodes.find(e => e.id === id);
-  if (!meta) throw new Error('Unknown replay');
-  const episode = await json(`/dev/agent/${meta.file}`);
-  if (req !== state.request) return;
-  state.episode = episode; state.loading = false;
-  $('player').replaceChildren(...Array.from({ length: meta.players }, (_, seat) => new Option(`AI ${seat + 1}`, `ai_${seat}`)));
-  $('episode').value = id;
-  selectPlayer();
-  const u = new URL(location.href); u.searchParams.set('replay', id); history.replaceState(null, '', u);
+  state.selectedId = id;
+  state.playing = false; state.loading = true; state.error = ''; updateControls();
+  try {
+    const meta = state.manifest.episodes.find(e => e.id === id);
+    if (!meta) throw new Error(t('索引中没有这条回放，请重新选择'));
+    const episode = await json(`/dev/agent/${meta.file}`);
+    if (req !== state.request) return;
+    state.episode = episode; state.loading = false;
+    $('player').replaceChildren(...Array.from({ length: meta.players }, (_, seat) => new Option(`AI ${seat + 1}`, `ai_${seat}`)));
+    $('episode').value = id;
+    selectPlayer();
+    const u = new URL(location.href); u.searchParams.set('replay', id); history.replaceState(null, '', u);
+  } catch (error) { if (req === state.request) throw error; }
 }
 
 function selectPlayer() {
@@ -186,14 +198,14 @@ export async function bootReplay() {
   const episode = option('select', 'episode'), player = option('select', 'player'), round = option('select', 'round');
   const prev = option('button', 'prev', '上一步'), play = option('button', 'play', '播放'), next = option('button', 'next', '下一步');
   const battle = option('button', 'battle', '本回合作战'), back = option('a', 'back', '返回首页'); back.href = '/';
+  const retry = option('button', 'retry', '重试'); retry.hidden = true;
   const scrub = option('input', 'scrub'); scrub.type = 'range'; scrub.min = '0';
   const speed = option('select', 'speed'); for (const v of [0.5, 1, 2, 4, 8]) speed.add(new Option(`${v}×`, String(v))); speed.value = '1';
   const status = option('span', 'status');
-  controls.append(heading, episode, player, round, prev, play, next, battle, speed, back, scrub, status);
+  status.setAttribute('role', 'status');
+  controls.append(heading, episode, player, round, prev, play, next, battle, speed, retry, back, scrub, status);
   document.body.append(controls);
   render(html`<div class="app-root"><${GameScreen} /><${UiHosts} /><${ToastHost} /><${GuideHost} /></div>`, document.getElementById('app'));
-  state.manifest = await json('/dev/agent/index.json');
-  for (const e of state.manifest.episodes) episode.add(new Option(`${e.policyLabel ? e.policyLabel + ' · ' : ''}${e.config} · seed ${e.seed} · ${e.victory ? t('胜利') : t('失败')}`, e.id));
   episode.onchange = () => loadEpisode(episode.value).catch(showError); player.onchange = selectPlayer;
   round.onchange = () => showStep(state.steps.findIndex(s => s.before.round === Number(round.value)));
   prev.onclick = () => nextStep(-1); next.onclick = () => nextStep(1);
@@ -201,8 +213,23 @@ export async function bootReplay() {
   battle.onclick = () => showBattle({ auto: true }).catch(showError);
   speed.onchange = () => { state.speed = Number(speed.value); };
   scrub.oninput = () => { if (state.mode === 'battle') seekBattle(Number(scrub.value)); else showStep(Number(scrub.value)); };
-  const id = new URLSearchParams(location.search).get('replay') || 'solo-ABYSS-s1';
-  await loadEpisode(id);
+  async function openReplay() {
+    state.error = ''; state.loading = true; updateControls();
+    try {
+      const manifest = await json('/dev/agent/index.json');
+      if (!Array.isArray(manifest.episodes) || !manifest.episodes.length) throw new Error(t('当前没有可用回放'));
+      state.manifest = manifest;
+      const id = state.selectedId || new URLSearchParams(location.search).get('replay') || manifest.episodes[0].id;
+      episode.replaceChildren(...manifest.episodes.map(e => new Option(`${e.policyLabel ? e.policyLabel + ' · ' : ''}${e.config} · seed ${e.seed} · ${e.victory ? t('胜利') : t('失败')}`, e.id)));
+      if (!manifest.episodes.some(e => e.id === id)) {
+        const missing = new Option(t('链接中的回放不存在，请重新选择'), id, true, true);
+        missing.disabled = true; episode.prepend(missing);
+      } else episode.value = id;
+      await loadEpisode(id);
+    } catch (error) { showError(error); }
+  }
+  retry.onclick = () => openReplay();
+  await openReplay();
   document.getElementById('boot')?.remove();
   globalThis.__SP__ = { store, net, data, replay: true, version: 1 };
   globalThis.__nativeReplay = { state };

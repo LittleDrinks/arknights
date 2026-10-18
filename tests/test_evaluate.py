@@ -116,8 +116,11 @@ class ProcessTests(unittest.TestCase):
         self.assertEqual(result.status, 'complete')
         pid = int(result.stdout)
         state = Path(f'/proc/{pid}/stat')
-        if state.exists():
-            self.assertEqual(state.read_text().rsplit(')', 1)[1].split()[0], 'Z')
+        try:
+            process_state = state.read_text()
+        except FileNotFoundError:
+            return  # The OS may reap the killed child before or during this read.
+        self.assertEqual(process_state.rsplit(')', 1)[1].split()[0], 'Z')
 
     def test_jsonl_drains_stderr_and_records_raw(self):
         code = ("import sys,json,os\nfor line in sys.stdin:\n"
