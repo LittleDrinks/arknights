@@ -1,6 +1,8 @@
 """Independent arithmetic and behavior-policy checks; no game process."""
 import copy
+import struct
 import unittest
+from unittest import mock
 
 import train
 import torch
@@ -15,6 +17,196 @@ def trajectory(rewards, dones, ends, next_values, values=None):
     return {'features': [None] * n, 'actions': [0] * n, 'logprobs': [0.] * n,
             'values': values or [0.] * n, 'rewards': rewards, 'dones': dones,
             'ends': ends, 'next_values': next_values}
+
+
+class SynchronizationTests(unittest.TestCase):
+    def setUp(self):
+        torch.manual_seed(33)
+        self.model = train.ActorCritic(2, 1, 8)
+        self.row = trajectory([1., -1., .5, 2.], [False] * 3 + [True],
+                              [False] * 3 + [True], [0.] * 4)
+        self.row['features'] = [
+            {'global': [1., 0.], 'candidates': [[1.], [200.], [-1.]],
+             'mask': [True, False, True]},
+            {'global': [0., 1.], 'candidates': [[1.]], 'mask': [True]},
+            {'global': [.5, 1.], 'candidates': [[-1.], [2.]], 'mask': [True, True]},
+            {'global': [1., .5], 'candidates': [[1.], [-2.]], 'mask': [True, True]},
+        ]
+        self.row['actions'], self.row['logprobs'], self.row['values'] = map(
+            list, zip(*(self.model.act(f) for f in self.row['features'])))
+        self.results = [{'worker': 0, 'trajectory': self.row}]
+
+    def old_bytes(self):
+        return struct.pack('4d', *self.row['logprobs'])
+
+    def run_update(self, model, batch_offsets=None, singleton_offsets=None, reject=False):
+        # Inject only into the no-grad synchronization check. Actual actor sampling,
+        # masked distributions, gradients and Adam updates use production code.
+        forward = model.forward
+        randperm = torch.randperm
+        singleton_rows, batch_errors = [], []
+        old_bytes = self.old_bytes()
+        old_object = self.row['logprobs']
+        parameters = train.vector(model)
+        rng = torch.get_rng_state().clone()
+        optimizer = torch.optim.Adam(model.parameters(), lr=.01)
+        features = self.row['features']
+        positions = {id(f): i for i, f in enumerate(features)}
+
+        def checked_forward(fs):
+            distribution, value = forward(fs)
+            if not torch.is_grad_enabled():
+                indices = [positions[id(f)] for f in fs]
+                singleton = len(fs) == 1
+                if singleton:
+                    singleton_rows.extend(indices)
+                offsets = (singleton_offsets if singleton else batch_offsets) or {}
+                log_prob = distribution.log_prob
+
+                def perturbed(actions):
+                    result = log_prob(actions)
+                    result = result + torch.tensor([offsets.get(i, 0.) for i in indices])
+                    if not singleton:
+                        old = torch.tensor([self.row['logprobs'][i] for i in indices])
+                        batch_errors.append((result - old).abs().max().item())
+                    return result
+
+                distribution.log_prob = perturbed
+            return distribution, value
+
+        def checked_randperm(*args, **kwargs):
+            if shuffle.call_count == 1:
+                # This is the exact boundary between validation and PPO. Fallback
+                # must neither sample an action nor mutate parameters/oldprobs.
+                self.assertTrue(torch.equal(torch.get_rng_state(), rng))
+                self.assertTrue(torch.equal(train.vector(model), parameters))
+                self.assertEqual(self.old_bytes(), old_bytes)
+            return randperm(*args, **kwargs)
+
+        with mock.patch.object(model, 'forward', side_effect=checked_forward), \
+                mock.patch.object(torch, 'randperm', side_effect=checked_randperm) as shuffle, \
+                mock.patch.object(optimizer, 'step', wraps=optimizer.step) as step:
+            if reject:
+                with self.assertRaisesRegex(RuntimeError, 'Behavior policy mismatch'):
+                    train.update(model, optimizer, self.results, CONFIG)
+                step.assert_not_called()
+                shuffle.assert_not_called()
+                self.assertEqual(optimizer.state_dict()['state'], {})
+                self.assertTrue(torch.equal(train.vector(model), parameters))
+                self.assertTrue(torch.equal(torch.get_rng_state(), rng))
+                metrics = None
+            else:
+                metrics = train.update(model, optimizer, self.results, CONFIG)
+                self.assertEqual(step.call_count, 4)
+        self.assertIs(self.row['logprobs'], old_object)
+        self.assertEqual(self.old_bytes(), old_bytes)
+        return metrics, singleton_rows, batch_errors, optimizer.state_dict()
+
+    def assert_state_equal(self, left, right):
+        if isinstance(left, torch.Tensor):
+            self.assertTrue(torch.equal(left, right))
+        elif isinstance(left, dict):
+            self.assertEqual(left.keys(), right.keys())
+            for key in left:
+                self.assert_state_equal(left[key], right[key])
+        elif isinstance(left, list):
+            self.assertEqual(len(left), len(right))
+            for a, b in zip(left, right):
+                self.assert_state_equal(a, b)
+        else:
+            self.assertEqual(left, right)
+
+    def test_batch_only_roundoff_falls_back_without_changing_ppo(self):
+        reference = copy.deepcopy(self.model)
+        rng = torch.get_rng_state().clone()
+        normal, rows, errors, normal_optimizer = self.run_update(reference)
+        self.assertEqual(rows, [])
+        self.assertEqual(normal['behaviorLogprobMaxError'], max(errors))
+        final_rng = torch.get_rng_state().clone()
+        torch.set_rng_state(rng)
+        repaired, rows, errors, repaired_optimizer = self.run_update(
+            self.model, batch_offsets={0: 3e-5})
+        self.assertFalse(normal['behaviorLogprobFallbackUsed'])
+        self.assertIsNone(normal['behaviorLogprobSingletonMaxError'])
+        self.assertEqual(normal['behaviorLogprobAcceptedMaxError'], normal['behaviorLogprobMaxError'])
+        self.assertEqual(rows, list(range(4)))  # Includes the unaffected second batch.
+        self.assertTrue(repaired['behaviorLogprobFallbackUsed'])
+        self.assertEqual(repaired['behaviorLogprobMaxError'], max(errors))
+        self.assertGreater(max(errors), 2e-5)
+        self.assertEqual(repaired['behaviorLogprobSingletonMaxError'], 0.)
+        self.assertEqual(repaired['behaviorLogprobAcceptedMaxError'], 0.)
+        for key in normal:
+            if not key.startswith('behaviorLogprob'):
+                self.assertEqual(normal[key], repaired[key])
+        self.assertTrue(torch.equal(train.vector(reference), train.vector(self.model)))
+        self.assertTrue(torch.equal(final_rng, torch.get_rng_state()))
+        self.assert_state_equal(normal_optimizer, repaired_optimizer)
+
+    def test_finite_batch_within_original_tolerance_stays_on_fast_path(self):
+        metrics, rows, errors, _ = self.run_update(self.model, batch_offsets={0: 1e-5})
+        self.assertEqual(rows, [])
+        self.assertGreater(max(errors), 0.)
+        self.assertLessEqual(max(errors), 2e-5)
+        self.assertFalse(metrics['behaviorLogprobFallbackUsed'])
+        self.assertEqual(metrics['behaviorLogprobAcceptedMaxError'], max(errors))
+
+    def test_singleton_reports_nonzero_error_with_original_tolerance(self):
+        reference = copy.deepcopy(self.model)
+        rng = torch.get_rng_state().clone()
+        normal, _, _, normal_optimizer = self.run_update(reference)
+        torch.set_rng_state(rng)
+        metrics, rows, _, repaired_optimizer = self.run_update(
+            self.model, batch_offsets={0: 3e-5}, singleton_offsets={3: 1e-5})
+        self.assertEqual(rows, list(range(4)))
+        self.assertGreater(metrics['behaviorLogprobSingletonMaxError'], 0.)
+        self.assertLessEqual(metrics['behaviorLogprobSingletonMaxError'], 2e-5)
+        self.assertEqual(metrics['behaviorLogprobAcceptedMaxError'],
+                         metrics['behaviorLogprobSingletonMaxError'])
+        # Even an accepted nonzero singleton error must not change PPO's old
+        # denominator: replacing it would change gradients and Adam's state.
+        self.assertEqual(metrics['loss'], normal['loss'])
+        self.assertTrue(torch.equal(train.vector(reference), train.vector(self.model)))
+        self.assert_state_equal(normal_optimizer, repaired_optimizer)
+
+    def test_late_singleton_mismatch_cannot_be_hidden_by_first_batch_fallback(self):
+        _, rows, _, _ = self.run_update(self.model, batch_offsets={0: 3e-5},
+                                         singleton_offsets={3: 3e-5}, reject=True)
+        self.assertEqual(rows, list(range(4)))
+
+    def test_nonfinite_batch_never_falls_back_even_if_later_batch_is_finite(self):
+        for bad in (float('nan'), float('inf'), -float('inf')):
+            with self.subTest(bad=bad):
+                _, rows, _, _ = self.run_update(self.model, batch_offsets={0: bad}, reject=True)
+                self.assertEqual(rows, [])
+
+    def test_nonfinite_singleton_is_rejected(self):
+        for bad in (float('nan'), float('inf'), -float('inf')):
+            with self.subTest(bad=bad):
+                self.run_update(self.model, batch_offsets={0: 3e-5},
+                                singleton_offsets={0: bad}, reject=True)
+
+    def test_genuine_parameter_drift_is_rejected(self):
+        with torch.no_grad():
+            self.model.actor[0].weight.mul_(2.)
+        self.run_update(self.model, reject=True)
+
+    def test_corrupt_old_logprob_is_rejected_without_overwrite(self):
+        for bad in (self.row['logprobs'][0] + 3e-5, float('nan'), float('inf')):
+            with self.subTest(bad=bad):
+                self.row['logprobs'][0] = bad
+                self.run_update(self.model, reject=True)
+
+    def test_changed_legal_mask_is_rejected(self):
+        original = self.row['features'][-1]['mask'][:]
+        selected = self.row['actions'][-1]
+        # Removing a sampled action yields -inf; removing the other legal action
+        # yields a finite but genuinely different singleton probability.
+        for removed in (selected, 1 - selected):
+            with self.subTest(removed=removed):
+                mask = original[:]
+                mask[removed] = False
+                self.row['features'][-1]['mask'] = mask
+                self.run_update(self.model, reject=True)
 
 
 class NumericalTests(unittest.TestCase):

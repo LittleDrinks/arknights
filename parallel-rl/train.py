@@ -255,14 +255,35 @@ def update(model, optimizer, results, config):
     before = vector(model)
     # Validate synchronization BEFORE any optimizer step; never replace old logprobs.
     max_error = 0.0
+    singleton_error = None
+    fallback_used = False
     with torch.no_grad():
         for start in range(0, len(actions), config['batch_size']):
             sl = slice(start, start + config['batch_size'])
             distribution, _ = model(rollout['features'][sl])
             error = (distribution.log_prob(actions[sl]) - old[sl]).abs().max().item()
+            # Reject each non-finite batch before max() can hide a previous NaN.
+            if not math.isfinite(error):
+                raise RuntimeError(f'Behavior policy mismatch: non-finite batch logprob error {error}')
             max_error = max(error, max_error)
-    if not math.isfinite(max_error) or max_error > 2e-5:
-        raise RuntimeError(f'Behavior policy mismatch: max logprob error {max_error}')
+        accepted_error = max_error
+        if max_error > 2e-5:
+            # FP32 batched kernels can differ from actor.act's singleton forward.
+            # Check EVERY state via that original path, without sampling an action
+            # or replacing the immutable PPO denominator with recomputed logprobs.
+            fallback_used = True
+            singleton_error = 0.0
+            for i, features in enumerate(rollout['features']):
+                distribution, _ = model([features])
+                error = (distribution.log_prob(actions[i:i + 1]) - old[i:i + 1]).abs().item()
+                if not math.isfinite(error):
+                    raise RuntimeError(f'Behavior policy mismatch: batch max logprob error {max_error}, '
+                                       f'non-finite singleton logprob error {error} at state {i}')
+                singleton_error = max(error, singleton_error)
+            if singleton_error > 2e-5:
+                raise RuntimeError(f'Behavior policy mismatch: batch max logprob error {max_error}, '
+                                   f'singleton max logprob error {singleton_error}')
+            accepted_error = singleton_error
     updates = 0
     for _ in range(config['epochs']):
         for indices in torch.randperm(len(actions)).split(config['batch_size']):
@@ -284,6 +305,9 @@ def update(model, optimizer, results, config):
     return {'loss': loss.item(), 'policyLoss': policy_loss.item(), 'valueLoss': value_loss.item(),
             'entropy': entropy.item(), 'optimizerSteps': updates, 'environmentSteps': len(actions),
             'terminalTransitions': sum(rollout['dones']), 'behaviorLogprobMaxError': max_error,
+            'behaviorLogprobSingletonMaxError': singleton_error,
+            'behaviorLogprobFallbackUsed': fallback_used,
+            'behaviorLogprobAcceptedMaxError': accepted_error,
             'parameterDeltaL2': (vector(model) - before).norm().item(), 'parameterSHA256': digest(model)}
 
 
