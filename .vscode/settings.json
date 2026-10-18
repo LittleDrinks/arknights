@@ -1,0 +1,5 @@
+{
+  "git.repositoryScanIgnoredFolders": ["results", "runtime", "node_modules"],
+  "files.watcherExclude": {"**/results/**": true, "**/runtime/**": true},
+  "search.exclude": {"results": true, "runtime": true, "node_modules": true}
+}

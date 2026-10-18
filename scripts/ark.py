@@ -10,6 +10,7 @@ import shlex
 import shutil
 import subprocess
 import sys
+import uuid
 import tarfile
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -98,9 +99,12 @@ def prepare():
     temp.rename(target)
     return target
 
-def output_paths(args):
+def output_paths(args, command):
+    destinations = {"analyze": ("--out-dir",), "learner": ("--out", "--trace-dir"), "ppo": ("--out",), "replay": ("--out",)}.get(command, ())
     for index, argument in enumerate(args):
         flag, separator, inline = argument.partition('=')
+        if flag.startswith('--') and flag not in destinations and any(name.startswith(flag) for name in destinations):
+            raise ValueError('Use the full output option: '+flag)
         if flag not in ('--out', '--trace-dir', '--out-dir'):
             continue
         value = inline if separator else args[index+1]
@@ -120,6 +124,9 @@ def main():
         return
     if options.command == 'preview':
         os.execvp('node', ['node', str(ROOT/'adapters/web/server.mjs'), *args])
+    output_paths(args, options.command)
+    if options.command == 'analyze' and '--help' not in args and not any(x.split('=')[0] == '--out-dir' for x in args):
+        args += ['--out-dir', str(ROOT/'results/benchmarks'/('analysis-'+uuid.uuid4().hex[:12]))]
     workspace = prepare()
     if options.command == 'prepare':
         print(workspace)
@@ -134,7 +141,7 @@ def main():
             args.remove('--coop')
         command = ['node', str(workspace/('coop/env.mjs' if coop else 'rl/env.mjs')), '--game', str(ROOT/'game'), *args]
     elif options.command == 'ppo':
-        output_paths(args)
+        output_paths(args, options.command)
         env.setdefault('COOP_POOL', 'mixed')
         env.setdefault('COOP_SPLIT', 'train')
         if '--env-command' not in args:
@@ -143,13 +150,13 @@ def main():
             args += ['--mode', 'coop']
         command = [interpreter, '-B', str(workspace/'parallel-rl/train.py'), *args]
     elif options.command == 'learner':
-        output_paths(args)
+        output_paths(args, options.command)
         command = [interpreter, '-B', str(workspace/'rl/learner.py'), *args]
     elif options.command == 'analyze':
-        output_paths(args)
+        output_paths(args, options.command)
         command = [interpreter, '-B', str(workspace/'analyze.py'), *args]
     else:
-        output_paths(args)
+        output_paths(args, options.command)
         command = ['node', str(workspace/'frozen-replay/cli.mjs'), '--game', str(ROOT/'game'), *args]
     os.chdir(ROOT)
     os.execvpe(command[0], command, env)

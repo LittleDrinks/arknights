@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""One-time in-place migration; rename original bytes and verify every file identity."""
+"""One-time journaled migration: preserve original bytes, refuse collisions, resume moves."""
 import argparse
 from datetime import datetime, timezone
 import json
@@ -30,11 +30,14 @@ SPECIAL={
  'game/public/vendor':'runtime/web/vendor', 'game/public/fonts':'runtime/web/fonts',
  'game/public/dev':'results/replays/public/dev', 'game/.cache':'runtime/cache/game',
 }
+RULES='6ab2468279e926d107788f63d7fe219b85f67b4a'
+
+def exists(path):return path.exists() or path.is_symlink()
 
 def mapped(name):
     for old,new in sorted({**MOVE,**SPECIAL}.items(),key=lambda x:len(x[0]),reverse=True):
-        if name==old or name.startswith(old+'/'):
-            return new+name[len(old):]
+        if name==old or name.startswith(old+'/'):return new+name[len(old):]
+    if name.split('/')[0] in ('results','runtime'):return name
     raise ValueError('Unmapped original file: '+name)
 
 def identity(path):
@@ -42,64 +45,90 @@ def identity(path):
     return dict(device=s.st_dev,inode=s.st_ino,bytes=s.st_size,mtimeNS=s.st_mtime_ns,
                 mode=stat.S_IFMT(s.st_mode),link=os.readlink(path) if path.is_symlink() else None)
 
+def node_identity(path):
+    d=identity(path)
+    return {k:d[k] for k in ('device','inode','mode','link')} if stat.S_ISDIR(d['mode']) else d
+
 def inventory(root):
     rows={}
-    for old in MOVE:
+    for old in (*MOVE,'results','runtime'):
         top=root/old
-        if not top.exists() and not top.is_symlink():
-            continue
-        if top.is_file() or top.is_symlink():
-            rows[old]=identity(top)
-            continue
+        if not exists(top):continue
+        if not top.is_dir() or top.is_symlink():rows[old]=identity(top);continue
         for parent,dirs,files in os.walk(top,followlinks=False):
             for name in list(dirs):
                 p=Path(parent)/name
-                if p.is_symlink():
-                    rows[str(p.relative_to(root))]=identity(p)
-                    dirs.remove(name)
+                if p.is_symlink():rows[str(p.relative_to(root))]=identity(p);dirs.remove(name)
             for name in files:
-                p=Path(parent)/name
-                rows[str(p.relative_to(root))]=identity(p)
+                p=Path(parent)/name;rows[str(p.relative_to(root))]=identity(p)
     return rows
 
-def main():
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--root',type=Path,required=True);args=p.parse_args()
-    root=args.root.resolve()
-    if (root/'.git').exists():raise ValueError('Root is already a repository; migration is one-time')
-    unknown={x.name for x in root.iterdir()}-set(MOVE)-{'.migration-stage','results','runtime'}
-    if unknown:raise ValueError('Uninventoried top-level entries: '+str(sorted(unknown)))
-    stage=root/'.migration-stage/game'
-    if not stage.exists():raise ValueError('Pristine staged game clone required')
-    if subprocess.check_output(['git','-C',str(stage),'rev-parse','HEAD'],text=True).strip()!='6ab2468279e926d107788f63d7fe219b85f67b4a':raise ValueError('Wrong staged game')
-    before=inventory(root)
-    out=root/'results/migrations/layout-20261018';out.mkdir(parents=True,exist_ok=False)
-    (out/'inventory-before.json').write_text(json.dumps(before,sort_keys=True))
-    mapping={name:mapped(name) for name in before}
-    (out/'path-map.json').write_text(json.dumps(mapping,sort_keys=True))
-    (out/'prefix-map.json').write_text(json.dumps({**MOVE,**SPECIAL},indent=2))
-    journal=out/'moves.jsonl'
+def plain_parents(root,path):
+    for parent in (path,*path.parents):
+        if parent==root:break
+        if parent.is_symlink():raise ValueError('Destination crosses a symlink: '+str(parent))
+
+def staged_game(stage):
+    if not stage.is_dir() or stage.is_symlink():raise ValueError('Pristine staged game clone required')
+    def git(*args):return subprocess.check_output(['git','-C',str(stage),*args],text=True).strip()
+    if git('rev-parse','--show-toplevel')!=str(stage):raise ValueError('Stage is not its own checkout')
+    if git('rev-parse','HEAD')!=RULES:raise ValueError('Wrong staged game')
+    if git('status','--porcelain','--untracked-files=all'):raise ValueError('Dirty staged game')
+    for rel in ('node_modules','.cache','public/assets','public/vendor','public/fonts'):
+        if exists(stage/rel):raise ValueError('Generated content in staged game: '+rel)
+
+def make_plan(root,stage):
+    staged_game(stage)
+    operations=[]
     for old,new in MOVE.items():
-        source=root/old;dest=root/new
-        if not source.exists() and not source.is_symlink():continue
-        if dest.exists():raise ValueError('Refuse overwrite '+str(dest))
-        dest.parent.mkdir(parents=True,exist_ok=True)
-        with journal.open('a') as f:f.write(json.dumps(dict(old=old,new=new,state='intent'))+'\n');f.flush();os.fsync(f.fileno())
-        source.rename(dest)
-        with journal.open('a') as f:f.write(json.dumps(dict(old=old,new=new,state='moved'))+'\n');f.flush();os.fsync(f.fileno())
-    archived=root/MOVE['game']
+        if exists(root/old):operations.append(dict(source=old,target=new,identity=node_identity(root/old)))
     for old,new in SPECIAL.items():
-        source=archived/old.removeprefix('game/');dest=root/new
-        if source.exists():
-            dest.parent.mkdir(parents=True,exist_ok=True);source.rename(dest)
-    stage.rename(root/'game')
+        if exists(root/old):operations.append(dict(source=MOVE['game']+'/'+old.removeprefix('game/'),target=new,identity=node_identity(root/old)))
+    operations.append(dict(source=str(stage.relative_to(root)),target='game',identity=node_identity(stage)))
+    # Check EVERY destination before moving anything; existing runtime/results data stays intact.
+    for op in operations:
+        target=root/op['target'];plain_parents(root,target.parent)
+        if exists(target) and op['target']!='game':raise ValueError('Refuse existing destination '+str(target))
+    if exists(root/'node_modules'):raise ValueError('Refuse existing root node_modules')
+    return operations
+
+def write_new(path,value):
+    with path.open('x') as f:json.dump(value,f,sort_keys=True);f.flush();os.fsync(f.fileno())
+
+def move_one(root,op,journal):
+    source,target=root/op['source'],root/op['target']
+    plain_parents(root,target.parent)
+    if exists(target):
+        if node_identity(target)!=op['identity']:raise ValueError('Resume target identity mismatch: '+op['target'])
+        if exists(source) and node_identity(source)==op['identity']:raise ValueError('Source and destination both own the original object')
+        return  # Rename completed before its journal acknowledgement.
+    if not exists(source) or node_identity(source)!=op['identity']:raise ValueError('Missing/changed migration source: '+op['source'])
+    target.parent.mkdir(parents=True,exist_ok=True)
+    def log(state):
+        with journal.open('a') as f:f.write(json.dumps(dict(source=op['source'],target=op['target'],state=state))+'\n');f.flush();os.fsync(f.fileno())
+    log('intent');source.rename(target);log('moved')
+
+def main():
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--root',type=Path,required=True);p.add_argument('--resume',action='store_true');args=p.parse_args()
+    root=args.root.resolve();out=root/'results/migrations/layout-20261018'
+    if (root/'.git').exists():raise ValueError('Root is already a repository; migration is one-time')
+    if args.resume:
+        if (out/'preservation.json').exists():print('File preservation already verified; finish project deployment separately.');return
+        operations=json.loads((out/'operations.json').read_text());before=json.loads((out/'inventory-before.json').read_text());mapping=json.loads((out/'path-map.json').read_text())
+    else:
+        unknown={x.name for x in root.iterdir()}-set(MOVE)-{'.migration-stage','results','runtime'}
+        if unknown:raise ValueError('Uninventoried top-level entries: '+str(sorted(unknown)))
+        if exists(out):raise ValueError('Migration exists; inspect it and use --resume')
+        operations=make_plan(root,root/'.migration-stage/game');before=inventory(root);mapping={name:mapped(name) for name in before}
+        out.mkdir(parents=True,exist_ok=False)
+        write_new(out/'inventory-before.json',before);write_new(out/'path-map.json',mapping);write_new(out/'prefix-map.json',{**MOVE,**SPECIAL});write_new(out/'operations.json',operations)
+    for op in operations:move_one(root,op,out/'moves.jsonl')
     rows={}
     for old,expected in before.items():
         actual=identity(root/mapping[old])
         if actual!=expected:raise ValueError('Preservation mismatch: '+old)
         rows[old]=dict(new=mapping[old],identity=actual)
-    (out/'preservation.json').write_text(json.dumps(dict(status='verified',method='same-filesystem rename; inode/device/bytes/mtime/type/link identity retained for every original file',files=len(rows),totalOriginalBytes=sum(x['bytes'] for x in before.values()),at=datetime.now(timezone.utc).isoformat(),entries=rows),sort_keys=True))
-    # Shell activation and console entrypoints embed the old prefix. Save each original
-    # before rewriting only runtime environment scripts; scientific artifacts stay untouched.
+    write_new(out/'preservation.json',dict(status='verified',method='same-filesystem rename; inode/device/bytes/mtime/type/link identity retained for every original file',files=len(rows),totalOriginalBytes=sum(x['bytes'] for x in before.values()),at=datetime.now(timezone.utc).isoformat(),entries=rows))
     changes=[]
     for bin_dir in (root/'runtime/venvs').glob('*/bin'):
         for path in bin_dir.iterdir():
@@ -110,7 +139,7 @@ def main():
             except UnicodeDecodeError:continue
             backup=out/'venv-script-originals'/path.relative_to(root/'runtime/venvs');backup.parent.mkdir(parents=True,exist_ok=True);backup.write_bytes(raw)
             path.write_bytes(raw.replace(old,new));changes.append(str(path.relative_to(root)))
-    (out/'runtime-script-updates.json').write_text(json.dumps(changes,indent=2))
-    if not (root/'node_modules').exists():(root/'node_modules').symlink_to('runtime/node_modules',target_is_directory=True)
+    write_new(out/'runtime-script-updates.json',changes)
+    if not exists(root/'node_modules'):(root/'node_modules').symlink_to('runtime/node_modules',target_is_directory=True)
     print(json.dumps(dict(status='verified',originalFiles=len(rows),runtimeScriptsUpdated=len(changes),receipt=str(out/'preservation.json'))))
 if __name__=='__main__':main()
