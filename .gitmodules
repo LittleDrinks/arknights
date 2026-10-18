@@ -1,0 +1,3 @@
+[submodule "game"]
+	path = game
+	url = https://github.com/sganggs/Stronghold-Protocol.git

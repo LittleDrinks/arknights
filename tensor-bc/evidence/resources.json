@@ -1,1 +1,0 @@
-{"exitCode":0,"maxSampleGapSeconds":0.021878065999771934,"measurement":"Sampled /proc summed supervisor+all descendant RSS; not an instantaneous kernel bound","outputBytesBeforeResourceReport":331024,"outputLimitBytes":5000000,"passed":true,"peakSummedTreeRSSBytes":791011328,"rssLimitBytes":1073741824,"rssSamples":139,"seconds":2.5240418930006854,"terminationReason":null}

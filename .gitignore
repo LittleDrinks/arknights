@@ -1,0 +1,13 @@
+# Generated results: preserve directory scaffolding only.
+/results/**
+!/results/**/
+!/results/**/.gitkeep
+/runtime/**
+!/runtime/.gitkeep
+/node_modules
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.env
+.env.*
+!.env.example
