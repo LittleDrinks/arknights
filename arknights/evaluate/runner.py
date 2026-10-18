@@ -273,7 +273,7 @@ def _plan(seeds, partners):
                 ((partner, seed) for partner in partners for seed in seeds), 1)]
 
 
-def _perform(root, path, case, spec, cancel):
+def _perform(root, path, case, spec, cancel, started=None):
     directory = _safe_path(path / case['id'])
     directory.mkdir(exist_ok=False)
     row = {**case, 'status': 'failed', 'teamVictory': None, 'learnerIndividualVictory': None}
@@ -292,7 +292,7 @@ def _perform(root, path, case, spec, cancel):
                    '--case-dir', str(directory)]
         execution = run_command(command, env=environment, cwd=root, timeout=spec['timeout'],
                                 stdout_path=directory / 'stdout.log',
-                                stderr_path=directory / 'stderr.log', cancel=cancel)
+                                stderr_path=directory / 'stderr.log', cancel=cancel, on_start=started)
         row['process'] = {'returncode': execution.returncode, 'status': execution.status,
                           'reason': execution.reason, 'stdoutBytes': execution.stdout_bytes,
                           'stderrBytes': execution.stderr_bytes}
@@ -334,7 +334,7 @@ def _summary(rows, status, guard_error=None, *, schema=SCHEMA):
 
 def evaluate(script, *, root=None, seeds=tuple(range(1, 17)), mode='coop',
              difficulty='ABYSS', partners=('original',), timeout=120,
-             workers=1, max_requests=4096):
+             workers=1, max_requests=4096, _created=None, _started=None):
     """Run each partner/seed once in its own Python subprocess, with no retries.
 
     Every planned case is in the denominator. Technical failures remain distinct
@@ -373,6 +373,8 @@ def evaluate(script, *, root=None, seeds=tuple(range(1, 17)), mode='coop',
     manifest = {'schema': SCHEMA, 'status': 'running', 'spec': 'spec.json',
                 'identity': 'identity.json', 'games': rows}
     _write_json(path / 'manifest.json', manifest)
+    if _created is not None:
+        _created(path)
     cancelled, guard_error, cancel = False, None, threading.Event()
     executor = ThreadPoolExecutor(max_workers=min(workers, len(cases)))
     futures, next_case = {}, 0
@@ -382,7 +384,7 @@ def evaluate(script, *, root=None, seeds=tuple(range(1, 17)), mode='coop',
                 index = next_case
                 rows[index]['status'] = 'running'
                 _write_json(path / 'manifest.json', manifest)
-                futures[executor.submit(_perform, root, path, cases[index], spec, cancel)] = index
+                futures[executor.submit(_perform, root, path, cases[index], spec, cancel, _started)] = index
                 next_case += 1
             if not futures:
                 break

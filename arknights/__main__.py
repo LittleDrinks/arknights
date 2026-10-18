@@ -36,6 +36,9 @@ def main(argv=None):
     ev.add_argument("--workers", type=int, default=1)
     ev.add_argument("--timeout", type=float, default=120)
     ev.add_argument("--plan", action="store_true", help="Print resolved case plan without running a game")
+    ev.add_argument("--queue", action="store_true", help="Submit a persistent job to the evaluation dashboard")
+    ev.add_argument("--label", help="Display name for queued evaluation")
+    ev.add_argument("--port", type=int, default=38181, help="Viewer/queue port")
     rep = commands.add_parser("replay", help="Verify and record a complete saved episode")
     rep.add_argument("run")
     rep.add_argument("--episode")
@@ -57,6 +60,13 @@ def main(argv=None):
             print(json.dumps(dict(script=str(args.script.resolve()), suite=args.suite, mode=args.mode,
                 difficulty=args.difficulty, seeds=selected, partners=partners, workers=args.workers,
                 timeout=args.timeout, cases=len(selected) * (1 if args.mode == "solo" else len(partners))), indent=2))
+            return
+        if args.queue:
+            from arknights.evaluate import submit
+            job = submit(args.script, root=ROOT, port=args.port, label=args.label,
+                seeds=",".join(map(str, selected)), mode=args.mode, difficulty=args.difficulty,
+                partners=partners, workers=args.workers, timeout=args.timeout)
+            print(json.dumps(job, ensure_ascii=False, indent=2))
             return
         run = evaluate(args.script, root=ROOT, seeds=selected, mode=args.mode, difficulty=args.difficulty,
                        partners=partners, timeout=args.timeout, workers=args.workers)

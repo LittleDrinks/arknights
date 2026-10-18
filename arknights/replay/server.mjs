@@ -4,7 +4,8 @@ import net from 'node:net';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
+import readline from 'node:readline';
 import { RULES } from './export.mjs';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -29,7 +30,7 @@ export function parseArgs(args) {
   return options;
 }
 
-export function createPreviewServer({ upstream, root = ROOT, replayDir, webDir = WEB }) {
+export function createPreviewServer({ upstream, root = ROOT, replayDir, webDir = WEB, evaluationsPort }) {
   root = path.resolve(root);
   const live = path.join(root, 'results/replays/public/dev');
   const mounts = [
@@ -49,9 +50,31 @@ export function createPreviewServer({ upstream, root = ROOT, replayDir, webDir =
     }
     if (pathname === '/healthz' && ['GET', 'HEAD'].includes(req.method)) {
       const bytes = Buffer.from(JSON.stringify({ arknightsPreview: 1, rules: RULES, root,
-        replayDir: replayDir ? path.resolve(replayDir) : null, overlay: 'external' }));
+        replayDir: replayDir ? path.resolve(replayDir) : null, overlay: 'external', evaluations: !!evaluationsPort }));
       res.writeHead(200, { 'Content-Type': mime['.json'], 'Content-Length': bytes.length, 'Cache-Control': 'no-store' });
       res.end(req.method === 'HEAD' ? undefined : bytes); return;
+    }
+    if (pathname === '/evaluations' || pathname === '/evaluations/') pathname = '/evaluations.html';
+    if (pathname.startsWith('/api/evaluations')) {
+      if (!evaluationsPort) { res.writeHead(503); res.end('Evaluation queue unavailable'); return; }
+      if (!['GET', 'POST'].includes(req.method)) { res.writeHead(405); res.end(); return; }
+      if (req.method === 'POST') {
+        // Strategy execution belongs to this local research page, never a cross-site form.
+        let foreign = req.headers['sec-fetch-site'] === 'cross-site';
+        try { if (req.headers.origin) foreign ||= new URL(req.headers.origin).host !== req.headers.host; }
+        catch { foreign = true; }
+        if (foreign || !(req.headers['content-type'] || '').startsWith('application/json')) {
+          res.writeHead(403); res.end(); return;
+        }
+      }
+      const api = http.request({ hostname: '127.0.0.1', port: evaluationsPort,
+        method: req.method, path: req.url, headers: req.headers }, response => {
+        res.writeHead(response.statusCode, response.headers); response.pipe(res);
+      });
+      api.on('error', () => { if (!res.headersSent) res.writeHead(503); res.end(); });
+      req.on('aborted', () => api.destroy());
+      res.on('close', () => { if (!res.writableFinished) api.destroy(); });
+      req.pipe(api); return;
     }
     if (req.method === 'GET' || req.method === 'HEAD') for (const [prefix, base] of mounts) {
       if (!pathname.startsWith(prefix)) continue;
@@ -108,15 +131,42 @@ export async function startPreview({ port = 38181, host = '0.0.0.0', replayDir, 
   const { startServer } = await import(pathToFileURL(path.join(game, 'server/index.js')));
   const quiet = { info() {}, debug() {}, warn() {}, error() {} };
   const upstream = await startServer({ port: 0, host: '127.0.0.1', quiet: true, log: quiet, assetIndex: false, studio: false });
-  const proxy = createPreviewServer({ upstream, root, replayDir });
+  const python = process.env.ARK_DASHBOARD_PYTHON || 'python3';
+  const queue = spawn(python, ['-m', 'arknights.evaluate.dashboard', 'serve', '--root', root], {
+    cwd: root, env: { ...process.env, PYTHONPATH: root }, stdio: ['ignore', 'pipe', 'inherit'],
+  });
+  const stopQueue = async () => {
+    if (!queue.pid || queue.exitCode !== null || queue.signalCode !== null) return;
+    await new Promise(resolve => {
+      const timer = setTimeout(() => queue.kill('SIGKILL'), 10000);
+      queue.once('exit', () => { clearTimeout(timer); resolve(); });
+      queue.kill('SIGTERM');
+    });
+  };
+  let evaluationsPort;
+  try {
+    evaluationsPort = await new Promise((resolve, reject) => {
+      const lines = readline.createInterface({ input: queue.stdout });
+      const timer = setTimeout(() => reject(Error('Evaluation service startup timeout')), 10000);
+      queue.once('error', reject);
+      queue.once('exit', () => reject(Error('Evaluation service exited during startup')));
+      lines.once('line', line => {
+        clearTimeout(timer); lines.close();
+        try { const value = JSON.parse(line).evaluationsPort;
+          if (!Number.isInteger(value) || value < 1) throw Error('Invalid queue port'); resolve(value);
+        } catch (e) { reject(e); }
+      });
+    });
+  } catch (error) { await stopQueue(); await upstream.close(); throw error; }
+  const proxy = createPreviewServer({ upstream, root, replayDir, evaluationsPort });
   try {
     await new Promise((resolve, reject) => { proxy.once('error', reject); proxy.listen(port, host, resolve); });
-  } catch (error) { proxy.destroyConnections(); await upstream.close(); throw error; }
+  } catch (error) { proxy.destroyConnections(); await stopQueue(); await upstream.close(); throw error; }
   let closing;
   const close = () => closing ||= (async () => {
     const stopped = new Promise(resolve => proxy.close(resolve));
     proxy.destroyConnections(); proxy.closeAllConnections();
-    await Promise.all([stopped, upstream.close()]);
+    await Promise.all([stopped, upstream.close(), stopQueue()]);
   })();
   return { server: proxy, port: proxy.address().port, host, root, rules: RULES, close };
 }

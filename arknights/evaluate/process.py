@@ -69,7 +69,7 @@ class CommandResult:
 
 
 def run_command(command, *, env=None, cwd=None, stdout_path=None,
-                stderr_path=None, timeout=120, max_bytes=MAX_BYTES, cancel=None):
+                stderr_path=None, timeout=120, max_bytes=MAX_BYTES, cancel=None, on_start=None):
     """Supervise one fresh process group; drain both pipes under a total deadline.
 
     Saved/captured bytes are capped jointly. A byte-limit breach is a technical
@@ -86,6 +86,8 @@ def run_command(command, *, env=None, cwd=None, stdout_path=None,
         proc = subprocess.Popen(command, cwd=cwd, env=env, stdin=subprocess.DEVNULL,
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                 start_new_session=True, bufsize=0)
+        if on_start is not None:
+            on_start(proc.pid)
         deadline = time.monotonic() + timeout
         for name, pipe in (('stdout', proc.stdout), ('stderr', proc.stderr)):
             os.set_blocking(pipe.fileno(), False)

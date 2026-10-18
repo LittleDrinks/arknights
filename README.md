@@ -60,9 +60,13 @@ def play(game):
 
 购物、冻结、升级、售出、部署/换位/朝向、装备/替换、道具、奖励、选择、准备与游戏允许的观察控制均可调用。`confirm` 对应本局情报确认；`band` 选择策略。受控席是真实玩家席，不会自动帮你完成开局。局前持有/自选配置通过 `Session` 的初始参数提供，技能/模组配置遵守上游允许的阶段。客户端战斗结果上报不提供给策略。
 
-策略是受信任的研究代码，子进程用于故障隔离及资源收尾，不是安全沙箱。框架隐藏命令、进程和文件管理；训练算法可直接使用 `from arknights.adapter import Session` 创建对局。原有训练实现保存在 `arknights/evaluate/_legacy/`，尚未改造成新的训练入口，正式训练保持暂停。
+策略是受信任的研究代码，子进程用于故障隔离及资源收尾，不是安全沙箱。框架隐藏命令、进程和文件管理；训练算法可直接使用 `from arknights.adapter import Session` 创建对局。当前独立策略及 RL 实验放在 `experiments/`；原有训练实现保存在 `arknights/evaluate/_legacy/`。
 
 ## 看结果和回放
+
+`ark preview` 后打开 **http://127.0.0.1:38181/evaluations**。面板自动发现正在运行的测评，显示进度、逐局胜负和盟约层数；评测结束后后台自动准备原游戏回放，准备好即可播放。服务器使用 VS Code 转发 **38181**。已有测评也会补回放，按局串行生成；准备状态与测评结果分开。
+
+需要排队运行时执行 `ark evaluate experiments/sol/agent.py --seeds 1:8 --queue --label sol-dev`，也可以在面板提交。普通 `ark evaluate` 直接执行，并自动出现在面板中。队列按提交顺序运行，代码在排队期间改变会拒绝执行，避免错用策略版本。
 
 每局保留 requests、原始协议、stderr、终局和结果；运行保存完整配置、代码/规则身份、逐局状态、汇总和文件校验。`summary.json` 中的 `games[].id` 是 episode ID。
 

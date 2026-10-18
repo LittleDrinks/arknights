@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0c1512">
+  <title>卫戍协议 · 评测队列</title>
+  <link rel="stylesheet" href="/evaluations.css">
+  <script src="/evaluations.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳至评测队列</a>
+  <header class="site-header">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">▥</span><span>卫戍协议 <span class="brand-divider">/</span> <span class="muted">策略实验室</span></span></div>
+    <nav aria-label="主导航">
+      <a href="/">返回原版游戏 <span aria-hidden="true">↗</span></a>
+      <a href="/?replay">原生回放列表 <span aria-hidden="true">↗</span></a>
+      <a href="/evaluations" aria-current="page">评测队列</a>
+    </nav>
+  </header>
+
+  <main id="main" class="shell">
+    <section class="page-heading" aria-labelledby="page-title">
+      <div><p class="eyebrow">EVALUATION CONTROL</p><h1 id="page-title">评测队列<span class="title-dot" aria-hidden="true">.</span></h1><p class="muted">从策略运行到逐局结果，再到原生战场回放。</p></div>
+      <div class="heading-actions"><span id="connection" class="connection" role="status">正在连接…</span><button id="refresh" class="button secondary" type="button">刷新</button><button id="new-job" class="button primary" type="button" aria-expanded="false" aria-controls="submit-panel">＋ 新建评测</button></div>
+    </section>
+
+    <div id="network-error" class="notice error" role="status" hidden></div>
+    <noscript><p class="notice error">请启用 JavaScript，以查看队列和提交评测。</p></noscript>
+
+    <section class="metrics" aria-label="评测总览">
+      <article class="metric"><span class="metric-label"><span class="status-dot queued" aria-hidden="true"></span>等待中</span><strong id="metric-queued">—</strong><span class="metric-note">队列中的评测</span></article>
+      <article class="metric"><span class="metric-label"><span class="status-dot running" aria-hidden="true"></span>运行中</span><strong id="metric-running">—</strong><span class="metric-note">正在执行的评测</span></article>
+      <article class="metric"><span class="metric-label">已完成</span><strong id="metric-completed">—</strong><span class="metric-note">已结束的评测</span></article>
+      <article class="metric accent"><span class="metric-label">团队胜率</span><strong id="metric-wins">—</strong><span id="metric-win-note" class="metric-note">暂无已完成对局</span></article>
+      <article class="metric"><span class="metric-label">失败对局</span><strong id="metric-failed">—</strong><span id="metric-fail-note" class="metric-note">执行错误，不含战败</span></article>
+    </section>
+
+    <section id="submit-panel" class="panel submit-panel" aria-labelledby="submit-title" hidden>
+      <div class="panel-heading"><div><p class="eyebrow">NEW EVALUATION</p><h2 id="submit-title">提交策略</h2></div><button id="close-submit" class="button quiet" type="button">收起</button></div>
+      <form id="submit-form">
+        <div class="form-grid">
+          <label class="field field-script">策略脚本 <span class="required">*</span><input id="script" name="script" value="experiments/sol/agent.py" required autocomplete="off" spellcheck="false" placeholder="experiments/sol/agent.py" aria-describedby="script-help"><span id="script-help" class="field-help">仅接受规范仓库内的脚本，填写相对仓库路径。</span></label>
+          <label class="field">评测名称 <span class="optional">可选</span><input name="label" autocomplete="off" placeholder="例如：羁绊策略 · 第三版"></label>
+          <label class="field">种子范围<input name="seeds" value="1:8" required autocomplete="off" spellcheck="false" aria-describedby="seeds-help"><span id="seeds-help" class="field-help">默认 1:8，格式由服务端校验。</span></label>
+          <label class="field">模式<select name="mode" id="mode"><option value="coop">合作 · coop</option><option value="solo">单人 · solo</option></select></label>
+          <fieldset class="partners"><legend>搭档类型</legend><div class="partner-options"><label><input type="checkbox" name="partners" value="original">original</label><label><input type="checkbox" name="partners" value="mixed" checked>mixed</label><label><input type="checkbox" name="partners" value="weak">weak</label></div><p id="partner-help" class="field-help">合作模式至少选择一种搭档。</p></fieldset>
+        </div>
+        <div class="form-footer"><p class="muted">终极模拟 ABYSS <span aria-hidden="true">·</span> 2 个工作进程 <span aria-hidden="true">·</span> 超时 120 秒</p><button id="submit-job" class="button primary" type="submit">加入评测队列 <span aria-hidden="true">→</span></button></div>
+        <p id="submit-feedback" class="form-feedback" role="status" hidden></p>
+      </form>
+    </section>
+
+    <div class="workspace">
+      <section class="panel queue-panel" aria-labelledby="queue-title">
+        <div class="panel-heading"><div class="section-title"><h2 id="queue-title">评测任务</h2><span id="job-count" class="count">—</span></div><label class="filter-label" for="status-filter">状态<select id="status-filter"><option value="all">全部状态</option><option value="queued">等待中</option><option value="running">运行中</option><option value="completed">已完成</option><option value="failed">异常 / 部分完成</option></select></label></div>
+        <div class="queue-caption"><span>策略 / 进度</span><span>状态</span></div>
+        <div id="job-list" class="job-list" aria-label="选择评测查看详情"></div>
+        <div id="queue-empty" class="empty-state"><span class="empty-symbol" aria-hidden="true">⌁</span><h3 id="queue-empty-title">正在读取评测…</h3><p id="queue-empty-note">连接队列后，任务会显示在这里。</p></div>
+        <div class="panel-footnote"><span class="small-dot" aria-hidden="true"></span><span id="sync-note">每 3 秒自动同步</span></div>
+      </section>
+
+      <section class="panel detail-panel" aria-labelledby="detail-heading">
+        <div id="detail-empty" class="empty-state detail-placeholder"><span class="empty-symbol" aria-hidden="true">◎</span><h2 id="detail-heading">策略效果</h2><p>选择一项评测，查看逐局结果与原生回放。</p></div>
+        <div id="detail-content" hidden>
+          <div class="panel-heading detail-heading"><div><p class="eyebrow">STRATEGY INSPECTOR</p><h2 id="detail-title">评测详情</h2></div><span id="detail-status" class="badge">—</span></div>
+          <div class="detail-body">
+            <dl class="strategy-meta"><div><dt>策略脚本</dt><dd id="detail-script" class="mono">—</dd></div><div><dt>结果目录</dt><dd id="detail-root" class="mono truncate">—</dd></div><div><dt>运行标识</dt><dd id="detail-run" class="mono">—</dd></div><div><dt>更新时间</dt><dd id="detail-updated">—</dd></div></dl>
+            <div id="detail-notice" class="notice" role="status" hidden></div>
+            <div id="job-error" class="notice error error-text" hidden></div>
+            <div class="progress-heading"><span>评测进度</span><strong id="detail-progress-text">—</strong></div>
+            <progress id="detail-progress" max="1" value="0" aria-label="评测完成进度"></progress>
+            <div id="detail-progress-counts" class="progress-counts">—</div>
+            <div class="outcomes"><div><span>团队胜利</span><strong id="detail-team">—</strong></div><div><span>学习者个人胜利</span><strong id="detail-learner">—</strong></div><div><span>执行失败</span><strong id="detail-failed">—</strong></div></div>
+            <div class="games-heading"><h3>逐局观测</h3><span id="game-count" class="count">—</span></div>
+            <p class="observation-note">运行中展示已保存前缀的最新回合、生命与实际激活羁绊层数；这是观测快照，并非实时战斗视频。符合条件的已完成对局会自动准备回放，就绪后点击「播放回放」。</p>
+            <div id="detail-error" class="notice error" role="status" hidden></div>
+            <div id="games" class="games"></div>
+            <p id="games-empty" class="games-empty">等待对局数据…</p>
+          </div>
+        </div>
+      </section>
+    </div>
+    <footer class="page-footer"><span>卫戍协议 · 策略评测</span><span>队列 → 观测 → 原生回放</span></footer>
+    <p id="announcer" class="sr-only" role="status" aria-live="polite"></p>
+  </main>
+</body>
+</html>
