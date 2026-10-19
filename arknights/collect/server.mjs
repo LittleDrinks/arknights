@@ -125,10 +125,10 @@ export class Collector {
         return true;
       }
       let file;
-      if (pathname === '/collect' || pathname === '/collect/') file = new URL('index.html', WEB);
-      else if (pathname === '/collect/app.mjs') file = new URL('app.mjs', WEB);
-      else if (pathname === '/collect/style.css') file = new URL('style.css', WEB);
-      else if (pathname === '/collect/replay.mjs') file = new URL('replay.mjs', WEB);
+      if (pathname === '/collect' || pathname === '/collect/') {
+        res.writeHead(302, { Location: '/', 'Cache-Control': 'no-store' }); res.end(); return true;
+      }
+      if (pathname === '/collect/replay.mjs') file = new URL('replay.mjs', WEB);
       else if (pathname === '/collect/replay') file = new URL('replay.html', WEB);
       else if (pathname === '/collect/probe.mjs') file = new URL('./probe.mjs', import.meta.url);
       if (!file) { res.writeHead(404); res.end(); return true; }

@@ -7,7 +7,6 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { execFileSync, spawn } from 'node:child_process';
 import readline from 'node:readline';
 import { RULES } from './export.mjs';
-import { Collector } from '../collect/server.mjs';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const WEB = fileURLToPath(new URL('./web/', import.meta.url));
@@ -19,8 +18,10 @@ const mime = { '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript
 
 export function parseArgs(args) {
   const options = { port: 38181, host: '0.0.0.0' }, seen = new Set();
-  for (let i = 0; i < args.length; i += 2) {
-    const key = args[i], value = args[i + 1];
+  for (let i = 0; i < args.length; i++) {
+    const key = args[i];
+    if (key === '--evaluations' && !seen.has(key)) { options.evaluations = true; seen.add(key); continue; }
+    const value = args[++i];
     if (!['--port', '--host', '--replay-dir'].includes(key) || !value || seen.has(key)) throw Error(`Invalid option ${key}`);
     seen.add(key);
     if (key === '--port') options.port = Number(value);
@@ -48,6 +49,9 @@ export function createPreviewServer({ upstream, root = ROOT, replayDir, webDir =
     catch { res.writeHead(400); res.end(); return; }
     if (pathname.includes('\\') || pathname.includes('\0') || pathname.split('/').some(p => p === '..' || p.startsWith('.'))) {
       res.writeHead(403); res.end(); return;
+    }
+    if (!collector && (pathname === '/collect' || pathname === '/collect/')) {
+      res.writeHead(302, { Location: '/', 'Cache-Control': 'no-store' }); res.end(); return;
     }
     if (collector && await collector.http(req, res, pathname)) return;
     if (collector && pathname === '/js/net.js') {
@@ -127,7 +131,7 @@ export function createPreviewServer({ upstream, root = ROOT, replayDir, webDir =
   return proxy;
 }
 
-export async function startPreview({ port = 38181, host = '0.0.0.0', replayDir, root = ROOT } = {}) {
+export async function startPreview({ port = 38181, host = '0.0.0.0', replayDir, root = ROOT, evaluations = false } = {}) {
   root = fs.realpathSync(root);
   const game = path.join(root, 'game');
   if (execFileSync('git', ['-C', game, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim() !== RULES) throw Error('Pinned game revision mismatch');
@@ -137,19 +141,13 @@ export async function startPreview({ port = 38181, host = '0.0.0.0', replayDir, 
   process.env.SP_ASSET_INDEX = '0';
   const { startServer } = await import(pathToFileURL(path.join(game, 'server/index.js')));
   const quiet = { info() {}, debug() {}, warn() {}, error() {} };
-  const collector = new Collector(root);
-  const [{ Match }, { Battle }] = await Promise.all([
-    import(pathToFileURL(path.join(game, 'server/match/Match.js'))),
-    import(pathToFileURL(path.join(game, 'server/sim/Battle.js'))),
-  ]);
-  const upstream = await startServer({ port: 0, host: '127.0.0.1', quiet: true, log: quiet, assetIndex: false, studio: false,
-    MatchClass: collector.matchClass(Match, Battle) });
+  const upstream = await startServer({ port: 0, host: '127.0.0.1', quiet: true, log: quiet, assetIndex: false, studio: false });
   const python = process.env.ARK_DASHBOARD_PYTHON || 'python3';
-  const queue = spawn(python, ['-m', 'arknights.evaluate.dashboard', 'serve', '--root', root], {
+  const queue = evaluations ? spawn(python, ['-m', 'arknights.evaluate.dashboard', 'serve', '--root', root], {
     cwd: root, env: { ...process.env, PYTHONPATH: root }, stdio: ['ignore', 'pipe', 'inherit'],
-  });
+  }) : null;
   const stopQueue = async () => {
-    if (!queue.pid || queue.exitCode !== null || queue.signalCode !== null) return;
+    if (!queue?.pid || queue.exitCode !== null || queue.signalCode !== null) return;
     await new Promise(resolve => {
       const timer = setTimeout(() => queue.kill('SIGKILL'), 10000);
       queue.once('exit', () => { clearTimeout(timer); resolve(); });
@@ -158,7 +156,7 @@ export async function startPreview({ port = 38181, host = '0.0.0.0', replayDir, 
   };
   let evaluationsPort;
   try {
-    evaluationsPort = await new Promise((resolve, reject) => {
+    if (queue) evaluationsPort = await new Promise((resolve, reject) => {
       const lines = readline.createInterface({ input: queue.stdout });
       const timer = setTimeout(() => reject(Error('Evaluation service startup timeout')), 10000);
       queue.once('error', reject);
@@ -171,14 +169,14 @@ export async function startPreview({ port = 38181, host = '0.0.0.0', replayDir, 
       });
     });
   } catch (error) { await stopQueue(); await upstream.close(); throw error; }
-  const proxy = createPreviewServer({ upstream, root, replayDir, evaluationsPort, collector });
+  const proxy = createPreviewServer({ upstream, root, replayDir, evaluationsPort });
   try {
     await new Promise((resolve, reject) => { proxy.once('error', reject); proxy.listen(port, host, resolve); });
   } catch (error) { proxy.destroyConnections(); await stopQueue(); await upstream.close(); throw error; }
   let closing;
   const close = () => closing ||= (async () => {
     const stopped = new Promise(resolve => proxy.close(resolve));
-    collector.close(); proxy.destroyConnections(); proxy.closeAllConnections();
+    proxy.destroyConnections(); proxy.closeAllConnections();
     await Promise.all([stopped, upstream.close(), stopQueue()]);
   })();
   return { server: proxy, port: proxy.address().port, host, root, rules: RULES, close };

@@ -223,6 +223,7 @@ test('server options and project root are independent of legacy layout config', 
   assert.equal(ROOT, fileURLToPath(new URL('../', import.meta.url)).replace(/\/$/, ''));
   assert.deepEqual(parseArgs([]), { port: 38181, host: '0.0.0.0' });
   assert.equal(parseArgs(['--port', '38182', '--replay-dir', '.']).port, 38182);
+  assert.equal(parseArgs(['--evaluations', '--port', '38182']).evaluations, true);
   for (const args of [['--port'], ['--port', '0'], ['--port', 'bad'], ['--unknown', 'a']]) assert.throws(() => parseArgs(args));
 });
 
@@ -250,6 +251,10 @@ test('private mount overrides indexes, preserves live files and identifies /heal
   const url = `http://127.0.0.1:${proxy.address().port}`;
   const health = await (await fetch(url + '/healthz')).json();
   assert.equal(health.arknightsPreview, 1); assert.equal(health.rules, RULES); assert.equal(health.root, root);
+  assert.equal(health.collect.supported, false);
+  assert.equal(health.evaluations, false);
+  const retired = await fetch(url + '/collect?id=old-invite', { redirect: 'manual' });
+  assert.equal(retired.status, 302); assert.equal(retired.headers.get('location'), '/');
   assert.equal(await (await fetch(url + '/dev/agent/index.json')).text(), 'private-case');
   assert.equal(fs.readFileSync(liveFile, 'utf8'), 'existing-45');
   assert.equal(await (await fetch(url + '/js/main.js')).text(), 'exact-overlay');
