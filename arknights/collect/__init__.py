@@ -1,4 +1,4 @@
-"""Explicit-consent human capture. Export uses recorded events, never virtual re-execution."""
+"""Automatic room capture. Export uses recorded events, never virtual re-execution."""
 from __future__ import annotations
 from dataclasses import dataclass, field
 import json

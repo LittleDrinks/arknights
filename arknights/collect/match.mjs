@@ -1,7 +1,5 @@
 // Sanctioned MatchClass extension. RealScheduler and all game decisions stay upstream.
 import { randomUUID } from 'node:crypto';
-import fs from 'node:fs';
-import path from 'node:path';
 import { redact } from './projection.mjs';
 const methods = {
   buy: slot => ({ t: 'g.buy', slot }), refresh: () => ({ t: 'g.refresh' }), freeze: () => ({ t: 'g.freeze' }),
@@ -16,7 +14,7 @@ export function capturedMatchClass(Match, Battle, collector) {
       const enrolled = opts.seats.filter(s => !s.isBot).map(s => collector.players.get(s.playerId));
       const participating = enrolled.filter(Boolean);
       if (!participating.length) { super(opts); return; }
-      if (enrolled.some(p => !p || p.collectionId !== participating[0].collectionId)) throw Error('All humans must consent to the same collection before start');
+      if (enrolled.some(p => !p || p.collectionId !== participating[0].collectionId)) throw Error('All human seats must belong to the room collection before start');
       const collectionId = participating[0].collectionId, id = 'm-' + randomUUID();
       const store = collector.store;
       const seats = opts.seats.map(s => ({ seat: s.seat, playerId: s.playerId, isBot: s.isBot,
@@ -100,14 +98,15 @@ export function capturedMatchClass(Match, Battle, collector) {
           if (!store.failed.has(match.collectionId) && this.collectEnabled !== false && !preview && !this.fieldId?.startsWith('r:')) (this.pendingCollect ||= []).push(redact(tuple)); }
         captureFrame() {
           if (!this.collectRecord || store.failed.has(match.collectionId)) { this.pendingCollect.length = 0; return; }
+          if (this.collectRecord.result) { this.pendingCollect.length = 0; return; }
           try {
             const rec = this.collectRecord; rec.field ||= redact(this.fieldMeta());
             const last = rec.frames.at(-1), snap = redact(this.snapshot()), ev = this.pendingCollect.splice(0);
+            store.battleFrame(match.collectionId, rec, { snap, ev });
             if (last?.snap.t === snap.t) { last.snap = snap; last.ev.push(...ev); } else rec.frames.push({ snap, ev });
             if (this.finished && !rec.result) {
               rec.duration = this.time; rec.result = redact(this.result());
-              const dir = store.file(match.collectionId, 'battles'); fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
-              fs.writeFileSync(path.join(dir, rec.name + '.json'), JSON.stringify(rec), { flag: 'wx', mode: 0o600 });
+              store.saveBattle(match.collectionId, rec, true);
               audit({ kind: 'battle', name: rec.name, round: rec.round, result: rec.result });
               // Frames are on disk; do not retain an entire multi-hour game in RAM.
               rec.frames = [];
@@ -122,7 +121,14 @@ export function capturedMatchClass(Match, Battle, collector) {
     dispose() {
       if (this.disposed) return;
       if (this.captureId) {
-        try { this.captureStore.finish(this.collectionId, this.captureId, null, this.captureStore.failed.get(this.collectionId)); }
+        try {
+          for (const rec of this.collectBattles || []) if (rec.frames.length && !rec.result) {
+            this.captureStore.saveBattle(this.collectionId, { ...rec, duration: rec.frames.at(-1).snap.t,
+              result: null, interruption: 'match disposed during battle' }, false);
+            rec.frames = [];
+          }
+          this.captureStore.finish(this.collectionId, this.captureId, null, this.captureStore.failed.get(this.collectionId));
+        }
         catch { this.captureStore.failed.set(this.collectionId, 'partial capture could not be sealed'); }
         finally {
           this.collector.matches.delete(this.captureId);

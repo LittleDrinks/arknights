@@ -19,6 +19,14 @@ export function installProbe(net, credentials = null) {
   net._onMessage = function(data) {
     try { state.receiving = JSON.parse(data); } catch { state.receiving = null; }
     const receiving = state.receiving;
+    if (receiving?._collect?.access) {
+      const { organizerKey, ...access } = receiving._collect.access;
+      try {
+        sessionStorage.setItem('ark-collection', JSON.stringify(access));
+        localStorage.setItem('ark-participant:' + access.collectionId, JSON.stringify(access));
+        if (organizerKey) localStorage.setItem('ark-organizer:' + access.collectionId, organizerKey);
+      } catch { /* recording continues if browser storage is unavailable */ }
+    }
     const result = receive.call(this, data);
     state.receiving = null;
     try { const m = JSON.parse(data); if (m._collect) Object.assign(state, {
@@ -30,7 +38,7 @@ export function installProbe(net, credentials = null) {
   };
   const next = net._nextRid;
   net._nextRid = function() { const rid = next.call(this); if (state.active) state.decisions.set(rid, state.active); if (state.decisions.size > 512) state.decisions.delete(state.decisions.keys().next().value); return rid; };
-  const stamp = () => ({ decisionId: globalThis.crypto.randomUUID(), decisionSeq: state.seq,
+  const stamp = () => ({ decisionId: globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`, decisionSeq: state.seq,
     decisionEpoch: state.epoch, matchId: state.matchId, invokedAt: Date.now() });
   const request = net.request;
   net.request = function(t, fields, opts) {

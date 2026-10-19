@@ -12,12 +12,35 @@ const safeBody = async req => {
   return JSON.parse(body || '{}');
 };
 export class Collector {
-  constructor(root) {
+  constructor(root, { automatic = false } = {}) {
     this.root = root; this.store = new Collections(root, { recover: true }); this.participants = new Map(); this.players = new Map();
+    this.automatic = automatic; this.rooms = new WeakMap(); this.organizerKeys = new Map();
     this.active = new Map(); this.matches = new Map(); this.pendingHandles = new Map(); this.connections = new Set();
     this.wss = new WebSocketServer({ noServer: true, maxPayload: 65536 });
   }
   matchClass(Match, Battle) { return capturedMatchClass(Match, Battle, this); }
+  roomCollection(room) {
+    let id = this.rooms.get(room);
+    if (!id) {
+      const c = this.store.create(`${room.code} · ${room.mode}/${room.difficulty}`, { automatic: true, roomCode: room.code });
+      const organizerKey = randomBytes(32).toString('hex');
+      fs.writeFileSync(this.store.file(c.id, 'access.json'), JSON.stringify({ organizerHash: sha(organizerKey) }), { flag: 'wx', mode: 0o600 });
+      id = c.id; this.rooms.set(room, id); this.organizerKeys.set(id, organizerKey);
+    }
+    return id;
+  }
+  enroll(room, playerId) {
+    const collectionId = this.roomCollection(room), prior = this.players.get(playerId);
+    if (prior?.collectionId === collectionId) return prior;
+    const key = randomUUID(), p = { id: 'p-' + randomUUID(), key, collectionId, playerId, seq: 0 };
+    this.participants.set(key, p); this.players.set(playerId, p);
+    this.store.append(collectionId, 'players', { kind: 'enrolled', participantId: p.id, playerId, automatic: true });
+    const file = this.store.file(collectionId, 'participants.json');
+    const members = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : {};
+    members[sha(key)] = { id: p.id, collectionId, playerId };
+    fs.writeFileSync(file, JSON.stringify(members), { mode: 0o600 });
+    return p;
+  }
   join(collectionId, consent) {
     this.store.get(collectionId);
     if (consent !== true) throw Error('Explicit consent required');
@@ -45,8 +68,12 @@ export class Collector {
     } catch { return false; }
   }
   participant(id, req) {
-    const p = this.participants.get(req.headers['x-collect-participant']);
-    return p?.collectionId === id ? p : null;
+    const key = req.headers['x-collect-participant'];
+    const p = this.participants.get(key);
+    if (p?.collectionId === id) return p;
+    if (typeof key !== 'string' || key.length > 256) return null;
+    try { return JSON.parse(fs.readFileSync(this.store.file(id, 'participants.json'), 'utf8'))[sha(key)] || null; }
+    catch { return null; }
   }
   authorizeSeat(id, matchId, seat, req) {
     const match = this.store.get(id).matches.find(m => m.id === matchId);
@@ -126,9 +153,11 @@ export class Collector {
       }
       let file;
       if (pathname === '/collect' || pathname === '/collect/') {
-        res.writeHead(302, { Location: '/', 'Cache-Control': 'no-store' }); res.end(); return true;
+        if (this.automatic) file = new URL('library.html', WEB);
+        else { res.writeHead(302, { Location: '/', 'Cache-Control': 'no-store' }); res.end(); return true; }
       }
-      if (pathname === '/collect/replay.mjs') file = new URL('replay.mjs', WEB);
+      if (pathname === '/collect/library.mjs') file = new URL('library.mjs', WEB);
+      else if (pathname === '/collect/replay.mjs') file = new URL('replay.mjs', WEB);
       else if (pathname === '/collect/replay') file = new URL('replay.html', WEB);
       else if (pathname === '/collect/probe.mjs') file = new URL('./probe.mjs', import.meta.url);
       if (!file) { res.writeHead(404); res.end(); return true; }
@@ -142,6 +171,7 @@ export class Collector {
   }
   // Original module is served byte-for-byte plus a probe installer; frozen game is untouched.
   netModule() {
+    if (this.automatic) return fs.readFileSync(path.join(this.root, 'game/public/js/net.js'), 'utf8') + `\nimport { installProbe } from '/collect/probe.mjs';\ninstallProbe(net);\n`;
     return fs.readFileSync(path.join(this.root, 'game/public/js/net.js'), 'utf8') + `\nimport { installProbe } from '/collect/probe.mjs';
 let credentials = null;
 try { credentials = JSON.parse(sessionStorage.getItem('ark-collection')); } catch {}
@@ -164,12 +194,14 @@ if (credentials) installProbe(net, credentials);\n`;
     const backend = new WebSocket(`ws://127.0.0.1:${upstream.port}/ws`);
     const epoch = randomUUID(), pending = [], decisions = new Map(), outstanding = new Map(), sentAcks = new Map(), pendingKeys = new Map(), unconfirmed = new Set();
     let playerId = null, open = false, closed = false;
+    const beforeRoom = [];
     this.connections.add(client); this.connections.add(backend);
     const match = () => this.active.get(playerId);
     const write = row => {
       const m = match(), seat = m?.players.get(playerId)?.seat;
-      if (p) this.store.append(p.collectionId, 'players', { participantId: p.id, playerId, epoch,
-        matchId: m?.captureId || null, seat: seat ?? null, ...row });
+      const entry = { participantId: p?.id, playerId, epoch, matchId: m?.captureId || null, seat: seat ?? null, ...row };
+      if (p) this.store.append(p.collectionId, 'players', entry);
+      else if (this.automatic) beforeRoom.push(redact({ at: Date.now(), ...entry }));
     };
     const reply = message => { if (client.readyState === 1) client.send(JSON.stringify(message)); };
     const processMessage = raw => {
@@ -196,12 +228,17 @@ if (credentials) installProbe(net, credentials);\n`;
       const room = upstream.lobby?.rooms.get(upstream.registry?.byId(playerId)?.roomCode);
       // Room lookup does not depend on a Net/Session semantic change.
       const actualRoom = room || [...(upstream.lobby?.rooms.values() || [])].find(r => r.seats.some(s => s?.playerId === playerId));
+      if (this.automatic && msg.t === 'room.start' && actualRoom) {
+        for (const seat of actualRoom.seats.filter(s => s && !s.isBot)) this.enroll(actualRoom, seat.playerId);
+        p = this.players.get(playerId);
+      }
       const capturedRoom = p || actualRoom?.seats.some(s => this.players.has(s?.playerId));
       if (capturedRoom && ((msg.t === 'room.setPlugins' && msg.plugins?.length) || msg.t === 'room.setMode' ||
         (msg.t === 'room.start' && (actualRoom?.modded || actualRoom?.content?.execution === 'script')))) {
-        reply({ t: 'error', code: 'BAD_MSG', rid: msg.rid, detail: 'Collect V1 supports vanilla server-combat only' }); return;
+        const error = { t: 'error', code: 'BAD_MSG', rid: msg.rid, detail: 'Collect V1 supports vanilla server-combat only' };
+        write({ kind: 'blocked', message: msg, response: error, source: 'human', status: 'rejected' }); reply(error); return;
       }
-      if (msg.t === 'room.start' && capturedRoom) {
+      if (msg.t === 'room.start' && capturedRoom && !this.automatic) {
         const humans = actualRoom?.seats.filter(s => s && !s.isBot) || [];
         const owners = humans.map(s => this.players.get(s.playerId));
         if (!humans.length || owners.some(o => !o || o.collectionId !== (p?.collectionId || owners.find(Boolean)?.collectionId))) {
@@ -209,12 +246,12 @@ if (credentials) installProbe(net, credentials);\n`;
         }
       }
       delete msg._arkCollect;
-      const relevant = /^(g\.|b\.)/.test(msg.t) || msg.t === 'room.loadout';
-      if (p && relevant) {
+      const relevant = /^(g\.|b\.)/.test(msg.t) || (this.automatic ? msg.t.startsWith('room.') : msg.t === 'room.loadout');
+      if ((p || this.automatic) && relevant) {
         const requestId = randomUUID(), key = `${msg.rid ?? 'none'}:${msg.t}`, decision = decisions.get(key) || null;
         decisions.delete(key);
-        write({ kind: 'request', requestId, message: msg, decision, flushSeq: p.seq, source: 'human' });
-        if (msg.t !== 'room.loadout') {
+        write({ kind: 'request', requestId, message: msg, decision, flushSeq: p?.seq || 0, source: 'human' });
+        if (/^(g\.|b\.)/.test(msg.t)) {
           const hkey = `${epoch}:${msg.rid ?? 'none'}:${msg.t}:${requestId}`;
           this.pendingHandles.set(hkey, { requestId, epoch, playerId, matchId: match()?.captureId || null, message: structuredClone(msg) });
           pendingKeys.set(requestId, hkey);
@@ -231,6 +268,7 @@ if (credentials) installProbe(net, credentials);\n`;
       let msg; try { msg = JSON.parse(raw.toString()); } catch { reply({ t: 'error', code: 'INTERNAL' }); return; }
       if (msg.t === 'welcome') {
         playerId = msg.playerId;
+        if (this.automatic) p = this.players.get(playerId) || null;
         if (p) {
           if (p.playerId && p.playerId !== playerId) { client.close(1008, 'Participant is bound to its original identity'); backend.close(); return; }
           p.playerId = playerId; this.players.set(playerId, p); write({ kind: 'connected' });
@@ -245,6 +283,13 @@ if (credentials) installProbe(net, credentials);\n`;
           }
         }
       }
+      if (this.automatic && msg.t === 'room.state') {
+        const room = upstream.lobby.rooms.get(msg.code);
+        if (room) {
+          p = this.enroll(room, playerId);
+          for (const entry of beforeRoom.splice(0)) this.store.append(p.collectionId, 'players', { ...entry, participantId: p.id });
+        }
+      }
       if (p) {
         const seq = ++p.seq;
         if (msg.rid != null && outstanding.has(msg.rid) && ['ok', 'error'].includes(msg.t)) {
@@ -256,6 +301,12 @@ if (credentials) installProbe(net, credentials);\n`;
         // Raw messages are restricted, never served as a dataset or mixed into verification observations.
         write({ kind: 'frame', clientSeq: seq, message: redact(msg) });
         msg._collect = { seq, epoch, matchId: match()?.captureId || null };
+        if (this.automatic && msg.t === 'room.state') msg._collect.access = {
+          key: p.key, participantId: p.id, playerId, collectionId: p.collectionId,
+          ...(msg.hostId === playerId ? { organizerKey: this.organizerKeys.get(p.collectionId) } : {}),
+        };
+      } else if (this.automatic) {
+        write({ kind: 'frame', message: redact(msg) });
       }
       reply(msg);
     });

@@ -15,7 +15,7 @@ import { installDeviceSupport } from '/js/ui/device.js';
 const $=id=>document.getElementById(id), query=new URLSearchParams(location.search), id=query.get('id'), matchId=query.get('match'), seat=Number(query.get('seat'));
 const headers = () => {
   const organizer = localStorage.getItem('ark-organizer:' + id); let participant;
-  try { participant = JSON.parse(sessionStorage.getItem('ark-collection')); } catch {}
+  try { participant = JSON.parse(localStorage.getItem('ark-participant:' + id) || sessionStorage.getItem('ark-collection')); } catch {}
   return { ...(organizer ? { 'X-Collect-Organizer':organizer } : {}), ...(participant?.collectionId === id ? { 'X-Collect-Participant':participant.key } : {}) };
 };
 const json=async path=>{const r=await fetch(`/api/collect/${id}/${path}`, { headers: headers() });if(!r.ok)throw Error(await r.text());return r.json();};

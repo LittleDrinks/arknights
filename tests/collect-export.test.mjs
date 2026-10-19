@@ -70,3 +70,16 @@ test('journal truncation/tampering and changed immutable datasets cannot be sile
   const file=store.file(id,'players.jsonl');fs.writeFileSync(file,fs.readFileSync(file,'utf8').replace('"funds":7','"funds":777'));
   assert.throws(()=>store.export(id,'all-human'),/integrity/);
 });
+
+test('a restart preserves interrupted battle bytes and recovers every complete journal frame as partial', t => {
+  const {store,id}=fixture(t),dir=path.resolve(store.root,'../..');
+  const rec={name:'m-interrupted-r1-0',round:1,kind:'normal',field:{fieldId:'n:p_one'},participants:['p_one'],frames:[]};
+  store.battleFrame(id,rec,{snap:{t:0,units:[]},ev:[['start']]});
+  store.battleFrame(id,rec,{snap:{t:.1,units:[]},ev:[]});
+  const journal=store.file(id,'battles/'+rec.name+'.frames.jsonl');fs.appendFileSync(journal,'{"partial":');
+  const original=fs.readFileSync(journal);new Collections(dir,{recover:true});
+  const recovered=JSON.parse(fs.readFileSync(store.file(id,'battles/'+rec.name+'.json')));
+  assert.equal(recovered.complete,false);assert.equal(recovered.result,null);assert.deepEqual(recovered.frames.map(f=>f.snap.t),[0,.1]);
+  assert.deepEqual(fs.readFileSync(journal),original);
+  new Collections(dir,{recover:true});assert.deepEqual(fs.readFileSync(journal),original);
+});

@@ -7,6 +7,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { execFileSync, spawn } from 'node:child_process';
 import readline from 'node:readline';
 import { RULES } from './export.mjs';
+import { Collector } from '../collect/server.mjs';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const WEB = fileURLToPath(new URL('./web/', import.meta.url));
@@ -60,7 +61,7 @@ export function createPreviewServer({ upstream, root = ROOT, replayDir, webDir =
     }
     if (pathname === '/healthz' && ['GET', 'HEAD'].includes(req.method)) {
       const bytes = Buffer.from(JSON.stringify({ arknightsPreview: 1, rules: RULES, root,
-        replayDir: replayDir ? path.resolve(replayDir) : null, overlay: 'external', evaluations: !!evaluationsPort, collect: collector ? { supported: true, schema: 'arknights.human-collection.v1', combatMode: 'server', replayMode: 'recorded-events' } : { supported: false } }));
+        replayDir: replayDir ? path.resolve(replayDir) : null, overlay: 'external', evaluations: !!evaluationsPort, collect: collector ? { supported: true, automatic: collector.automatic, schema: 'arknights.human-collection.v1', combatMode: 'server', replayMode: 'recorded-events' } : { supported: false } }));
       res.writeHead(200, { 'Content-Type': mime['.json'], 'Content-Length': bytes.length, 'Cache-Control': 'no-store' });
       res.end(req.method === 'HEAD' ? undefined : bytes); return;
     }
@@ -141,7 +142,13 @@ export async function startPreview({ port = 38181, host = '0.0.0.0', replayDir, 
   process.env.SP_ASSET_INDEX = '0';
   const { startServer } = await import(pathToFileURL(path.join(game, 'server/index.js')));
   const quiet = { info() {}, debug() {}, warn() {}, error() {} };
-  const upstream = await startServer({ port: 0, host: '127.0.0.1', quiet: true, log: quiet, assetIndex: false, studio: false });
+  const collector = new Collector(root, { automatic: true });
+  const [{ Match }, { Battle }] = await Promise.all([
+    import(pathToFileURL(path.join(game, 'server/match/Match.js'))),
+    import(pathToFileURL(path.join(game, 'server/sim/Battle.js'))),
+  ]);
+  const upstream = await startServer({ port: 0, host: '127.0.0.1', quiet: true, log: quiet, assetIndex: false, studio: false,
+    MatchClass: collector.matchClass(Match, Battle) });
   const python = process.env.ARK_DASHBOARD_PYTHON || 'python3';
   const queue = evaluations ? spawn(python, ['-m', 'arknights.evaluate.dashboard', 'serve', '--root', root], {
     cwd: root, env: { ...process.env, PYTHONPATH: root }, stdio: ['ignore', 'pipe', 'inherit'],
@@ -169,14 +176,14 @@ export async function startPreview({ port = 38181, host = '0.0.0.0', replayDir, 
       });
     });
   } catch (error) { await stopQueue(); await upstream.close(); throw error; }
-  const proxy = createPreviewServer({ upstream, root, replayDir, evaluationsPort });
+  const proxy = createPreviewServer({ upstream, root, replayDir, evaluationsPort, collector });
   try {
     await new Promise((resolve, reject) => { proxy.once('error', reject); proxy.listen(port, host, resolve); });
   } catch (error) { proxy.destroyConnections(); await stopQueue(); await upstream.close(); throw error; }
   let closing;
   const close = () => closing ||= (async () => {
     const stopped = new Promise(resolve => proxy.close(resolve));
-    proxy.destroyConnections(); proxy.closeAllConnections();
+    collector.close(); proxy.destroyConnections(); proxy.closeAllConnections();
     await Promise.all([stopped, upstream.close(), stopQueue()]);
   })();
   return { server: proxy, port: proxy.address().port, host, root, rules: RULES, close };

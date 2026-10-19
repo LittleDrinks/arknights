@@ -8,7 +8,10 @@ export const sha = bytes => createHash('sha256').update(bytes).digest('hex');
 const read = file => JSON.parse(fs.readFileSync(file, 'utf8'));
 function atomic(file, value) {
   const tmp = file + '.' + randomUUID() + '.tmp';
-  fs.writeFileSync(tmp, JSON.stringify(value, null, 2), { flag: 'wx', mode: 0o600 }); fs.renameSync(tmp, file);
+  const fd = fs.openSync(tmp, 'wx', 0o600);
+  try { fs.writeFileSync(fd, JSON.stringify(value, null, 2)); fs.fsyncSync(fd); }
+  finally { fs.closeSync(fd); }
+  fs.renameSync(tmp, file);
 }
 export class Collections {
   constructor(root, { recover = false } = {}) {
@@ -18,12 +21,13 @@ export class Collections {
       m.status = 'partial'; m.complete = false; m.victory = null; m.failure = 'collector interrupted before terminal seal';
       atomic(this.file(c.id, 'manifest.json'), c);
     }
+    if (recover) for (const c of this.list()) this.recoverBattles(c.id);
   }
   file(id, name = 'manifest.json') { safeId(id); return path.join(this.root, id, name); }
   get(id) { return read(this.file(id)); }
   list() { return fs.readdirSync(this.root).filter(id => /^c-[\w-]+$/.test(id)).map(id => this.get(id)); }
-  create(label) {
-    const id = 'c-' + randomUUID(), value = { id, schema: SCHEMA, rules: RULES, projection: PROJECTION,
+  create(label, metadata = {}) {
+    const id = 'c-' + randomUUID(), value = { ...metadata, id, schema: SCHEMA, rules: RULES, projection: PROJECTION,
       label: String(label || '真人采集').slice(0, 120), created: new Date().toISOString(), matches: [] };
     fs.mkdirSync(path.join(this.root, id), { mode: 0o700 });
     for (const channel of ['players', 'verification', 'annotations']) fs.writeFileSync(this.file(id, channel + '.jsonl'), '', { flag: 'wx', mode: 0o600 });
@@ -60,6 +64,41 @@ export class Collections {
       previous = chain.hash;
     }
     return rows;
+  }
+  battleFrame(id, record, frame) {
+    const dir = this.file(id, 'battles'); fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
+    const meta = path.join(dir, record.name + '.metadata');
+    if (!fs.existsSync(meta)) {
+      const { frames, ...metadata } = record;
+      atomic(meta, metadata);
+    }
+    const fd = fs.openSync(path.join(dir, record.name + '.frames.jsonl'), 'a', 0o600);
+    try { fs.writeFileSync(fd, JSON.stringify(frame) + '\n'); fs.fsyncSync(fd); }
+    finally { fs.closeSync(fd); }
+  }
+  saveBattle(id, record, complete) {
+    const file = this.file(id, 'battles/' + record.name + '.json');
+    if (fs.existsSync(file)) throw Error('Battle recording already exists');
+    atomic(file, { ...record, complete });
+    for (const suffix of ['.metadata', '.frames.jsonl']) fs.rmSync(this.file(id, 'battles/' + record.name + suffix), { force: true });
+  }
+  recoverBattles(id) {
+    const dir = this.file(id, 'battles');
+    if (!fs.existsSync(dir)) return;
+    for (const name of fs.readdirSync(dir).filter(n => n.endsWith('.metadata'))) {
+      const meta = read(path.join(dir, name)), journal = path.join(dir, meta.name + '.frames.jsonl');
+      if (fs.existsSync(path.join(dir, meta.name + '.json')) || !fs.existsSync(journal)) continue;
+      const lines = fs.readFileSync(journal, 'utf8').split('\n'); lines.pop();
+      const frames = [];
+      for (const line of lines) {
+        const frame = JSON.parse(line), last = frames.at(-1);
+        if (last?.snap.t === frame.snap.t) { last.snap = frame.snap; last.ev.push(...frame.ev); }
+        else frames.push(frame);
+      }
+      // Keep the original interrupted journal as evidence; publish a read-only partial recording.
+      atomic(path.join(dir, meta.name + '.json'), { ...meta, frames, complete: false,
+        duration: frames.at(-1)?.snap.t || 0, result: null, interruption: 'server restarted before battle completion' });
+    }
   }
   match(id, meta) {
     const c = this.get(id); c.matches.push({ ...meta, status: 'recording', complete: false, victory: null,
