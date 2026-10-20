@@ -6,6 +6,8 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { execFileSync, spawn } from 'node:child_process';
 import readline from 'node:readline';
+import { createGzip } from 'node:zlib';
+import { pipeline } from 'node:stream';
 import { RULES } from './export.mjs';
 import { Collector } from '../collect/server.mjs';
 
@@ -16,6 +18,16 @@ const mime = { '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript
   '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.svg': 'image/svg+xml',
   '.gz': 'application/gzip', '.atlas': 'text/plain', '.skel': 'application/octet-stream',
   '.woff2': 'font/woff2', '.mp3': 'audio/mpeg' };
+
+function acceptsGzip(header = '') {
+  const entries = String(header).split(',').map(entry => {
+    const [name, ...params] = entry.trim().toLowerCase().split(';');
+    const quality = params.map(p => p.trim()).find(p => p.startsWith('q='));
+    return { name, quality: quality ? Number(quality.slice(2)) : 1 };
+  });
+  const preference = entries.find(e => e.name === 'gzip') || entries.find(e => e.name === '*');
+  return !!preference && preference.quality > 0 && preference.quality <= 1;
+}
 
 export function parseArgs(args) {
   const options = { port: 38181, host: '0.0.0.0' }, seen = new Set();
@@ -100,10 +112,20 @@ export function createPreviewServer({ upstream, root = ROOT, replayDir, webDir =
         st = fs.statSync(realFile);
       } catch { continue; }
       if (!st.isFile()) continue;
-      res.writeHead(200, { 'Content-Type': mime[path.extname(file)] || 'application/octet-stream',
-        'Content-Length': st.size, 'Cache-Control': 'no-cache', 'X-Arknights-Overlay': 'external' });
+      const compressible = /\.(json|js|mjs|css|html|svg|atlas)$/.test(file) && st.size >= 1024;
+      const gzip = compressible && acceptsGzip(req.headers['accept-encoding']);
+      // A weak validator describes the same file across identity/gzip representations.
+      const etag = `W/"${st.size.toString(16)}-${st.mtimeMs.toString(16)}"`;
+      const headers = { 'Content-Type': mime[path.extname(file)] || 'application/octet-stream',
+        'Cache-Control': 'no-cache', ETag: etag, 'Last-Modified': st.mtime.toUTCString(),
+        'X-Arknights-Overlay': 'external', ...(compressible ? { Vary: 'Accept-Encoding' } : {}) };
+      if (String(req.headers['if-none-match'] || '').split(',').some(tag => ['*', etag].includes(tag.trim()))) {
+        res.writeHead(304, headers); res.end(); return;
+      }
+      res.writeHead(200, { ...headers, ...(gzip ? { 'Content-Encoding': 'gzip' } : { 'Content-Length': st.size }) });
       if (req.method === 'HEAD') res.end();
-      else fs.createReadStream(file).on('error', () => res.destroy()).pipe(res);
+      else if (gzip) pipeline(fs.createReadStream(file), createGzip(), res, () => {});
+      else pipeline(fs.createReadStream(file), res, () => {});
       return;
     }
     const forwarded = http.request({ hostname: '127.0.0.1', port: upstream.port,

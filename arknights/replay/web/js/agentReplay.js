@@ -181,7 +181,8 @@ async function tick(at) {
 
 export async function bootReplay() {
   installDeviceSupport();
-  const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = '/dev/agent/native.css'; document.head.append(css);
+  // Controls are application code, independent of generated/retained replay artifacts.
+  const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = '/css/replay.css'; document.head.append(css);
   document.body.classList.add('agent-native-replay');
   await initLang();
   await data.loadAll(...GAME_FILES, 'assets', 'local');

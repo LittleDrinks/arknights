@@ -8,9 +8,72 @@ import net from 'node:net';
 import { once } from 'node:events';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import { gunzipSync } from 'node:zlib';
 import { Recorder, viewerIds } from '../arknights/replay/recorder.mjs';
 import { RULES, SCHEMA, battleViews, bundle, mergeIndexes, writeBundle } from '../arknights/replay/export.mjs';
 import { ROOT, parseArgs, createPreviewServer } from '../arknights/replay/server.mjs';
+
+async function staticPreview(t) {
+  const root = temporary(t);
+  const upstream = http.createServer((_req, res) => { res.writeHead(404); res.end(); });
+  upstream.listen(0, '127.0.0.1'); await once(upstream, 'listening');
+  const proxy = createPreviewServer({ root, upstream: { port: upstream.address().port } });
+  proxy.listen(0, '127.0.0.1'); await once(proxy, 'listening');
+  t.after(async () => {
+    proxy.destroyConnections(); proxy.closeAllConnections();
+    await new Promise(resolve => proxy.close(resolve));
+    upstream.closeAllConnections(); await new Promise(resolve => upstream.close(resolve));
+  });
+  return { root, url: `http://127.0.0.1:${proxy.address().port}` };
+}
+
+function rawGet(url, headers = {}, method = 'GET') {
+  return new Promise((resolve, reject) => {
+    const req = http.request(url, { headers, method }, res => {
+      const chunks = []; res.on('data', b => chunks.push(b));
+      res.on('end', () => resolve({ status: res.statusCode, headers: res.headers, bytes: Buffer.concat(chunks) }));
+      res.on('error', reject);
+    });
+    req.on('error', reject); req.end();
+  });
+}
+
+test('replay controls CSS is served from code without generated replay artifacts', async t => {
+  const { url } = await staticPreview(t);
+  const response = await fetch(url + '/css/replay.css');
+  assert.equal(response.status, 200);
+  assert.match(response.headers.get('content-type'), /text\/css/);
+  const css = await response.text();
+  assert.match(css, /agent-replay-dock/);
+  assert.match(css, /position:\s*fixed/);
+});
+
+test('large replay files negotiate lossless gzip and revalidate instead of downloading again', async t => {
+  const { root, url } = await staticPreview(t);
+  const file = path.join(root, 'results/replays/public/dev/agent/episodes/network-case.json');
+  const bytes = Buffer.from(JSON.stringify({ steps: Array.from({ length: 1200 }, (_, seq) => ({
+    seq, action: { t: 'g.buy', slot: seq % 4 }, observation: { round: 1, phase: 'PREP',
+      own: { funds: 12, hand: [null, null], name: '部署与装备' } },
+  })) }));
+  fs.mkdirSync(path.dirname(file), { recursive: true }); fs.writeFileSync(file, bytes);
+  const endpoint = url + '/dev/agent/episodes/network-case.json';
+  const compressed = await rawGet(endpoint, { 'Accept-Encoding': 'br, gzip' });
+  assert.equal(compressed.status, 200);
+  assert.equal(compressed.headers['content-encoding'], 'gzip');
+  assert.match(compressed.headers.vary, /Accept-Encoding/i);
+  assert(compressed.bytes.length < bytes.length / 4, 'Repeated observations should not cross the tunnel in full');
+  assert.deepEqual(gunzipSync(compressed.bytes), bytes);
+  assert.ok(compressed.headers.etag);
+  const cached = await rawGet(endpoint, { 'Accept-Encoding': 'gzip', 'If-None-Match': compressed.headers.etag });
+  assert.equal(cached.status, 304); assert.equal(cached.bytes.length, 0);
+  const head = await rawGet(endpoint, { 'Accept-Encoding': 'gzip' }, 'HEAD');
+  assert.equal(head.headers['content-encoding'], 'gzip'); assert.equal(head.bytes.length, 0);
+  const plain = await rawGet(endpoint, { 'Accept-Encoding': 'gzip;q=0, *;q=1' });
+  assert.equal(plain.headers['content-encoding'], undefined); assert.deepEqual(plain.bytes, bytes);
+  fs.appendFileSync(file, '\n');
+  const changed = await rawGet(endpoint, { 'If-None-Match': compressed.headers.etag });
+  assert.equal(changed.status, 200); assert.notEqual(changed.headers.etag, compressed.headers.etag);
+});
 
 function temporary(t) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'arknights-replay-'));
