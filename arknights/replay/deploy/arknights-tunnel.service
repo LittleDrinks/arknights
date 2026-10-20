@@ -1,0 +1,14 @@
+[Unit]
+Description=Arknights reverse tunnel from the lab to szh
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/ssh -N -T -p 22 -i /data1/zsm/arknights/runtime/public-proxy/id_ed25519_szh_tunnel -o BatchMode=yes -o IdentitiesOnly=yes -o ForwardAgent=no -o StrictHostKeyChecking=yes -o UserKnownHostsFile=/data1/zsm/arknights/runtime/public-proxy/known_hosts -o ExitOnForwardFailure=yes -o ConnectTimeout=10 -o ConnectionAttempts=1 -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -o LogLevel=ERROR -R 127.0.0.1:48181:127.0.0.1:38181 ubuntu@43.167.212.176
+Restart=always
+RestartSec=10
+TimeoutStopSec=10
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=default.target

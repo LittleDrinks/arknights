@@ -1,0 +1,10 @@
+# Preparation route: append to the existing gateway Caddyfile.
+# HTTP uses the existing port 80; the SSH listener stays on loopback.
+http://arknights.shzeno.com {
+	reverse_proxy 127.0.0.1:48181 {
+		flush_interval -1
+	}
+}
+
+# After DNS and origin TLS are ready, change the site address above to
+# arknights.shzeno.com (without http://) to let Caddy manage HTTPS.
