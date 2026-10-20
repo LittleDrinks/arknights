@@ -157,6 +157,7 @@ export class Collector {
         else { res.writeHead(302, { Location: '/', 'Cache-Control': 'no-store' }); res.end(); return true; }
       }
       if (pathname === '/collect/library.mjs') file = new URL('library.mjs', WEB);
+      else if (pathname === '/collect/library.css') file = new URL('library.css', WEB);
       else if (pathname === '/collect/replay.mjs') file = new URL('replay.mjs', WEB);
       else if (pathname === '/collect/replay') file = new URL('replay.html', WEB);
       else if (pathname === '/collect/probe.mjs') file = new URL('./probe.mjs', import.meta.url);

@@ -20,7 +20,7 @@ for (const [humans, bots] of matrix) test(`${humans} human + ${bots} AI: automat
   t.after(async()=>{report.finished=new Date().toISOString();fs.writeFileSync(path.join(proof,'report.json'),JSON.stringify(report,null,2));await browser.close();});
   for(let i=0;i<humans;i++) {
     const ctx=await browser.createBrowserContext(),p=await ctx.newPage();pages.push(p);await p.setViewport({width:1440,height:960});
-    p.on('pageerror',e=>report.browserErrors.push({seat:i,message:e.message}));
+    p.on('pageerror',e=>report.browserErrors.push({seat:i,message:e.message,stack:e.stack}));
   }
   const host=pages[0],guest=pages.at(-1);
   const api=async(id,suffix='',body)=>host.evaluate(async(id,suffix,body)=>{
@@ -50,6 +50,9 @@ for (const [humans, bots] of matrix) test(`${humans} human + ${bots} AI: automat
       const active=await Promise.any(pages.map(async p=>{await p.waitForFunction(()=>[...document.querySelectorAll('button')].some(b=>b.textContent.trim()==='确认选择'&&!b.disabled));return p;}));await clickText(active,'确认选择');
     }
     await Promise.all(pages.map(p=>p.waitForFunction(()=>__SP__.store.get().match.public?.phase==='PREP')));
+    await Promise.all(pages.map(p=>p.waitForFunction(()=>globalThis.__SP_VIEW__?.kind==='engine'
+      && !document.querySelector('.gm__loading') && !!document.querySelector('canvas[aria-label]'), {timeout:30000})));
+    report.realFieldRenderer=true;
     const playerId=await guest.evaluate(()=>__SP__.net.playerId);await guest.reload({waitUntil:'domcontentloaded'});
     await guest.waitForFunction(()=>globalThis.__SP__?.net.status==='online'&&__SP__.store.get().match.public?.phase==='PREP');assert.equal(await guest.evaluate(()=>__SP__.net.playerId),playerId);
     assert.equal((await guest.evaluate(()=>JSON.parse(sessionStorage.getItem('ark-collection')))).collectionId,id);report.reconnect=true;
@@ -70,9 +73,16 @@ for (const [humans, bots] of matrix) test(`${humans} human + ${bots} AI: automat
     await host.waitForFunction(async id=>{const key=localStorage.getItem('ark-organizer:'+id);const c=await(await fetch('/api/collect/'+id,{headers:{'X-Collect-Organizer':key}})).json();return c.matches[0].status!=='recording';},{timeout:15000},id);
     const sealed=await api(id);assert.notEqual(sealed.matches[0].status,'technical-failure');report.status=sealed.matches[0].status;
     const exported=await api(id,'/export',{profile:'all-human'});assert(exported.quality.samples>=humans);report.confirmedSamples=exported.quality.samples;
-    await host.goto(base+'/collect',{waitUntil:'domcontentloaded'});await host.waitForSelector('#rooms section button');await host.click('#rooms section button');await host.waitForSelector('#start option');
+    await host.goto(base+'/collect',{waitUntil:'domcontentloaded'});await host.waitForSelector('#rooms .seat a.primary');
+    const direct=await host.$eval('#rooms .seat a.primary',a=>a.href);
+    assert.equal(new URL(direct).pathname,'/collect/replay');assert.equal(new URL(direct).searchParams.get('match'),match.id);
+    assert.equal(new URL(direct).searchParams.get('seat'),'0');report.directNativeLink=true;
+    await host.screenshot({path:path.join(proof,'library.png'),fullPage:true});
+    await host.click('#rooms section button');await host.waitForSelector('#start option');
     await host.type('#core','验收');await host.click('#annotation button');await host.waitForFunction(()=>document.getElementById('feedback').textContent==='标注已保存');
     report.annotation=true;await host.click('#replay');await host.waitForFunction(()=>globalThis.__collectReplay?.ready,{timeout:60000});
+    await host.waitForFunction(()=>globalThis.__SP_VIEW__?.kind==='engine'&&!document.querySelector('.gm__loading'),{timeout:30000});
+    report.realReplayRenderer=true;
     const option=await host.$eval('#battles',s=>s.options[1]?.value);assert(option);await host.select('#battles',option);await host.waitForFunction(()=>__collectReplay.battleReady,{timeout:60000});
     await host.click('#play');await host.screenshot({path:path.join(proof,'replay.png'),fullPage:true});report.nativeReplay=true;
     assert.deepEqual(report.browserErrors,[]);report.pass=true;

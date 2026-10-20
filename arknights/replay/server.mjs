@@ -10,6 +10,7 @@ import { createGzip } from 'node:zlib';
 import { pipeline } from 'node:stream';
 import { RULES } from './export.mjs';
 import { Collector } from '../collect/server.mjs';
+import { clientBuild } from './client.mjs';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const WEB = fileURLToPath(new URL('./web/', import.meta.url));
@@ -47,8 +48,10 @@ export function parseArgs(args) {
 
 export function createPreviewServer({ upstream, root = ROOT, replayDir, webDir = WEB, evaluationsPort, collector }) {
   root = path.resolve(root);
+  const client = clientBuild(root);
   const live = path.join(root, 'results/replays/public/dev');
   const mounts = [
+    ['/client/', path.join(root, 'runtime/web/client')],
     ...(replayDir ? [['/dev/', path.resolve(replayDir)]] : []),
     ['/dev/', live], ['/assets/', path.join(root, 'runtime/web/assets')],
     ['/vendor/', path.join(root, 'runtime/web/vendor')], ['/fonts/', path.join(root, 'runtime/web/fonts')],
@@ -62,6 +65,13 @@ export function createPreviewServer({ upstream, root = ROOT, replayDir, webDir =
     catch { res.writeHead(400); res.end(); return; }
     if (pathname.includes('\\') || pathname.includes('\0') || pathname.split('/').some(p => p === '..' || p.startsWith('.'))) {
       res.writeHead(403); res.end(); return;
+    }
+    if (client && ['GET', 'HEAD'].includes(req.method) && (['/', '/index.html'].includes(pathname)
+      || (collector && pathname === '/collect/replay'))) {
+      const bytes = Buffer.from(pathname === '/collect/replay' ? client.collect : client.index);
+      res.writeHead(200, { 'Content-Type': mime['.html'], 'Content-Length': bytes.length,
+        'Cache-Control': 'no-cache', 'Content-Security-Policy': client.csp, 'X-Arknights-Overlay': 'external' });
+      res.end(req.method === 'HEAD' ? undefined : bytes); return;
     }
     if (!collector && (pathname === '/collect' || pathname === '/collect/')) {
       res.writeHead(302, { Location: '/', 'Cache-Control': 'no-store' }); res.end(); return;
@@ -116,8 +126,11 @@ export function createPreviewServer({ upstream, root = ROOT, replayDir, webDir =
       const gzip = compressible && acceptsGzip(req.headers['accept-encoding']);
       // A weak validator describes the same file across identity/gzip representations.
       const etag = `W/"${st.size.toString(16)}-${st.mtimeMs.toString(16)}"`;
+      const immutable = prefix === '/client/' && client?.files[path.basename(file)];
+      const art = ['/assets/', '/fonts/'].includes(prefix);
       const headers = { 'Content-Type': mime[path.extname(file)] || 'application/octet-stream',
-        'Cache-Control': 'no-cache', ETag: etag, 'Last-Modified': st.mtime.toUTCString(),
+        'Cache-Control': immutable ? 'public, max-age=31536000, immutable' : art ? 'public, max-age=300, must-revalidate' : 'no-cache',
+        ETag: etag, 'Last-Modified': st.mtime.toUTCString(),
         'X-Arknights-Overlay': 'external', ...(compressible ? { Vary: 'Accept-Encoding' } : {}) };
       if (String(req.headers['if-none-match'] || '').split(',').some(tag => ['*', etag].includes(tag.trim()))) {
         res.writeHead(304, headers); res.end(); return;

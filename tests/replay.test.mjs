@@ -13,8 +13,9 @@ import { Recorder, viewerIds } from '../arknights/replay/recorder.mjs';
 import { RULES, SCHEMA, battleViews, bundle, mergeIndexes, writeBundle } from '../arknights/replay/export.mjs';
 import { ROOT, parseArgs, createPreviewServer } from '../arknights/replay/server.mjs';
 
-async function staticPreview(t) {
+async function staticPreview(t, setup = () => {}) {
   const root = temporary(t);
+  setup(root);
   const upstream = http.createServer((_req, res) => { res.writeHead(404); res.end(); });
   upstream.listen(0, '127.0.0.1'); await once(upstream, 'listening');
   const proxy = createPreviewServer({ root, upstream: { port: upstream.address().port } });
@@ -26,6 +27,28 @@ async function staticPreview(t) {
   });
   return { root, url: `http://127.0.0.1:${proxy.address().port}` };
 }
+
+test('compiled browser entry preloads versioned assets, caches only verified outputs, and rejects stale builds', async t => {
+  const { root, url } = await staticPreview(t, root => {
+    const bytes = Buffer.from('export const renderer = "engine";'), name = 'main-testhash.js';
+    fs.mkdirSync(path.join(root, 'runtime/web/client'), { recursive: true });
+    fs.writeFileSync(path.join(root, 'runtime/web/client', name), bytes);
+    fs.writeFileSync(path.join(root, 'runtime/web/client.json'), JSON.stringify({ version: 1, rules: RULES,
+      files: { [name]: createHash('sha256').update(bytes).digest('hex') }, inputs: {},
+      index: `<html><head><link rel="modulepreload" href="/client/${name}"></head><body><script type="module" src="/client/${name}"></script></body></html>`,
+      collect: '<html>native collection viewer</html>' }));
+  });
+  const index = await rawGet(url + '/');
+  assert.match(index.bytes.toString(), /modulepreload/);
+  assert.match(index.headers['content-security-policy'], /script-src 'self'/);
+  assert.equal(index.headers['cache-control'], 'no-cache');
+  const module = await rawGet(url + '/client/main-testhash.js');
+  assert.match(module.headers['cache-control'], /max-age=31536000, immutable/);
+  const cached = await rawGet(url + '/client/main-testhash.js', { 'If-None-Match': module.headers.etag });
+  assert.equal(cached.status, 304);
+  fs.appendFileSync(path.join(root, 'runtime/web/client/main-testhash.js'), 'changed');
+  assert.throws(() => createPreviewServer({ root, upstream: { port: 1 } }), /Browser build changed/);
+});
 
 function rawGet(url, headers = {}, method = 'GET') {
   return new Promise((resolve, reject) => {

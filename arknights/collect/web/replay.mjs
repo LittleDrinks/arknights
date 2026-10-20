@@ -72,7 +72,9 @@ try {
   rows=await json(`timeline?match=${matchId}&seat=${seat}`);let havePublic=false,havePrivate=false; const first=rows.findIndex(r=>{havePublic ||= r.message?.t==='m.public';havePrivate ||= r.message?.t==='m.private';return havePublic&&havePrivate;});
   if(first<0)throw Error('No recorded private view for this seat');
   store.set({connection:{status:'online',ping:0,everOnline:true},session:{entered:true},room:{code:'COLLECT',inMatch:true,mode:'coop',spectators:[],seats:[]},ui:{pendingJoin:null,restoring:false,buildStale:false}});
-  display(first);
+  let phase=null;const firstField=rows.findIndex(r=>{if(r.message?.t==='m.public')phase=r.message.phase;
+    return r.message?.t==='m.private'&&phase&&!['LOBBY','INFO_CHECK','BAND_DRAFT'].includes(phase);});
+  display(firstField>=0?firstField:first);
   render(html`<div class="app-root"><${GameScreen}/><${UiHosts}/><${ToastHost}/><${GuideHost}/></div>`,document.getElementById('app'));
   for(const [i,r]of rows.entries())if(r.kind==='request'||r.message?.t==='m.private')$('events').add(new Option(`${i} ${r.message?.t||r.kind}`,i));
   $('events').onchange=()=>display(Number($('events').value));
