@@ -1,7 +1,15 @@
-# Preparation route: append to the existing gateway Caddyfile.
-# HTTP uses the existing port 80; the SSH listener stays on loopback.
-http://arknights.shzeno.com {
+# Direct public entry and the domain route share the same lab backend.
+# The SSH listener stays on loopback; 3657 serves ordinary HTTP and WebSockets.
+http://:3657 {
 	reverse_proxy 127.0.0.1:48181 {
+		flush_interval -1
+	}
+}
+
+# A browser opening the domain without a port uses HTTP port 80.
+# Proxy internally to 3657 so the address bar keeps the original domain.
+http://arknights.shzeno.com {
+	reverse_proxy 127.0.0.1:3657 {
 		flush_interval -1
 	}
 }
